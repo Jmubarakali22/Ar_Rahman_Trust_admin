@@ -233,7 +233,11 @@ import { Admin, Role, AvailablePage } from '../../core/models/models';
               <button type="button" class="btn-close btn-close-white" (click)="showAddModal.set(false)"></button>
             </div>
 
-            <form (ngSubmit)="saveNewAdmin()">
+            <form (ngSubmit)="saveNewAdmin()" autocomplete="off">
+              <!-- Dummy hidden inputs to absorb browser autofill -->
+              <input type="text" style="display:none" aria-hidden="true" tabindex="-1">
+              <input type="password" style="display:none" aria-hidden="true" tabindex="-1">
+
               <div class="modal-body p-4 bg-light">
                 <!-- User Basic Details -->
                 <div class="bg-white p-3 rounded-3 border mb-3 shadow-sm">
@@ -243,28 +247,28 @@ import { Admin, Role, AvailablePage } from '../../core/models/models';
                   <div class="row g-3">
                     <div class="col-md-6">
                       <label class="form-label small fw-bold text-secondary mb-1">Full Name *</label>
-                      <input type="text" class="form-control" [(ngModel)]="formData.name" name="name" 
-                             placeholder="e.g. Fuzail Ahmed" required>
+                      <input type="text" class="form-control" [(ngModel)]="formData.name" name="new_admin_name" 
+                             placeholder="e.g. Fuzail Ahmed" autocomplete="off" required>
                     </div>
                     <div class="col-md-6">
                       <label class="form-label small fw-bold text-secondary mb-1">Username *</label>
                       <div class="input-group">
                         <span class="input-group-text bg-light text-muted">&#64;</span>
-                        <input type="text" class="form-control" [(ngModel)]="formData.username" name="username" 
-                               placeholder="e.g. fuzail_ahmed" required>
+                        <input type="text" class="form-control" [(ngModel)]="formData.username" name="new_admin_username" 
+                               placeholder="e.g. fuzail_ahmed" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" required>
                       </div>
                     </div>
                     <div class="col-md-6">
                       <label class="form-label small fw-bold text-secondary mb-1">Email Address *</label>
-                      <input type="email" class="form-control" [(ngModel)]="formData.email" name="email" 
-                             placeholder="staff@arrahmantrust.org" required>
+                      <input type="email" class="form-control" [(ngModel)]="formData.email" name="new_admin_email" 
+                             placeholder="staff@arrahmantrust.org" autocomplete="off" required>
                     </div>
                     <div class="col-md-6">
                       <label class="form-label small fw-bold text-secondary mb-1">Initial Password *</label>
                       <div class="input-group">
                         <input [type]="showPassword() ? 'text' : 'password'" class="form-control" 
-                               [(ngModel)]="formData.password" name="password" 
-                               placeholder="Enter temporary password" required minlength="6">
+                               [(ngModel)]="formData.password" name="new_admin_password" 
+                               placeholder="Enter temporary password" autocomplete="new-password" required minlength="6">
                         <button type="button" class="btn btn-outline-secondary" (click)="showPassword.set(!showPassword())">
                           <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
                         </button>
@@ -499,6 +503,14 @@ import { Admin, Role, AvailablePage } from '../../core/models/models';
     .transition {
       transition: all 0.2s ease;
     }
+    /* Prevent Chrome from forcing light-blue background on autofill */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 30px white inset !important;
+      -webkit-text-fill-color: #1e293b !important;
+    }
   `]
 })
 export class AdminsComponent implements OnInit {
@@ -638,6 +650,12 @@ export class AdminsComponent implements OnInit {
     };
     this.showPassword.set(false);
     this.showAddModal.set(true);
+
+    // Guard against browser password managers attempting delayed autofill
+    setTimeout(() => {
+      this.formData.username = '';
+      this.formData.password = '';
+    }, 50);
   }
 
   onRoleSelected(newRoleName: string): void {
