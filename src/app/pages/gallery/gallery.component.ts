@@ -165,25 +165,9 @@ import { GalleryItem } from '../../core/models/models';
             </button>
           </div>
 
-          <!-- Search & Sort Controls -->
-          <div class="d-flex align-items-center gap-2 flex-wrap flex-sm-nowrap">
-            <div class="search-input-wrapper flex-grow-1 flex-sm-grow-0">
-              <i class="bi bi-search search-icon text-muted"></i>
-              <input 
-                type="text" 
-                class="form-control form-control-sm search-field" 
-                placeholder="Search photos..."
-                [(ngModel)]="searchQuery"
-                (ngModelChange)="onSearchChange()"
-              >
-              @if (searchQuery) {
-                <button class="btn btn-sm clear-btn" (click)="searchQuery = ''; onSearchChange()">
-                  <i class="bi bi-x-circle-fill text-muted"></i>
-                </button>
-              }
-            </div>
-
-            <!-- Sort By Select -->
+          <!-- Sort Controls -->
+          <div class="d-flex align-items-center gap-2 ms-lg-auto">
+            <span class="small text-muted fw-semibold d-none d-sm-inline">Sort:</span>
             <select class="form-select form-select-sm sort-select" [(ngModel)]="sortBy" (ngModelChange)="applyFilter()">
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -207,9 +191,7 @@ import { GalleryItem } from '../../core/models/models';
             @if (activeCategory) {
               <span> in <strong class="text-navy">{{ getCategoryDisplayName(activeCategory) }}</strong></span>
             }
-            @if (searchQuery) {
-              <span> matching "<em class="text-dark">{{ searchQuery }}</em>"</span>
-            }
+            
           </div>
           <div class="d-flex align-items-center gap-2">
             <span class="text-muted">Per page:</span>
@@ -305,7 +287,7 @@ import { GalleryItem } from '../../core/models/models';
                   <i class="bi bi-images text-muted" style="font-size: 2.5rem;"></i>
                 </div>
                 <h5 class="fw-bold text-navy mb-1">No photos found</h5>
-                <p class="text-muted small mb-3">Try adjusting your filters, clearing your search, or uploading a new photo.</p>
+                <p class="text-muted small mb-3">Try choosing another category tab or uploading a new photo.</p>
                 <button class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5" (click)="openAddModal()">
                   <i class="bi bi-cloud-arrow-up-fill me-1.5"></i> Upload Photo Now
                 </button>
