@@ -113,7 +113,7 @@ import { GalleryItem } from '../../core/models/models';
         <!-- Summary & Pagination Controls Bar -->
         <div class="d-flex justify-content-between align-items-center mb-3 text-muted small flex-wrap gap-2">
           <div>
-            Showing <strong>{{ pagedPhotos().length }}</strong> of <strong>{{ filteredPhotos().length }}</strong> matching photos
+            Showing <strong>{{ paginationInfo().start }} &ndash; {{ paginationInfo().end }}</strong> of <strong>{{ paginationInfo().total }}</strong> matching photos
             @if (activeCategory) {
               <span> in <strong>{{ getCategoryDisplayName(activeCategory) }}</strong></span>
             }
@@ -132,7 +132,7 @@ import { GalleryItem } from '../../core/models/models';
             </div>
             <div class="d-flex align-items-center gap-1.5">
               <span>Per page:</span>
-              <select class="form-select form-select-sm per-page-select" [(ngModel)]="pageSize" (ngModelChange)="currentPage = 1">
+              <select class="form-select form-select-sm per-page-select" [ngModel]="pageSize()" (ngModelChange)="onPageSizeChange($event)">
                 <option [ngValue]="12">12</option>
                 <option [ngValue]="24">24</option>
                 <option [ngValue]="48">48</option>
@@ -245,26 +245,68 @@ import { GalleryItem } from '../../core/models/models';
 
         <!-- Pagination Controls -->
         @if (totalPages() > 1) {
-          <div class="d-flex justify-content-center align-items-center gap-2 mt-2 mb-1">
-            <button 
-              class="btn btn-sm btn-outline-secondary px-3 rounded-pill" 
-              [disabled]="currentPage === 1"
-              (click)="goToPage(currentPage - 1)"
-            >
-              <i class="bi bi-chevron-left me-1"></i> Prev
-            </button>
+          <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 mt-4 pt-3 border-top">
+            <div class="text-muted small">
+              Page <strong>{{ currentPage() }}</strong> of <strong>{{ totalPages() }}</strong> ({{ paginationInfo().total }} total photos)
+            </div>
 
-            <span class="small text-muted px-2">
-              Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages() }}</strong>
-            </span>
+            <div class="d-flex align-items-center gap-1.5 flex-wrap justify-content-center">
+              <!-- First Page Button -->
+              <button 
+                type="button"
+                class="btn btn-sm btn-outline-secondary page-nav-btn" 
+                [disabled]="currentPage() === 1"
+                (click)="goToPage(1)"
+                title="First Page"
+              >
+                <i class="bi bi-chevron-double-left"></i>
+              </button>
 
-            <button 
-              class="btn btn-sm btn-outline-secondary px-3 rounded-pill" 
-              [disabled]="currentPage === totalPages()"
-              (click)="goToPage(currentPage + 1)"
-            >
-              Next <i class="bi bi-chevron-right ms-1"></i>
-            </button>
+              <!-- Prev Page Button -->
+              <button 
+                type="button"
+                class="btn btn-sm btn-outline-secondary page-nav-btn" 
+                [disabled]="currentPage() === 1"
+                (click)="goToPage(currentPage() - 1)"
+                title="Previous Page"
+              >
+                <i class="bi bi-chevron-left"></i>
+              </button>
+
+              <!-- Numbered Page Buttons -->
+              @for (p of visiblePages(); track p) {
+                <button 
+                  type="button"
+                  class="btn btn-sm page-num-btn"
+                  [ngClass]="currentPage() === p ? 'btn-navy-active active-page' : 'btn-outline-secondary'"
+                  (click)="goToPage(p)"
+                >
+                  {{ p }}
+                </button>
+              }
+
+              <!-- Next Page Button -->
+              <button 
+                type="button"
+                class="btn btn-sm btn-outline-secondary page-nav-btn" 
+                [disabled]="currentPage() === totalPages()"
+                (click)="goToPage(currentPage() + 1)"
+                title="Next Page"
+              >
+                <i class="bi bi-chevron-right"></i>
+              </button>
+
+              <!-- Last Page Button -->
+              <button 
+                type="button"
+                class="btn btn-sm btn-outline-secondary page-nav-btn" 
+                [disabled]="currentPage() === totalPages()"
+                (click)="goToPage(totalPages())"
+                title="Last Page"
+              >
+                <i class="bi bi-chevron-double-right"></i>
+              </button>
+            </div>
           </div>
         }
       }
@@ -682,6 +724,34 @@ import { GalleryItem } from '../../core/models/models';
       font-weight: 500;
     }
 
+    .page-nav-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 0.75rem;
+    }
+
+    .page-num-btn {
+      min-width: 34px;
+      height: 32px;
+      padding: 0 8px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      border-radius: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .active-page {
+      background-color: #0F3D63 !important;
+      border-color: #0F3D63 !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 6px rgba(15, 61, 99, 0.3);
+    }
+
     .photo-card {
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
@@ -844,8 +914,46 @@ export class GalleryComponent implements OnInit {
   });
 
   // Pagination
-  currentPage = 1;
-  pageSize = 24;
+  currentPage = signal(1);
+  pageSize = signal(24);
+
+  pagedPhotos = computed(() => {
+    const list = this.filteredPhotos();
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size;
+    return list.slice(start, start + size);
+  });
+
+  totalPages = computed(() => {
+    const total = this.filteredPhotos().length;
+    const size = this.pageSize();
+    return Math.ceil(total / size) || 1;
+  });
+
+  paginationInfo = computed(() => {
+    const total = this.filteredPhotos().length;
+    if (total === 0) return { start: 0, end: 0, total: 0 };
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size + 1;
+    const end = Math.min(page * size, total);
+    return { start, end, total };
+  });
+
+  visiblePages = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: number[] = [];
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+      return pages;
+    }
+    const start = Math.max(1, current - 2);
+    const end = Math.min(total, current + 2);
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  });
 
   // Lightbox
   lightboxPhoto = signal<GalleryItem | null>(null);
@@ -868,16 +976,6 @@ export class GalleryComponent implements OnInit {
   selectedFileSize = '';
   filePreviewUrl: string | null = null;
   targetImageKitFolder = '/assets/gallery-full/ration-kit-food-dist';
-
-  pagedPhotos = computed(() => {
-    const list = this.filteredPhotos();
-    const start = (this.currentPage - 1) * this.pageSize;
-    return list.slice(start, start + this.pageSize);
-  });
-
-  totalPages = computed(() => {
-    return Math.ceil(this.filteredPhotos().length / this.pageSize) || 1;
-  });
 
   constructor(private apiService: ApiService) {}
 
@@ -978,12 +1076,12 @@ export class GalleryComponent implements OnInit {
 
   selectCategory(cat: string): void {
     this.activeCategory = cat;
-    this.currentPage = 1;
+    this.currentPage.set(1);
     this.applyFilter();
   }
 
   onSearchChange(): void {
-    this.currentPage = 1;
+    this.currentPage.set(1);
     this.applyFilter();
   }
 
@@ -1031,9 +1129,15 @@ export class GalleryComponent implements OnInit {
 
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
-      this.currentPage = page;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      this.currentPage.set(page);
+      window.scrollTo({ top: 120, behavior: 'smooth' });
     }
+  }
+
+  onPageSizeChange(newSize: any): void {
+    const size = Number(newSize) || 24;
+    this.pageSize.set(size);
+    this.currentPage.set(1);
   }
 
   openLightbox(photo: GalleryItem): void {
@@ -1205,7 +1309,7 @@ export class GalleryComponent implements OnInit {
     this.showModal.set(false);
     // Switch to that category and jump to Page 1 so user sees their new upload immediately at the top
     this.activeCategory = category;
-    this.currentPage = 1;
+    this.currentPage.set(1);
     this.loadPhotos();
   }
 
