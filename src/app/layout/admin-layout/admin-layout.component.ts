@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -155,7 +155,7 @@ import { AutoLogoutService } from '../../core/services/auto-logout.service';
         </header>
 
         <!-- Page Body Content -->
-        <main class="page-body p-2 p-md-3 p-xl-3 flex-grow-1">
+        <main #pageBody class="page-body p-2 p-md-3 p-xl-3 flex-grow-1" (scroll)="onBodyScroll($event)">
           <router-outlet></router-outlet>
         </main>
 
@@ -169,6 +169,19 @@ import { AutoLogoutService } from '../../core/services/auto-logout.service';
             Registered Charity No.04/16/2020
           </div>
         </footer>
+
+        <!-- Floating Scroll to Top Button -->
+        @if (showScrollTop()) {
+          <button 
+            type="button" 
+            class="btn-scroll-top shadow-lg" 
+            (click)="scrollToTop()" 
+            title="Scroll to Top"
+            aria-label="Scroll to Top"
+          >
+            <i class="bi bi-chevron-up"></i>
+          </button>
+        }
 
         <!-- Inactivity Countdown Warning Modal -->
         @if (autoLogoutService.showWarningModal()) {
@@ -404,12 +417,74 @@ import { AutoLogoutService } from '../../core/services/auto-logout.service';
       flex-shrink: 0;
       z-index: 10;
     }
+    .btn-scroll-top {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #0F3D63;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      box-shadow: 0 4px 14px rgba(15, 61, 99, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      cursor: pointer;
+      z-index: 1040;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: popInScrollTop 0.25s ease-out;
+    }
+    .btn-scroll-top:hover {
+      background: #0a2740;
+      transform: translateY(-3px) scale(1.06);
+      box-shadow: 0 6px 20px rgba(15, 61, 99, 0.5);
+    }
+    @keyframes popInScrollTop {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.85);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
   `]
 })
 export class AdminLayoutComponent implements OnInit, OnDestroy {
   readonly currentYear = new Date().getFullYear();
   isSidebarCollapsed = signal(false);
   isMobileSidebarOpen = signal(false);
+  showScrollTop = signal(false);
+
+  @ViewChild('pageBody') pageBodyRef?: ElementRef<HTMLElement>;
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    this.checkScrollPosition();
+  }
+
+  onBodyScroll(event: Event): void {
+    this.checkScrollPosition();
+  }
+
+  private checkScrollPosition(): void {
+    const bodyScroll = this.pageBodyRef?.nativeElement?.scrollTop || 0;
+    const windowScroll = typeof window !== 'undefined' ? window.scrollY || document.documentElement.scrollTop || 0 : 0;
+    this.showScrollTop.set(bodyScroll > 180 || windowScroll > 180);
+  }
+
+  scrollToTop(): void {
+    if (this.pageBodyRef?.nativeElement) {
+      this.pageBodyRef.nativeElement.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
 
   constructor(
     public authService: AuthService,

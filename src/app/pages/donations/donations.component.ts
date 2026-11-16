@@ -381,6 +381,16 @@ import { Donation } from '../../core/models/models';
               >
                 <i class="bi bi-chevron-double-right"></i>
               </button>
+
+              <!-- Scroll to Top Button -->
+              <button 
+                type="button"
+                class="btn btn-sm page-nav-btn ms-1 text-primary fw-bold" 
+                (click)="scrollToTop()"
+                title="Scroll to Top of Page"
+              >
+                <i class="bi bi-arrow-up"></i>
+              </button>
             </div>
           </div>
         }
@@ -1540,6 +1550,16 @@ Jazakallahu Khairan for your continuous benevolence and trust.
     this.pageSize.set(size);
     this.currentPage.set(1);
     this.loadDonations();
+  }
+
+  scrollToTop(): void {
+    const pageBody = document.querySelector('.page-body');
+    if (pageBody) {
+      pageBody.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   openAddModal(): void {

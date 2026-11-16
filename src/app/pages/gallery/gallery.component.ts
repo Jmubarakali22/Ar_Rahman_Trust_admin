@@ -319,6 +319,16 @@ import { GalleryItem } from '../../core/models/models';
               >
                 <i class="bi bi-chevron-double-right"></i>
               </button>
+
+              <!-- Scroll to Top Button -->
+              <button 
+                type="button"
+                class="btn btn-sm page-nav-btn ms-1 text-primary fw-bold" 
+                (click)="scrollToTop()"
+                title="Scroll to Top of Page"
+              >
+                <i class="bi bi-arrow-up"></i>
+              </button>
             </div>
           </div>
         }
@@ -1190,6 +1200,16 @@ export class GalleryComponent implements OnInit {
     const size = Number(newSize) || 24;
     this.pageSize.set(size);
     this.currentPage.set(1);
+  }
+
+  scrollToTop(): void {
+    const pageBody = document.querySelector('.page-body');
+    if (pageBody) {
+      pageBody.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   openLightbox(photo: GalleryItem): void {
