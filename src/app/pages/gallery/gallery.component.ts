@@ -33,16 +33,6 @@ import { GalleryItem } from '../../core/models/models';
           </div>
 
           <div class="d-flex align-items-center gap-2 flex-wrap">
-            <a 
-              href="https://arrahmantrust.netlify.app/gallery-full" 
-              target="_blank" 
-              class="btn btn-outline-success btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5 fw-semibold"
-              title="Open Live Netlify Gallery in new tab"
-            >
-              <i class="bi bi-box-arrow-up-right"></i>
-              <span>Live Website</span>
-            </a>
-
             <button class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5 fw-semibold" (click)="openAddModal()">
               <i class="bi bi-cloud-arrow-up-fill"></i>
               <span>Upload Photo</span>

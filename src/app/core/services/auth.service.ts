@@ -130,6 +130,10 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/create`, data);
   }
 
+  updateAdmin(id: number, data: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, data);
+  }
+
   deleteAdmin(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }

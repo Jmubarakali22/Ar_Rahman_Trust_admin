@@ -29,12 +29,10 @@ import { Role, UserRoleItem, AvailablePage } from '../../core/models/models';
             <i class="bi bi-arrow-clockwise" [class.spin]="isLoading()"></i>
             <span>Refresh</span>
           </button>
-          @if (activeTab() === 'roles') {
-            <button class="btn btn-trust-primary btn-sm d-flex align-items-center gap-1.5 shadow-sm" (click)="openCreateRoleModal()">
-              <i class="bi bi-plus-circle-fill"></i>
-              <span>Create New Role</span>
-            </button>
-          }
+          <button class="btn btn-trust-primary btn-sm d-flex align-items-center gap-1.5 shadow-sm" (click)="openCreateRoleModal()">
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>Create New Role</span>
+          </button>
         </div>
       </div>
 
@@ -58,8 +56,8 @@ import { Role, UserRoleItem, AvailablePage } from '../../core/models/models';
               <i class="bi bi-people-fill"></i>
             </div>
             <div>
-              <div class="metric-value">{{ users().length }}</div>
-              <div class="metric-label">Staff Users</div>
+              <div class="metric-value">{{ customRolesCount() }}</div>
+              <div class="metric-label">Custom Roles</div>
             </div>
           </div>
         </div>
@@ -89,31 +87,7 @@ import { Role, UserRoleItem, AvailablePage } from '../../core/models/models';
         </div>
       </div>
 
-      <!-- Segmented Navigation Switcher -->
-      <div class="tab-switcher-wrapper mb-4">
-        <div class="tab-switcher">
-          <button 
-            type="button" 
-            class="tab-btn" 
-            [class.active]="activeTab() === 'roles'"
-            (click)="activeTab.set('roles')"
-          >
-            <i class="bi bi-shield-shaded me-1.5"></i>
-            <span>Role Templates & Permissions</span>
-            <span class="tab-count">{{ roles().length }}</span>
-          </button>
-          <button 
-            type="button" 
-            class="tab-btn" 
-            [class.active]="activeTab() === 'users'"
-            (click)="activeTab.set('users')"
-          >
-            <i class="bi bi-people-fill me-1.5"></i>
-            <span>User Access Assignment</span>
-            <span class="tab-count">{{ users().length }}</span>
-          </button>
-        </div>
-      </div>
+      
 
       <!-- Feedback Alerts -->
       @if (successMessage()) {
@@ -135,8 +109,7 @@ import { Role, UserRoleItem, AvailablePage } from '../../core/models/models';
         </div>
       }
 
-      <!-- TAB 1: ROLES & PAGE PERMISSIONS -->
-      @if (activeTab() === 'roles') {
+      <!-- ROLES & PAGE PERMISSIONS TEMPLATES -->
         @if (isLoading()) {
           <div class="loading-state text-center py-5">
             <div class="spinner-border text-primary" role="status"></div>
@@ -241,124 +214,6 @@ import { Role, UserRoleItem, AvailablePage } from '../../core/models/models';
             }
           </div>
         }
-      }
-
-      <!-- TAB 2: USER ACCESS ASSIGNMENT -->
-      @if (activeTab() === 'users') {
-        @if (isLoading()) {
-          <div class="loading-state text-center py-5">
-            <div class="spinner-border text-primary" role="status"></div>
-            <p class="text-muted small mt-2.5">Loading staff accounts and permissions...</p>
-          </div>
-        } @else {
-          <!-- Search & Filter Bar -->
-          <div class="clean-card p-3 mb-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
-            <div class="d-flex align-items-center gap-2 text-muted small">
-              <i class="bi bi-info-circle text-primary"></i>
-              <span>Assign pre-configured roles or override custom page access for each staff account.</span>
-            </div>
-            <div class="search-box-wrapper">
-              <i class="bi bi-search search-icon"></i>
-              <input 
-                type="text" 
-                class="form-control form-control-sm search-input" 
-                placeholder="Search staff by name, email, or role..." 
-                [(ngModel)]="userSearch"
-              >
-            </div>
-          </div>
-
-          <!-- User Access Table Card -->
-          <div class="clean-card mb-4 overflow-hidden">
-            <div class="table-responsive">
-              <table class="table clean-table mb-0 align-middle">
-                <thead>
-                  <tr>
-                    <th style="min-width: 200px;">Staff Member</th>
-                    <th style="min-width: 150px;">Assigned Role</th>
-                    <th style="min-width: 320px;">Effective Page Access</th>
-                    <th class="text-end" style="min-width: 130px;">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (u of filteredUsers(); track u.id) {
-                    <tr>
-                      <!-- Staff Info -->
-                      <td>
-                        <div class="d-flex align-items-center gap-2.5">
-                          <div class="user-avatar-circle">
-                            {{ u.name.charAt(0).toUpperCase() }}
-                          </div>
-                          <div>
-                            <div class="fw-bold text-dark user-name-label">{{ u.name }}</div>
-                            <div class="text-muted user-email-label">{{ u.email }}</div>
-                          </div>
-                        </div>
-                      </td>
-
-                      <!-- Role -->
-                      <td>
-                        <span class="role-badge" [ngClass]="getRoleBadgeClass(u.role)">
-                          {{ u.role }}
-                        </span>
-                        @if (u.custom_permissions) {
-                          <div class="text-primary mt-1 d-flex align-items-center gap-1" style="font-size: 10.5px; font-weight: 500;">
-                            <i class="bi bi-sliders"></i> Custom override
-                          </div>
-                        }
-                      </td>
-
-                      <!-- Allowed Pages -->
-                      <td>
-                        <div class="d-flex flex-wrap gap-1.5">
-                          @if (u.effective_permissions.includes('*')) {
-                            <span class="full-access-chip">
-                              <i class="bi bi-shield-fill-check me-1 text-success"></i> Full Access (All Modules)
-                            </span>
-                          } @else {
-                            @for (page of availablePages(); track page.key) {
-                              @if (u.effective_permissions.includes(page.key)) {
-                                <span class="module-chip">
-                                  <i class="bi me-1 text-primary" [class]="getPageIcon(page.key)"></i>
-                                  {{ page.name }}
-                                </span>
-                              }
-                            }
-                            @if (u.effective_permissions.length === 0) {
-                              <span class="badge bg-danger-subtle text-danger border border-danger-subtle py-1 px-2 fw-normal">
-                                No page permissions
-                              </span>
-                            }
-                          }
-                        </div>
-                      </td>
-
-                      <!-- Action -->
-                      <td class="text-end">
-                        <button class="btn btn-sm btn-trust-primary py-1 px-2.5 rounded-2 d-inline-flex align-items-center gap-1.5" (click)="openAssignUserModal(u)">
-                          <i class="bi bi-pencil-square"></i>
-                          <span>Assign Access</span>
-                        </button>
-                      </td>
-                    </tr>
-                  } @empty {
-                    <tr>
-                      <td colspan="4" class="text-center py-5 text-muted">
-                        <div class="empty-state">
-                          <i class="bi bi-person-x fs-1 text-muted opacity-50 mb-2"></i>
-                          <div class="fw-semibold">No staff users found</div>
-                          <div class="small">Try adjusting your search criteria</div>
-                        </div>
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-        }
-      }
-
       <!-- MODAL 1: CREATE / EDIT ROLE -->
       @if (showRoleModal()) {
         <div class="modal fade show d-block modal-backdrop-custom" tabindex="-1">
@@ -460,112 +315,7 @@ import { Role, UserRoleItem, AvailablePage } from '../../core/models/models';
         </div>
       }
 
-      <!-- MODAL 2: ASSIGN USER ACCESS -->
-      @if (showAssignModal()) {
-        <div class="modal fade show d-block modal-backdrop-custom" tabindex="-1">
-          <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-              <div class="modal-header px-4 py-3 text-white" style="background-color: #0F3D63;">
-                <div class="d-flex align-items-center gap-2">
-                  <i class="bi bi-person-gear"></i>
-                  <h5 class="modal-title fw-bold mb-0">Assign User Role & Page Access</h5>
-                </div>
-                <button type="button" class="btn-close btn-close-white" (click)="showAssignModal.set(false)" aria-label="Close"></button>
-              </div>
-
-              <div class="modal-body p-4">
-                @if (selectedUser) {
-                  <!-- User Brief Box -->
-                  <div class="user-brief-box p-3 rounded-3 mb-4 d-flex align-items-center gap-3">
-                    <div class="user-avatar-circle fs-5" style="width: 44px; height: 44px;">
-                      {{ selectedUser.name.charAt(0).toUpperCase() }}
-                    </div>
-                    <div class="flex-grow-1">
-                      <div class="fw-bold text-dark fs-6">{{ selectedUser.name }}</div>
-                      <div class="text-muted small">{{ selectedUser.email }} &bull; Username: <code>{{ selectedUser.username }}</code></div>
-                    </div>
-                    <div>
-                      <span class="role-badge" [ngClass]="getRoleBadgeClass(selectedUser.role)">
-                        Current: {{ selectedUser.role }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <form (ngSubmit)="saveUserAccess()">
-                    <!-- Role Template Selection -->
-                    <div class="mb-3.5">
-                      <label class="form-label small fw-bold text-dark">Assign Role Template</label>
-                      <select 
-                        class="form-select" 
-                        [(ngModel)]="assignForm.role" 
-                        name="assignRole"
-                        (change)="onRoleTemplateChange()"
-                      >
-                        @for (role of roles(); track role.id) {
-                          <option [value]="role.name">{{ role.name }} &mdash; {{ role.description }}</option>
-                        }
-                      </select>
-                      <div class="form-text small text-muted">
-                        Selecting a role will automatically load its standard page permissions below. You can customize them if needed.
-                      </div>
-                    </div>
-
-                    <!-- Page Access Checkboxes -->
-                    <div class="permission-matrix-section mb-4">
-                      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-2.5">
-                        <div>
-                          <label class="form-label small fw-bold text-dark mb-0">Allowed Pages for this User</label>
-                          <div class="text-muted" style="font-size: 11.5px;">Check or uncheck individual pages to customize access for this account.</div>
-                        </div>
-                        <div class="d-flex gap-2">
-                          <button type="button" class="btn btn-xs btn-outline-primary" (click)="toggleAllUserPages(true)">Allow All</button>
-                          <button type="button" class="btn btn-xs btn-outline-secondary" (click)="toggleAllUserPages(false)">Clear All</button>
-                        </div>
-                      </div>
-
-                      <div class="row g-2.5">
-                        @for (page of availablePages(); track page.key) {
-                          <div class="col-12 col-sm-6 col-md-4">
-                            <label class="module-toggle-card cursor-pointer" [class.selected]="isUserPageSelected(page.key)">
-                              <div class="d-flex align-items-start gap-2.5">
-                                <input 
-                                  type="checkbox" 
-                                  class="form-check-input mt-0.5" 
-                                  [checked]="isUserPageSelected(page.key)"
-                                  (change)="toggleUserPage(page.key)"
-                                >
-                                <div class="flex-grow-1 min-w-0">
-                                  <div class="d-flex align-items-center gap-1.5 mb-0.5">
-                                    <i class="bi text-primary" [class]="getPageIcon(page.key)"></i>
-                                    <span class="module-title text-dark fw-semibold">{{ page.name }}</span>
-                                  </div>
-                                  <div class="module-desc text-muted">{{ page.description }}</div>
-                                </div>
-                              </div>
-                            </label>
-                          </div>
-                        }
-                      </div>
-                    </div>
-
-                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-                      <button type="button" class="btn btn-light px-3" (click)="showAssignModal.set(false)" [disabled]="isSubmitting()">Cancel</button>
-                      <button type="submit" class="btn btn-trust-primary px-4" [disabled]="isSubmitting()">
-                        @if (isSubmitting()) {
-                          <span class="spinner-border spinner-border-sm me-1.5"></span> Saving...
-                        } @else {
-                          <i class="bi bi-shield-check me-1.5"></i> Update User Access
-                        }
-                      </button>
-                    </div>
-                  </form>
-                }
-              </div>
-            </div>
-          </div>
-        </div>
-      }
-    </div>
+      </div>
   `,
   styles: [`
     .roles-container {
@@ -940,7 +690,6 @@ import { Role, UserRoleItem, AvailablePage } from '../../core/models/models';
   `]
 })
 export class RolesComponent implements OnInit {
-  activeTab = signal<'roles' | 'users'>('roles');
   isLoading = signal(true);
   isSubmitting = signal(false);
 
@@ -948,10 +697,7 @@ export class RolesComponent implements OnInit {
   errorMessage = signal<string | null>(null);
 
   roles = signal<Role[]>([]);
-  users = signal<UserRoleItem[]>([]);
   availablePages = signal<AvailablePage[]>([]);
-
-  userSearch = '';
 
   // Role Form Modal State
   showRoleModal = signal(false);
@@ -963,14 +709,6 @@ export class RolesComponent implements OnInit {
     permissions: [] as string[]
   };
 
-  // User Assign Modal State
-  showAssignModal = signal(false);
-  selectedUser: UserRoleItem | null = null;
-  assignForm = {
-    role: '',
-    permissions: [] as string[]
-  };
-
   // Computed Metrics
   systemRolesCount = computed(() => this.roles().filter(r => r.is_system).length);
   customRolesCount = computed(() => this.roles().filter(r => !r.is_system).length);
@@ -978,12 +716,11 @@ export class RolesComponent implements OnInit {
   constructor(public authService: AuthService) {}
 
   ngOnInit(): void {
-    this.refreshAll();
+    this.loadRoles();
   }
 
   refreshAll(): void {
     this.loadRoles();
-    this.loadUsers();
   }
 
   loadRoles(): void {
@@ -1001,30 +738,7 @@ export class RolesComponent implements OnInit {
     });
   }
 
-  loadUsers(): void {
-    this.authService.getRoleUsers().subscribe({
-      next: (res) => {
-        this.users.set(res.users || []);
-        if (res.available_pages && this.availablePages().length === 0) {
-          this.availablePages.set(res.available_pages);
-        }
-      },
-      error: (err) => {
-        console.error('Failed to load users:', err);
-      }
-    });
-  }
-
-  filteredUsers(): UserRoleItem[] {
-    if (!this.userSearch.trim()) return this.users();
-    const q = this.userSearch.toLowerCase();
-    return this.users().filter(u => 
-      u.name.toLowerCase().includes(q) || 
-      u.email.toLowerCase().includes(q) || 
-      u.role.toLowerCase().includes(q) ||
-      u.username.toLowerCase().includes(q)
-    );
-  }
+  
 
   // Icons and Color Helpers
   getPageIcon(key: string): string {
@@ -1140,7 +854,6 @@ export class RolesComponent implements OnInit {
           this.showRoleModal.set(false);
           this.successMessage.set(`Role "${data.name}" updated successfully.`);
           this.loadRoles();
-          this.loadUsers();
           setTimeout(() => this.successMessage.set(null), 5000);
         },
         error: (err) => {
@@ -1180,92 +893,4 @@ export class RolesComponent implements OnInit {
     });
   }
 
-  // User Assignment Helpers
-  openAssignUserModal(user: UserRoleItem): void {
-    this.selectedUser = user;
-    const currentPerms = user.custom_permissions || user.effective_permissions || [];
-
-    // Match role against roles() list gracefully (case-insensitive & legacy aliases)
-    let matchedRoleName = user.role;
-    const match = this.roles().find(r => 
-      r.name.toLowerCase() === (user.role || '').toLowerCase() ||
-      ((user.role || '').toLowerCase() === 'superadmin' && r.name.toLowerCase() === 'super admin') ||
-      ((user.role || '').toLowerCase() === 'admin' && r.name.toLowerCase() === 'managing trustee')
-    );
-    if (match) {
-      matchedRoleName = match.name;
-    } else if (this.roles().length > 0) {
-      matchedRoleName = this.roles()[0].name;
-    }
-
-    this.assignForm = {
-      role: matchedRoleName,
-      permissions: [...currentPerms]
-    };
-    this.showAssignModal.set(true);
   }
-
-  onRoleTemplateChange(): void {
-    const matchedRole = this.roles().find(r => r.name.toLowerCase() === this.assignForm.role.toLowerCase());
-    if (matchedRole) {
-      if (matchedRole.permissions.includes('*')) {
-        this.assignForm.permissions = this.availablePages().map(p => p.key);
-      } else {
-        this.assignForm.permissions = [...matchedRole.permissions];
-      }
-    }
-  }
-
-  isUserPageSelected(key: string): boolean {
-    if (this.assignForm.permissions.includes('*')) return true;
-    return this.assignForm.permissions.includes(key);
-  }
-
-  toggleUserPage(key: string): void {
-    if (this.assignForm.permissions.includes('*')) {
-      this.assignForm.permissions = this.availablePages().map(p => p.key);
-    }
-    const idx = this.assignForm.permissions.indexOf(key);
-    if (idx !== -1) {
-      this.assignForm.permissions.splice(idx, 1);
-    } else {
-      this.assignForm.permissions.push(key);
-    }
-  }
-
-  toggleAllUserPages(select: boolean): void {
-    if (select) {
-      this.assignForm.permissions = this.availablePages().map(p => p.key);
-    } else {
-      this.assignForm.permissions = [];
-    }
-  }
-
-  saveUserAccess(): void {
-    if (!this.selectedUser) return;
-
-    this.isSubmitting.set(true);
-    const data = {
-      role: this.assignForm.role,
-      permissions: this.assignForm.permissions
-    };
-
-    this.authService.assignUserAccess(this.selectedUser.id, data).subscribe({
-      next: (res) => {
-        this.isSubmitting.set(false);
-        this.showAssignModal.set(false);
-        this.successMessage.set(res.message || 'User access updated successfully.');
-        this.loadRoles();
-        this.loadUsers();
-        if (this.selectedUser?.id === this.authService.currentUser()?.id) {
-          this.authService.getProfile().subscribe();
-        }
-        setTimeout(() => this.successMessage.set(null), 5000);
-      },
-      error: (err) => {
-        this.isSubmitting.set(false);
-        this.errorMessage.set(err.error?.message || err.message);
-      }
-    });
-  }
-}

@@ -173,11 +173,11 @@ import { Admin, Role, AvailablePage } from '../../core/models/models';
                     <td class="small text-muted">{{ a.created_at | date:'mediumDate' }}</td>
                     <td class="text-end" style="min-width: 110px; white-space: nowrap;">
                       <div class="d-inline-flex gap-1">
-                        <!-- Quick Role Assign Modal Button -->
+                        <!-- Edit User & Access Modal Button -->
                         <button class="btn btn-sm btn-outline-primary" 
                                 (click)="openAssignRoleModal(a)" 
-                                title="Change Role & Access">
-                          <i class="bi bi-person-gear"></i>
+                                title="Edit User Details & Access">
+                          <i class="bi bi-pencil-square"></i>
                         </button>
                         @if (a.id !== authService.currentUser()?.id) {
                           <button class="btn btn-sm btn-outline-danger" 
@@ -408,53 +408,148 @@ import { Admin, Role, AvailablePage } from '../../core/models/models';
       </div>
     }
 
-    <!-- ========================================== -->
-    <!-- 2. QUICK ASSIGN ROLE MODAL (EXISTING USER) -->
+        <!-- ========================================== -->
+    <!-- 2. EDIT USER ACCOUNT MODAL (FULL DETAILS)  -->
     <!-- ========================================== -->
     @if (showAssignModal() && selectedAdmin()) {
       <div class="modal fade show d-block" style="background: rgba(10, 39, 64, 0.65); z-index: 1060; backdrop-filter: blur(3px);" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
           <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header border-0 px-4 py-3 text-white" style="background: #0F3D63;">
+            <div class="modal-header border-0 px-4 py-3 text-white" style="background: linear-gradient(135deg, #0a2740 0%, #0F3D63 100%);">
               <div class="d-flex align-items-center gap-2">
-                <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 34px; height: 34px; background: rgba(255,255,255,0.15);">
-                  <i class="bi bi-person-gear"></i>
+                <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 36px; height: 36px; background: rgba(255,255,255,0.15);">
+                  <i class="bi bi-pencil-square"></i>
                 </div>
                 <div>
-                  <h5 class="modal-title fw-bold mb-0 fs-6">Change User Role</h5>
-                  <div class="small text-white-50" style="font-size: 11.5px;">Update permissions for {{ selectedAdmin()!.name }}</div>
+                  <h5 class="modal-title fw-bold mb-0 fs-6">Edit User Account & Access</h5>
+                  <div class="small text-white-50" style="font-size: 11.5px;">Update account credentials, security role, and permissions for {{ selectedAdmin()!.name }}</div>
                 </div>
               </div>
               <button type="button" class="btn-close btn-close-white" (click)="showAssignModal.set(false)"></button>
             </div>
 
-            <form (ngSubmit)="saveUserRoleAssignment()">
+            <form (ngSubmit)="saveUserRoleAssignment()" autocomplete="off">
+              <!-- Dummy hidden inputs to absorb browser autofill -->
+              <input type="text" style="display:none" aria-hidden="true" tabindex="-1">
+              <input type="password" style="display:none" aria-hidden="true" tabindex="-1">
+
               <div class="modal-body p-4 bg-light">
-                <!-- User Info Banner -->
-                <div class="p-3 bg-white rounded-3 border mb-3">
-                  <div>
-                    <div class="fw-bold text-dark fs-6">{{ selectedAdmin()!.name }}</div>
-                    <div class="text-muted small">{{ selectedAdmin()!.username }} &bull; {{ selectedAdmin()!.email }}</div>
-                    <div class="mt-1">
-                      <span class="badge rounded-pill px-2 py-0.5" [ngClass]="getRoleBadgeClass(selectedAdmin()!.role)">
-                        Current: {{ formatRoleName(selectedAdmin()!.role) }}
-                      </span>
+                <!-- User Basic Details -->
+                <div class="bg-white p-3 rounded-3 border mb-3 shadow-sm">
+                  <div class="fw-bold small text-dark mb-2 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
+                    <i class="bi bi-person-badge text-primary me-1"></i> Account Credentials
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold text-secondary mb-1">Full Name *</label>
+                      <input type="text" class="form-control" [(ngModel)]="editForm.name" name="edit_admin_name" 
+                             placeholder="e.g. Fuzail Ahmed" autocomplete="off" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold text-secondary mb-1">Username *</label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-light text-muted"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control" [(ngModel)]="editForm.username" name="edit_admin_username" 
+                               placeholder="e.g. fuzail_ahmed" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" required>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold text-secondary mb-1">Email Address *</label>
+                      <input type="email" class="form-control" [(ngModel)]="editForm.email" name="edit_admin_email" 
+                             placeholder="staff@arrahmantrust.org" autocomplete="off" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold text-secondary mb-1">New Password (Optional)</label>
+                      <div class="input-group">
+                        <input [type]="showEditPassword() ? 'text' : 'password'" class="form-control" 
+                               [(ngModel)]="editForm.password" name="edit_admin_password" 
+                               placeholder="Leave blank to keep unchanged" autocomplete="new-password" minlength="6">
+                        <button type="button" class="btn btn-outline-secondary" (click)="showEditPassword.set(!showEditPassword())">
+                          <i class="bi" [class.bi-eye]="!showEditPassword()" [class.bi-eye-slash]="showEditPassword()"></i>
+                        </button>
+                      </div>
+                      <div class="small text-muted mt-1" style="font-size: 11px;">
+                        Only enter a password if you want to reset it (min 6 characters).
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- Select New Role -->
-                <div class="bg-white p-3 rounded-3 border mb-3">
-                  <label class="form-label small fw-bold text-dark mb-1">Select New Designated Role *</label>
-                  <select class="form-select mb-2" [(ngModel)]="assignForm.role" name="role" required>
-                    @for (r of roles(); track r.id) {
-                      <option [value]="r.name">{{ r.name }}</option>
-                    }
-                  </select>
-
-                  <div class="small text-muted">
-                    Changing the role automatically updates the user's accessible pages and navigation items.
+                <!-- Role Assignment Section -->
+                <div class="bg-white p-3 rounded-3 border mb-3 shadow-sm">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="fw-bold small text-dark text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
+                      <i class="bi bi-shield-lock-fill text-danger me-1"></i> Designated Role & Security Profile *
+                    </div>
+                    <span class="badge bg-light text-muted border" style="font-size: 11px;">
+                      {{ roles().length }} Roles Available
+                    </span>
                   </div>
+
+                  <div class="mb-2">
+                    <label class="form-label small fw-semibold text-muted mb-1">Choose Designated Role</label>
+                    <select class="form-select form-select-lg fs-6 fw-semibold" 
+                            [(ngModel)]="editForm.role" 
+                            name="edit_role" 
+                            (ngModelChange)="onEditRoleSelected($event)" 
+                            required>
+                      @for (r of roles(); track r.id) {
+                        <option [value]="r.name">{{ r.name }}</option>
+                      }
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Granular Permissions Customization Option -->
+                <div class="bg-white p-3 rounded-3 border shadow-sm">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                      <div class="fw-bold small text-dark">
+                        <i class="bi bi-sliders text-primary me-1"></i> Tailor Custom Permissions (Optional)
+                      </div>
+                      <div class="text-muted small" style="font-size: 11.5px;">
+                        Override or customize specific page access rights for this user
+                      </div>
+                    </div>
+                    <div class="form-check form-switch mb-0">
+                      <input class="form-check-input cursor-pointer" type="checkbox" id="editCustomizeToggle" 
+                             [(ngModel)]="editForm.customizePermissions" name="editCustomizePermissions">
+                    </div>
+                  </div>
+
+                  @if (editForm.customizePermissions) {
+                    <div class="mt-3 pt-3 border-top">
+                      <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="small fw-semibold text-muted">SELECT ACCESSIBLE MODULES:</span>
+                        <div class="d-flex gap-2">
+                          <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none small" (click)="selectAllEditPermissions()">Select All</button>
+                          <span class="text-muted small">&bull;</span>
+                          <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none small text-secondary" (click)="clearAllEditPermissions()">Clear</button>
+                        </div>
+                      </div>
+
+                      <div class="row g-2">
+                        @for (page of availablePages(); track page.key) {
+                          <div class="col-md-6 col-lg-4">
+                            <label class="d-flex align-items-start gap-2 p-2 rounded-2 border cursor-pointer hover-bg-light transition"
+                                   [class.border-primary]="hasEditPagePermission(page.key)"
+                                   [class.bg-primary-subtle]="hasEditPagePermission(page.key)">
+                              <input type="checkbox" class="form-check-input mt-0.5" 
+                                     [checked]="hasEditPagePermission(page.key)"
+                                     (change)="toggleEditPagePermission(page.key)">
+                              <div class="small">
+                                <div class="fw-bold text-dark d-flex align-items-center gap-1">
+                                  <i class="bi" [ngClass]="getPageIcon(page.key)"></i>
+                                  {{ page.name }}
+                                </div>
+                                <div class="text-muted" style="font-size: 10px; line-height: 1.2;">{{ page.description }}</div>
+                              </div>
+                            </label>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
                 </div>
               </div>
 
@@ -462,9 +557,9 @@ import { Admin, Role, AvailablePage } from '../../core/models/models';
                 <button type="button" class="btn btn-light px-3" (click)="showAssignModal.set(false)">Cancel</button>
                 <button type="submit" class="btn btn-trust-primary px-4 fw-semibold" [disabled]="isSubmitting()">
                   @if (isSubmitting()) {
-                    <span class="spinner-border spinner-border-sm me-1" role="status"></span> Saving...
+                    <span class="spinner-border spinner-border-sm me-1" role="status"></span> Updating...
                   } @else {
-                    <i class="bi bi-check-circle me-1"></i> Update Role
+                    <i class="bi bi-check-circle me-1"></i> Save Changes
                   }
                 </button>
               </div>
@@ -534,11 +629,17 @@ export class AdminsComponent implements OnInit {
     permissions: []
   };
 
-  // Form for updating existing admin's role
-  assignForm = {
+  // Form for editing existing admin account
+  editForm = {
+    name: '',
+    username: '',
+    email: '',
+    password: '',
     role: '',
+    customizePermissions: false,
     permissions: [] as string[]
   };
+  showEditPassword = signal(false);
 
   // Standard fallback roles if backend API is temporarily offline
   readonly defaultRoles: Role[] = [
@@ -682,6 +783,38 @@ export class AdminsComponent implements OnInit {
     this.formData.permissions = ['dashboard'];
   }
 
+  onEditRoleSelected(newRoleName: string): void {
+    const roleObj = this.roles().find(r => r.name.toLowerCase() === (newRoleName || '').toLowerCase());
+    if (roleObj) {
+      this.editForm.permissions = [...roleObj.permissions];
+    }
+  }
+
+  hasEditPagePermission(pageKey: string): boolean {
+    return this.editForm.permissions.includes('*') || this.editForm.permissions.includes(pageKey);
+  }
+
+  toggleEditPagePermission(pageKey: string): void {
+    if (this.editForm.permissions.includes('*')) {
+      this.editForm.permissions = this.availablePages().map(p => p.key);
+    }
+    const idx = this.editForm.permissions.indexOf(pageKey);
+    if (idx > -1) {
+      this.editForm.permissions.splice(idx, 1);
+    } else {
+      this.editForm.permissions.push(pageKey);
+    }
+  }
+
+  selectAllEditPermissions(): void {
+    this.editForm.permissions = this.availablePages().map(p => p.key);
+  }
+
+  clearAllEditPermissions(): void {
+    this.editForm.permissions = ['dashboard'];
+  }
+
+
   saveNewAdmin(): void {
     if (!this.formData.name || !this.formData.username || !this.formData.email || !this.formData.password) {
       this.errorMessage.set('Please fill out all required fields.');
@@ -721,7 +854,7 @@ export class AdminsComponent implements OnInit {
     });
   }
 
-  // Quick Assign Role for Existing Admin
+  // Open Edit Admin Modal with Full Details
   openAssignRoleModal(admin: Admin): void {
     this.selectedAdmin.set(admin);
     let matchedRoleName = admin.role;
@@ -736,9 +869,17 @@ export class AdminsComponent implements OnInit {
       matchedRoleName = this.roles()[0].name;
     }
 
-    this.assignForm = {
+    const hasCustomPerms = Array.isArray(admin.permissions) && admin.permissions.length > 0 && !admin.permissions.includes('*');
+
+    this.showEditPassword.set(false);
+    this.editForm = {
+      name: admin.name || '',
+      username: admin.username || '',
+      email: admin.email || '',
+      password: '',
       role: matchedRoleName,
-      permissions: admin.permissions || []
+      customizePermissions: hasCustomPerms,
+      permissions: Array.isArray(admin.permissions) ? [...admin.permissions] : []
     };
     this.showAssignModal.set(true);
   }
@@ -747,27 +888,50 @@ export class AdminsComponent implements OnInit {
     const admin = this.selectedAdmin();
     if (!admin) return;
 
-    this.isSubmitting.set(true);
-    const roleObj = this.roles().find(r => r.name.toLowerCase() === this.assignForm.role.toLowerCase());
-    const effectivePerms = roleObj ? roleObj.permissions : ['dashboard'];
+    if (!this.editForm.name.trim() || !this.editForm.username.trim() || !this.editForm.email.trim() || !this.editForm.role) {
+      this.errorMessage.set('Name, username, email, and role are required fields.');
+      return;
+    }
 
-    const payload = {
-      role: this.assignForm.role,
-      permissions: effectivePerms
+    this.isSubmitting.set(true);
+    const payload: any = {
+      name: this.editForm.name.trim(),
+      username: this.editForm.username.trim(),
+      email: this.editForm.email.trim(),
+      role: this.editForm.role.trim()
     };
 
-    this.authService.assignUserAccess(admin.id, payload).subscribe({
-      next: () => {
+    if (this.editForm.password && this.editForm.password.trim().length > 0) {
+      if (this.editForm.password.trim().length < 6) {
+        this.isSubmitting.set(false);
+        this.errorMessage.set('New password must be at least 6 characters long.');
+        return;
+      }
+      payload.password = this.editForm.password.trim();
+    }
+
+    if (this.editForm.customizePermissions) {
+      payload.permissions = this.editForm.permissions;
+    } else {
+      const roleObj = this.roles().find(r => r.name.toLowerCase() === this.editForm.role.toLowerCase());
+      payload.permissions = roleObj ? roleObj.permissions : ['dashboard'];
+    }
+
+    this.authService.updateAdmin(admin.id, payload).subscribe({
+      next: (res) => {
         this.isSubmitting.set(false);
         this.showAssignModal.set(false);
-        this.successMessage.set(`Role for ${admin.name} updated to "${this.assignForm.role}".`);
+        this.successMessage.set(res.message || 'Admin account for ' + payload.name + ' updated successfully.');
         this.loadRoles();
         this.loadAdmins();
+        if (admin.id === this.authService.currentUser()?.id) {
+          this.authService.getProfile().subscribe({ error: () => {} });
+        }
         setTimeout(() => this.successMessage.set(null), 5000);
       },
       error: (err) => {
         this.isSubmitting.set(false);
-        this.errorMessage.set(err.error?.message || 'Failed to update user role.');
+        this.errorMessage.set(err.error?.message || 'Failed to update user account.');
       }
     });
   }

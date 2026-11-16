@@ -24,49 +24,25 @@ import { AuthService } from '../../core/services/auth.service';
             <!-- Background mesh & pattern -->
             <div class="hero-pattern-overlay"></div>
             
-            <!-- Top Trust Identity -->
-            <div class="hero-top-section position-relative">
-              <div class="brand-crest-wrapper mb-3">
-                <div class="brand-crest">
-                  <img 
-                    src="https://ik.imagekit.io/baaidzoik/assets/header-logo/ar_logo_1.png" 
-                    alt="Ar Rahman Trust Crest" 
-                    class="brand-crest-img"
-                  >
-                </div>
-                <div class="brand-badge-pill">
-                  <i class="bi bi-patch-check-fill text-success"></i>
-                  <span>Registered Charitable Trust</span>
-                </div>
+            <!-- Top Registered Badge -->
+            <div class="position-relative">
+              <div class="brand-badge-pill">
+                <i class="bi bi-patch-check-fill text-success"></i>
+                <span>Registered Charitable Trust &bull; 04/16/2020</span>
               </div>
-
-              <h1 class="hero-brand-name">Ar Rahman Trust</h1>
-              <div class="hero-brand-tagline">
-                <span class="location-badge">
-                  <i class="bi bi-geo-alt-fill text-danger me-1"></i> Pernambut &bull; Vellore Dist
-                </span>
-                <span class="reg-number">Reg. No. 04/16/2020</span>
-              </div>
-
-              <p class="hero-mission-lead mt-3">
-                Empowering underprivileged families with dignity, comprehensive ration relief, higher education grants, and emergency healthcare.
-              </p>
             </div>
 
-            <!-- Middle Inspiration & Highlights -->
-            <div class="hero-middle-section position-relative my-4">
-              <!-- Quranic / Wisdom Quote Card -->
-              <div class="quote-glass-card p-3 mb-2">
-                <div class="d-flex align-items-start gap-2">
-                  <i class="bi bi-quote fs-3 text-warning opacity-75"></i>
-                  <div>
-                    <p class="quote-text mb-1 fst-italic">
-                      "Those who spend their wealth in charity day and night, secretly and openly, will have their reward with their Lord."
-                    </p>
-                    <span class="quote-author">&mdash; Holy Quran (2:274)</span>
-                  </div>
-                </div>
+            <!-- Prominent Centered Trust Logo Showcase -->
+            <div class="hero-logo-showcase position-relative d-flex flex-column align-items-center text-center my-auto py-4">
+              <div class="hero-logo-circle mb-3">
+                <img 
+                  src="https://ik.imagekit.io/baaidzoik/assets/header-logo/ar_logo_1.png" 
+                  alt="Ar Rahman Trust Crest" 
+                  class="hero-logo-img"
+                >
               </div>
+              <h2 class="hero-logo-title mb-1">Ar Rahman Trust</h2>
+              <div class="hero-logo-subtitle">Pernambut &bull; Vellore Dist</div>
             </div>
 
             <!-- Bottom Hero Status -->
@@ -250,23 +226,25 @@ import { AuthService } from '../../core/services/auth.service';
                 </div>
 
                 <!-- Submit Button -->
-                <button 
-                  type="submit" 
-                  class="btn-login-primary"
-                  [disabled]="isLoading() || !username.trim() || !password.trim()"
-                >
-                  @if (isLoading()) {
-                    <div class="d-flex align-items-center justify-content-center gap-2">
-                      <span class="spinner-border spinner-border-sm" role="status"></span>
-                      <span>Verifying Credentials...</span>
-                    </div>
-                  } @else {
-                    <div class="d-flex align-items-center justify-content-center gap-2">
-                      <span>Sign In to Admin Portal</span>
-                      <i class="bi bi-arrow-right"></i>
-                    </div>
-                  }
-                </button>
+                <div class="mt-3">
+                  <button 
+                    type="submit" 
+                    class="btn-login-primary"
+                    [disabled]="isLoading() || !username.trim() || !password.trim()"
+                  >
+                    @if (isLoading()) {
+                      <div class="d-flex align-items-center justify-content-center gap-2">
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                        <span>Signing in...</span>
+                      </div>
+                    } @else {
+                      <div class="d-flex align-items-center justify-content-center gap-2">
+                        <span>Sign in</span>
+                        <i class="bi bi-arrow-right"></i>
+                      </div>
+                    }
+                  </button>
+                </div>
               </form>
             </div>
 
@@ -432,6 +410,48 @@ import { AuthService } from '../../core/services/auth.service';
       padding: 3rem 2.5rem;
       color: #ffffff;
       overflow: hidden;
+    }
+
+    
+    .hero-logo-showcase {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+    .hero-logo-circle {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: #ffffff;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 0 0 6px rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-logo-circle:hover {
+      transform: scale(1.04);
+    }
+    .hero-logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .hero-logo-title {
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    .hero-logo-subtitle {
+      font-size: 0.88rem;
+      color: rgba(255, 255, 255, 0.75);
+      font-weight: 500;
+      letter-spacing: 0.05em;
     }
 
     .hero-pattern-overlay {
@@ -873,16 +893,20 @@ import { AuthService } from '../../core/services/auth.service';
 
     /* Primary Login Button */
     .btn-login-primary {
-      width: 100%;
+      width: auto;
+      min-width: 170px;
       background: linear-gradient(135deg, #0F3D63 0%, #16568A 100%);
       color: #ffffff;
       border: none;
       border-radius: 12px;
-      padding: 0.85rem 1.25rem;
+      padding: 0.75rem 2rem;
       font-size: 0.95rem;
       font-weight: 700;
       letter-spacing: 0.01em;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       box-shadow: 0 4px 14px rgba(15, 61, 99, 0.25);
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
