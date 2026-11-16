@@ -307,24 +307,7 @@ import { Donation } from '../../core/models/models';
 
         <!-- Pagination Controls -->
         @if (totalPages() > 1 || totalDonations() > 0) {
-          <div class="px-3 py-3 border-top d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 bg-light bg-opacity-25 rounded-bottom">
-            <div class="d-flex align-items-center gap-3 flex-wrap">
-              <span class="small text-muted">
-                Showing <strong>{{ paginationInfo().start }} &ndash; {{ paginationInfo().end }}</strong> of <strong>{{ paginationInfo().total }}</strong> records
-                &bull; Page <strong>{{ currentPage() }}</strong> of <strong>{{ totalPages() }}</strong>
-              </span>
-
-              <div class="d-flex align-items-center gap-1.5 small text-muted">
-                <span>Per page:</span>
-                <select class="form-select form-select-sm per-page-select" [ngModel]="pageSize()" (ngModelChange)="onPageSizeChange($event)">
-                  <option [ngValue]="10">10</option>
-                  <option [ngValue]="25">25</option>
-                  <option [ngValue]="50">50</option>
-                  <option [ngValue]="100">100</option>
-                </select>
-              </div>
-            </div>
-
+          <div class="px-3 py-3 border-top d-flex justify-content-center align-items-center bg-light bg-opacity-25 rounded-bottom">
             <div class="d-flex align-items-center gap-1.5 flex-wrap justify-content-center">
               <!-- First Page Button -->
               <button 
