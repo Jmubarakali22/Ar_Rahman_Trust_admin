@@ -68,7 +68,7 @@ import { Donation } from '../../core/models/models';
               <option value="">All Donation Types</option>
               <option value="sadaqah">Sadaqah</option>
               <option value="zakat">Zakath</option>
-              <option value="monthly_contribution">Monthly Contribution</option>
+              <option value="monthly_contribution">Fitra</option>
             </select>
           </div>
           <div class="col-6 col-md-3">
@@ -238,9 +238,9 @@ import { Donation } from '../../core/models/models';
                       <span class="badge" [ngClass]="{
                         'bg-success': item.donation_type === 'zakat' || item.donation_type === 'zakath',
                         'bg-primary': item.donation_type === 'sadaqah',
-                        'bg-info text-dark': item.donation_type === 'monthly_contribution' || item.donation_type === 'monthly_donation' || item.donation_type === 'monthly'
+                        'bg-info text-dark': item.donation_type === 'monthly_contribution' || item.donation_type === 'monthly_donation' || item.donation_type === 'monthly' || item.donation_type === 'fitra'
                       }" style="font-size: 10px; padding: 2.5px 5.5px;">
-                        {{ (item.donation_type === 'monthly_contribution' || item.donation_type === 'monthly_donation' || item.donation_type === 'monthly') ? 'MONTHLY' : (item.donation_type === 'zakat' ? 'ZAKATH' : (item.donation_type | uppercase)) }}
+                        {{ (item.donation_type === 'monthly_contribution' || item.donation_type === 'monthly_donation' || item.donation_type === 'monthly' || item.donation_type === 'fitra') ? 'FITRA' : (item.donation_type === 'zakat' ? 'ZAKATH' : (item.donation_type | uppercase)) }}
                       </span>
                     </td>
                     <td>
@@ -357,7 +357,7 @@ import { Donation } from '../../core/models/models';
                     <select class="form-select" [(ngModel)]="formData.donation_type" name="donation_type">
                       <option value="sadaqah">Sadaqah</option>
                       <option value="zakat">Zakath</option>
-                      <option value="monthly_contribution">Monthly Contribution</option>
+                      <option value="monthly_contribution">Fitra</option>
                     </select>
                   </div>
                 </div>
@@ -473,9 +473,9 @@ import { Donation } from '../../core/models/models';
                       <span class="badge text-uppercase fs-6 px-3 py-1 mt-1" [ngClass]="{
                         'bg-success': activeReceipt?.donation_type === 'zakat' || activeReceipt?.donation_type === 'zakath',
                         'bg-primary': activeReceipt?.donation_type === 'sadaqah',
-                        'bg-info text-dark': activeReceipt?.donation_type === 'monthly_contribution' || activeReceipt?.donation_type === 'monthly_donation' || activeReceipt?.donation_type === 'monthly'
+                        'bg-info text-dark': activeReceipt?.donation_type === 'monthly_contribution' || activeReceipt?.donation_type === 'monthly_donation' || activeReceipt?.donation_type === 'monthly' || activeReceipt?.donation_type === 'fitra'
                       }">
-                        {{ (activeReceipt?.donation_type === 'monthly_contribution' || activeReceipt?.donation_type === 'monthly_donation' || activeReceipt?.donation_type === 'monthly') ? 'Monthly Contribution' : ((activeReceipt?.donation_type === 'zakat' ? 'Zakath' : activeReceipt?.donation_type) + ' Donation') }}
+                        {{ (activeReceipt?.donation_type === 'monthly_contribution' || activeReceipt?.donation_type === 'monthly_donation' || activeReceipt?.donation_type === 'monthly' || activeReceipt?.donation_type === 'fitra') ? 'Fitra' : ((activeReceipt?.donation_type === 'zakat' ? 'Zakath' : activeReceipt?.donation_type) + ' Donation') }}
                       </span>
                       <div class="small text-muted mt-2">Mode: <strong class="text-uppercase text-dark">{{ activeReceipt?.payment_method }}</strong></div>
                       <div class="small font-monospace text-muted">Ref/UTR: {{ activeReceipt?.transaction_id || 'N/A' }}</div>
@@ -616,9 +616,9 @@ import { Donation } from '../../core/models/models';
                   <span class="badge text-uppercase fs-6 px-3 py-1 mt-1" [ngClass]="{
                     'bg-success': activeReceipt?.donation_type === 'zakat' || activeReceipt?.donation_type === 'zakath',
                     'bg-primary': activeReceipt?.donation_type === 'sadaqah',
-                    'bg-info text-dark': activeReceipt?.donation_type === 'monthly_contribution' || activeReceipt?.donation_type === 'monthly_donation' || activeReceipt?.donation_type === 'monthly'
+                    'bg-info text-dark': activeReceipt?.donation_type === 'monthly_contribution' || activeReceipt?.donation_type === 'monthly_donation' || activeReceipt?.donation_type === 'monthly' || activeReceipt?.donation_type === 'fitra'
                   }">
-                    {{ (activeReceipt?.donation_type === 'monthly_contribution' || activeReceipt?.donation_type === 'monthly_donation' || activeReceipt?.donation_type === 'monthly') ? 'Monthly Contribution' : ((activeReceipt?.donation_type === 'zakat' ? 'Zakath' : activeReceipt?.donation_type) + ' Donation') }}
+                    {{ (activeReceipt?.donation_type === 'monthly_contribution' || activeReceipt?.donation_type === 'monthly_donation' || activeReceipt?.donation_type === 'monthly' || activeReceipt?.donation_type === 'fitra') ? 'Fitra' : ((activeReceipt?.donation_type === 'zakat' ? 'Zakath' : activeReceipt?.donation_type) + ' Donation') }}
                   </span>
                   <div class="small text-muted mt-2">Mode: <strong class="text-uppercase text-dark">{{ activeReceipt?.payment_method }}</strong></div>
                   <div class="small font-monospace text-muted">Ref/UTR: {{ activeReceipt?.transaction_id || 'N/A' }}</div>
@@ -707,7 +707,7 @@ import { Donation } from '../../core/models/models';
               <div class="p-3 bg-light rounded-3 mb-3 border">
                 <div class="d-flex justify-content-between align-items-center mb-1">
                   <span class="badge bg-secondary font-monospace">{{ formatReceiptNo(selectedWhatsAppDonation) }}</span>
-                  <span class="badge bg-success text-uppercase">{{ (selectedWhatsAppDonation?.donation_type === 'monthly_contribution' || selectedWhatsAppDonation?.donation_type === 'monthly_donation' || selectedWhatsAppDonation?.donation_type === 'monthly') ? 'MONTHLY CONTRIBUTION' : (selectedWhatsAppDonation?.donation_type === 'zakat' ? 'ZAKATH' : selectedWhatsAppDonation?.donation_type) }}</span>
+                  <span class="badge bg-success text-uppercase">{{ (selectedWhatsAppDonation?.donation_type === 'monthly_contribution' || selectedWhatsAppDonation?.donation_type === 'monthly_donation' || selectedWhatsAppDonation?.donation_type === 'monthly' || selectedWhatsAppDonation?.donation_type === 'fitra') ? 'FITRA' : (selectedWhatsAppDonation?.donation_type === 'zakat' ? 'ZAKATH' : selectedWhatsAppDonation?.donation_type) }}</span>
                 </div>
                 <div class="fw-bold text-dark fs-5">{{ selectedWhatsAppDonation?.donor_name }}</div>
                 <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
@@ -1367,7 +1367,7 @@ Jazakallahu Khairan for your continuous benevolence and trust.
     if (copy.status === 'completed') {
       copy.status = 'verified';
     }
-    if (copy.donation_type === 'monthly_donation' || copy.donation_type === 'monthly') {
+    if (copy.donation_type === 'monthly_donation' || copy.donation_type === 'monthly' || copy.donation_type === 'fitra') {
       copy.donation_type = 'monthly_contribution';
     }
     this.formData = copy;

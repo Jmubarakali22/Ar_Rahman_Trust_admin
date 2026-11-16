@@ -131,25 +131,16 @@ import { Admin, Role, AvailablePage } from '../../core/models/models';
                 @for (a of admins(); track a.id) {
                   <tr>
                     <td>
-                      <div class="d-flex align-items-center gap-2">
-                        <div class="avatar-sm rounded-circle text-white fw-bold d-flex align-items-center justify-content-center shadow-sm" 
-                             [style.background]="getAvatarColor(a.name)">
-                          {{ a.name ? a.name.charAt(0).toUpperCase() : 'U' }}
-                        </div>
-                        <div>
-                          <div class="fw-bold text-dark mb-0 d-flex align-items-center gap-1">
-                            {{ a.name }}
-                            @if (a.id === authService.currentUser()?.id) {
-                              <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-1" style="font-size: 10px;">You</span>
-                            }
-                          </div>
-                          <div class="text-muted small" style="font-size: 11px;">ID: #{{ a.id }}</div>
-                        </div>
+                      <div class="fw-bold text-dark mb-0 d-flex align-items-center gap-1">
+                        {{ a.name }}
+                        @if (a.id === authService.currentUser()?.id) {
+                          <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-1" style="font-size: 10px;">You</span>
+                        }
                       </div>
                     </td>
                     <td>
                       <span class="font-monospace small px-2 py-1 bg-light rounded border text-secondary">
-                        &#64;{{ a.username }}
+                        {{ a.username }}
                       </span>
                     </td>
                     <td>
@@ -253,7 +244,7 @@ import { Admin, Role, AvailablePage } from '../../core/models/models';
                     <div class="col-md-6">
                       <label class="form-label small fw-bold text-secondary mb-1">Username *</label>
                       <div class="input-group">
-                        <span class="input-group-text bg-light text-muted">&#64;</span>
+                        <span class="input-group-text bg-light text-muted"><i class="bi bi-person"></i></span>
                         <input type="text" class="form-control" [(ngModel)]="formData.username" name="new_admin_username" 
                                placeholder="e.g. fuzail_ahmed" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" required>
                       </div>
@@ -440,14 +431,10 @@ import { Admin, Role, AvailablePage } from '../../core/models/models';
             <form (ngSubmit)="saveUserRoleAssignment()">
               <div class="modal-body p-4 bg-light">
                 <!-- User Info Banner -->
-                <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 border mb-3">
-                  <div class="avatar-md rounded-circle text-white fw-bold d-flex align-items-center justify-content-center" 
-                       [style.background]="getAvatarColor(selectedAdmin()!.name)" style="width: 44px; height: 44px;">
-                    {{ selectedAdmin()!.name.charAt(0).toUpperCase() }}
-                  </div>
+                <div class="p-3 bg-white rounded-3 border mb-3">
                   <div>
-                    <div class="fw-bold text-dark">{{ selectedAdmin()!.name }}</div>
-                    <div class="text-muted small">&#64;{{ selectedAdmin()!.username }} &bull; {{ selectedAdmin()!.email }}</div>
+                    <div class="fw-bold text-dark fs-6">{{ selectedAdmin()!.name }}</div>
+                    <div class="text-muted small">{{ selectedAdmin()!.username }} &bull; {{ selectedAdmin()!.email }}</div>
                     <div class="mt-1">
                       <span class="badge rounded-pill px-2 py-0.5" [ngClass]="getRoleBadgeClass(selectedAdmin()!.role)">
                         Current: {{ formatRoleName(selectedAdmin()!.role) }}

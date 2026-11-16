@@ -191,7 +191,7 @@ import { GalleryItem } from '../../core/models/models';
                 <div class="p-3 flex-grow-1 d-flex flex-column">
                   <div class="d-flex align-items-center justify-content-between mb-1">
                     <span class="badge-category" [ngClass]="getCategoryBadgeClass(photo.category)">
-                      {{ photo.category }}
+                      {{ getCategoryDisplayName(photo.category) }}
                     </span>
                   </div>
 
@@ -318,7 +318,7 @@ import { GalleryItem } from '../../core/models/models';
         <div class="lightbox-dialog" (click)="$event.stopPropagation()">
           <div class="lightbox-header d-flex justify-content-between align-items-center p-3 text-white">
             <div>
-              <span class="badge bg-primary me-2">{{ lightboxPhoto()?.category }}</span>
+              <span class="badge bg-primary me-2">{{ getCategoryDisplayName(lightboxPhoto()?.category || '') }}</span>
               <strong class="fs-6">{{ lightboxPhoto()?.title }}</strong>
             </div>
             <button type="button" class="btn-close btn-close-white" (click)="closeLightbox()"></button>
@@ -907,9 +907,9 @@ export class GalleryComponent implements OnInit {
   userAddedCategories = signal<string[]>([]);
   dynamicCategories = computed(() => {
     const list = this.photos();
-    const defaults = ['Food Distribution', 'Education & Skill', 'Healthcare'];
-    const extracted = list.map(p => p.category).filter(Boolean);
-    const combined = Array.from(new Set([...defaults, ...extracted, ...this.userAddedCategories()]));
+    const defaults = ['Ration Kits', 'Tailoring Classes', 'Free Medicine & Medical Camp'];
+    const extracted = list.map(p => this.getCategoryDisplayName(p.category)).filter(Boolean);
+    const combined = Array.from(new Set([...defaults, ...extracted, ...this.userAddedCategories().map(c => this.getCategoryDisplayName(c))]));
     return combined;
   });
 
@@ -1006,13 +1006,13 @@ export class GalleryComponent implements OnInit {
   getCategoryDisplayName(category: string): string {
     const c = (category || '').toLowerCase().trim();
     if (c === 'food distribution' || c.includes('ration')) {
-      return 'Food Distribution (Ration Kits)';
+      return 'Ration Kits';
     }
     if (c === 'education & skill' || c.includes('tailor')) {
-      return 'Education & Skill (Tailoring Classes)';
+      return 'Tailoring Classes';
     }
     if (c === 'healthcare' || c.includes('medic') || c.includes('camp')) {
-      return 'Healthcare (Free Medicine & Medical Camps)';
+      return 'Free Medicine & Medical Camp';
     }
     return category;
   }
@@ -1222,7 +1222,7 @@ export class GalleryComponent implements OnInit {
     this.imageSourceMode = 'upload';
 
     // If currently filtered by category, default to it
-    const defaultCat = this.activeCategory || 'Food Distribution';
+    const defaultCat = this.activeCategory || 'Ration Kits';
     this.targetImageKitFolder = this.getFolderForCategory(defaultCat);
 
     this.formData = {
