@@ -336,9 +336,9 @@ import { GalleryItem } from '../../core/models/models';
                     <!-- If choosing existing category -->
                     @if (!isCreatingNewCategory) {
                       <div class="input-group">
-                        <select class="form-select" [(ngModel)]="formData.category" name="category">
+                        <select class="form-select" [(ngModel)]="formData.category" (ngModelChange)="onCategoryChange($event)" name="category">
                           @for (cat of dynamicCategories(); track cat) {
-                            <option [value]="cat">{{ cat }}</option>
+                            <option [value]="cat">{{ getCategoryDisplayName(cat) }}</option>
                           }
                           <option value="General">General</option>
                         </select>
@@ -351,8 +351,11 @@ import { GalleryItem } from '../../core/models/models';
                           <i class="bi bi-plus-lg"></i> New
                         </button>
                       </div>
-                      <div class="form-text small text-muted">
-                        Select a category or click <strong>+ Add New Category</strong> to create a custom one.
+                      <div class="form-text small text-muted d-flex align-items-center justify-content-between mt-1">
+                        <span>Select a category or click <strong>+ Add New Category</strong> to create a custom one.</span>
+                        <span class="badge bg-light text-primary border font-monospace" style="font-size: 10px;">
+                          {{ targetImageKitFolder }}
+                        </span>
                       </div>
                     } @else {
                       <!-- If creating a brand new category -->
@@ -366,6 +369,7 @@ import { GalleryItem } from '../../core/models/models';
                             type="text" 
                             class="form-control" 
                             [(ngModel)]="newCategoryName" 
+                            (ngModelChange)="onNewCategoryNameChange($event)"
                             name="newCategoryName" 
                             placeholder="e.g. Ramadan Relief, Drinking Water, Orphan Care..."
                             autofocus
@@ -378,8 +382,11 @@ import { GalleryItem } from '../../core/models/models';
                             Cancel
                           </button>
                         </div>
-                        <div class="small text-muted mt-1">
-                          This new category will be created and added to your filter tabs automatically.
+                        <div class="small text-muted mt-1.5 d-flex align-items-center justify-content-between">
+                          <span>This new category will be created and added to your filter tabs automatically.</span>
+                          <span class="badge bg-white text-success border font-monospace" style="font-size: 10px;">
+                            {{ targetImageKitFolder }}
+                          </span>
                         </div>
                       </div>
                     }
@@ -462,22 +469,22 @@ import { GalleryItem } from '../../core/models/models';
                             <span class="small fw-bold text-navy">
                               <i class="bi bi-cloud-arrow-up-fill text-primary me-1"></i> ImageKit Destination Folder:
                             </span>
-                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace small">
-                              baaidzoik
+                            <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace small" style="font-size: 10px;">
+                              <i class="bi bi-check2-circle me-1"></i>Auto-synced with Category
                             </span>
                           </div>
                           <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-light text-muted font-monospace small">...baaidzoik</span>
+                            <span class="input-group-text bg-light text-muted font-monospace small">ik.imagekit.io/baaidzoik</span>
                             <input 
                               type="text" 
                               class="form-control font-monospace text-primary fw-semibold" 
                               [(ngModel)]="targetImageKitFolder" 
                               name="targetImageKitFolder" 
-                              placeholder="/assets/gallery-full/Test"
+                              placeholder="/assets/gallery-full/..."
                             >
                           </div>
-                          <div class="text-muted small mt-1" style="font-size: 0.72rem;">
-                            Direct URL: <code>https://ik.imagekit.io/baaidzoik{{ targetImageKitFolder }}</code>
+                          <div class="text-muted small mt-1.5" style="font-size: 0.72rem;">
+                            Destination URL: <code>https://ik.imagekit.io/baaidzoik{{ targetImageKitFolder }}</code>
                           </div>
                         </div>
                       </div>
@@ -828,7 +835,7 @@ export class GalleryComponent implements OnInit {
   selectedFileName = '';
   selectedFileSize = '';
   filePreviewUrl: string | null = null;
-  targetImageKitFolder = '/assets/gallery-full/Test';
+  targetImageKitFolder = '/assets/gallery-full/ration-kit-food-dist';
 
   pagedPhotos = computed(() => {
     const list = this.filteredPhotos();
@@ -866,22 +873,74 @@ export class GalleryComponent implements OnInit {
     return `http://localhost:5000${url.startsWith('/') ? '' : '/'}${url}`;
   }
 
+  getCategoryDisplayName(category: string): string {
+    const c = (category || '').toLowerCase().trim();
+    if (c === 'food distribution' || c.includes('ration')) {
+      return 'Food Distribution (Ration Kits)';
+    }
+    if (c === 'education & skill' || c.includes('tailor')) {
+      return 'Education & Skill (Tailoring Classes)';
+    }
+    if (c === 'healthcare' || c.includes('medic') || c.includes('camp')) {
+      return 'Healthcare (Free Medicine & Medical Camps)';
+    }
+    return category;
+  }
+
+  getFolderForCategory(category: string): string {
+    const cat = (category || '').toLowerCase().trim();
+    if (cat.includes('food') || cat.includes('ration')) {
+      return '/assets/gallery-full/ration-kit-food-dist';
+    }
+    if (cat.includes('tailor') || cat.includes('skill') || cat.includes('education')) {
+      return '/assets/gallery-full/tailoring-class';
+    }
+    if (cat.includes('health') || cat.includes('medic') || cat.includes('camp')) {
+      return '/assets/gallery-full/medical-help';
+    }
+    const slug = cat
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'general';
+    return `/assets/gallery-full/${slug}`;
+  }
+
+  onCategoryChange(newCategory: string): void {
+    if (!this.isCreatingNewCategory) {
+      this.targetImageKitFolder = this.getFolderForCategory(newCategory);
+    }
+  }
+
+  onNewCategoryNameChange(name: string): void {
+    if (this.isCreatingNewCategory) {
+      this.targetImageKitFolder = this.getFolderForCategory(name || 'new-category');
+    }
+  }
+
   countByCategory(category: string): number {
-    return this.photos().filter(p => p.category === category).length;
+    const c = (category || '').toLowerCase();
+    return this.photos().filter(p => {
+      const pc = (p.category || '').toLowerCase();
+      if (c.includes('food') || c.includes('ration')) return pc.includes('food') || pc.includes('ration');
+      if (c.includes('tailor') || c.includes('skill') || c.includes('education')) return pc.includes('tailor') || pc.includes('skill') || pc.includes('education');
+      if (c.includes('health') || c.includes('medic') || c.includes('camp')) return pc.includes('health') || pc.includes('medic') || pc.includes('camp');
+      return pc === c;
+    }).length;
   }
 
   getCategoryIcon(category: string): string {
-    if (category === 'Food Distribution') return 'bi bi-box2-heart text-danger';
-    if (category === 'Education & Skill') return 'bi bi-scissors text-warning';
-    if (category === 'Healthcare') return 'bi bi-heart-pulse-fill text-success';
+    const c = (category || '').toLowerCase();
+    if (c.includes('food') || c.includes('ration')) return 'bi bi-box2-heart text-danger';
+    if (c.includes('tailor') || c.includes('skill') || c.includes('education')) return 'bi bi-scissors text-warning';
+    if (c.includes('health') || c.includes('medic') || c.includes('camp')) return 'bi bi-heart-pulse-fill text-success';
     return 'bi bi-tag-fill text-primary';
   }
 
   getCategoryBadgeClass(category: string): string {
-    if (category === 'Food Distribution') return 'badge-food';
-    if (category === 'Education & Skill') return 'badge-skill';
-    if (category === 'Healthcare') return 'badge-medical';
-    if (category === 'General') return 'badge-general';
+    const c = (category || '').toLowerCase();
+    if (c.includes('food') || c.includes('ration')) return 'badge-food';
+    if (c.includes('tailor') || c.includes('skill') || c.includes('education')) return 'badge-skill';
+    if (c.includes('health') || c.includes('medic') || c.includes('camp')) return 'badge-medical';
+    if (c === 'general') return 'badge-general';
     return 'badge-custom';
   }
 
@@ -901,7 +960,14 @@ export class GalleryComponent implements OnInit {
 
     // Category filter
     if (this.activeCategory) {
-      list = list.filter(p => p.category === this.activeCategory);
+      const ac = this.activeCategory.toLowerCase();
+      list = list.filter(p => {
+        const pc = (p.category || '').toLowerCase();
+        if (ac.includes('food') || ac.includes('ration')) return pc.includes('food') || pc.includes('ration');
+        if (ac.includes('tailor') || ac.includes('skill') || ac.includes('education')) return pc.includes('tailor') || pc.includes('skill') || pc.includes('education');
+        if (ac.includes('health') || ac.includes('medic') || ac.includes('camp')) return pc.includes('health') || pc.includes('medic') || pc.includes('camp');
+        return pc === ac;
+      });
     }
 
     // Search query filter
@@ -947,6 +1013,9 @@ export class GalleryComponent implements OnInit {
     this.isCreatingNewCategory = !this.isCreatingNewCategory;
     if (this.isCreatingNewCategory) {
       this.newCategoryName = '';
+      this.targetImageKitFolder = '/assets/gallery-full/new-category';
+    } else {
+      this.targetImageKitFolder = this.getFolderForCategory(this.formData.category);
     }
   }
 
@@ -1005,6 +1074,7 @@ export class GalleryComponent implements OnInit {
 
     // If currently filtered by category, default to it
     const defaultCat = this.activeCategory || 'Food Distribution';
+    this.targetImageKitFolder = this.getFolderForCategory(defaultCat);
 
     this.formData = {
       title: '',
@@ -1023,6 +1093,7 @@ export class GalleryComponent implements OnInit {
     this.newCategoryName = '';
     this.clearSelectedFile();
     this.formData = { ...item };
+    this.targetImageKitFolder = this.getFolderForCategory(item.category);
     this.imageSourceMode = 'url';
     this.showModal.set(true);
   }
@@ -1037,6 +1108,8 @@ export class GalleryComponent implements OnInit {
       }
     }
 
+    const finalFolder = this.targetImageKitFolder || this.getFolderForCategory(targetCategory);
+
     this.isSubmitting.set(true);
 
     if (this.imageSourceMode === 'upload' && this.selectedFile) {
@@ -1047,7 +1120,7 @@ export class GalleryComponent implements OnInit {
       fd.append('caption', this.formData.caption || '');
       fd.append('order_num', (this.formData.order_num || 0).toString());
       fd.append('is_visible', this.formData.is_visible ? '1' : '0');
-      fd.append('folder', this.targetImageKitFolder || '/assets/gallery-full/Test');
+      fd.append('folder', finalFolder);
       fd.append('image', this.selectedFile);
 
       if (this.isEditing()) {
