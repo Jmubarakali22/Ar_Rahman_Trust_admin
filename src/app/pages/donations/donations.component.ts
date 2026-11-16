@@ -89,7 +89,7 @@ import { Donation } from '../../core/models/models';
         <!-- Row 2: Datewise Filtration -->
         <div class="row g-2 align-items-center mt-2 pt-2 border-top">
           <!-- Quick Presets -->
-          <div class="col-12 col-sm-6 col-lg-3">
+          <div class="col-12 col-sm-5 col-md-4 col-lg-3">
             <div class="input-group input-group-sm">
               <span class="input-group-text bg-white"><i class="bi bi-calendar-event text-primary"></i></span>
               <select class="form-select form-select-sm" [(ngModel)]="datePreset" (change)="onDatePresetChange()">
@@ -99,49 +99,52 @@ import { Donation } from '../../core/models/models';
                 <option value="this_week">Last 7 Days</option>
                 <option value="this_month">This Month</option>
                 <option value="last_month">Last Month</option>
-                <option value="custom">Custom Date Range...</option>
+                <option value="custom">Custom Date Range</option>
               </select>
             </div>
           </div>
 
-          <!-- From Date -->
-          <div class="col-6 col-sm-3 col-lg-3">
-            <div class="input-group input-group-sm">
-              <span class="input-group-text bg-light text-muted" style="font-size: 11px;">From</span>
+          <!-- Single Unified Date Range (From - To) -->
+          <div class="col-12 col-sm-7 col-md-5 col-lg-5">
+            <div class="input-group input-group-sm date-range-picker-group">
+              <span class="input-group-text bg-light text-dark fw-semibold" style="font-size: 11.5px;">
+                <i class="bi bi-calendar-range text-primary me-1"></i> Date Range
+              </span>
               <input 
                 type="date" 
-                class="form-control form-control-sm font-monospace" 
+                class="form-control form-control-sm font-monospace text-center px-1" 
                 [(ngModel)]="startDate" 
                 (input)="onCustomDateChange()" 
                 (change)="onCustomDateChange()" 
-                title="Start Date"
+                title="From Date"
+                aria-label="From Date"
               >
-            </div>
-          </div>
-
-          <!-- To Date -->
-          <div class="col-6 col-sm-3 col-lg-3">
-            <div class="input-group input-group-sm">
-              <span class="input-group-text bg-light text-muted" style="font-size: 11px;">To</span>
+              <span class="input-group-text bg-white text-muted px-2" style="font-size: 11px;">to</span>
               <input 
                 type="date" 
-                class="form-control form-control-sm font-monospace" 
+                class="form-control form-control-sm font-monospace text-center px-1" 
                 [(ngModel)]="endDate" 
                 (input)="onCustomDateChange()" 
                 (change)="onCustomDateChange()" 
-                title="End Date"
+                title="To Date"
+                aria-label="To Date"
               >
+              @if (startDate || endDate) {
+                <button class="btn btn-outline-secondary" type="button" (click)="clearDateFilter()" title="Clear date range">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              }
             </div>
           </div>
 
           <!-- Active Filter Badge / Quick Clear -->
-          <div class="col-12 col-lg-3 d-flex align-items-center justify-content-between justify-content-lg-end gap-2">
+          <div class="col-12 col-md-3 col-lg-4 d-flex align-items-center justify-content-between justify-content-md-end gap-2">
             @if (startDate || endDate || datePreset) {
-              <span class="badge bg-primary-subtle text-primary border font-monospace" style="font-size: 11px;">
-                <i class="bi bi-funnel-fill me-1"></i>Date active
+              <span class="badge bg-primary-subtle text-primary border font-monospace text-truncate" style="font-size: 11px; max-width: 220px;" [title]="getDateRangeSummary()">
+                <i class="bi bi-funnel-fill me-1"></i>{{ getDateRangeSummary() }}
               </span>
               <button class="btn btn-sm btn-link text-danger text-decoration-none p-0" (click)="clearDateFilter()" style="font-size: 11.5px;">
-                <i class="bi bi-x-circle me-1"></i>Clear Date
+                <i class="bi bi-x-circle me-1"></i>Clear
               </button>
             } @else {
               <span class="small text-muted font-monospace" style="font-size: 11px;">
@@ -1338,6 +1341,33 @@ Jazakallahu Khairan for your continuous benevolence and trust.
     this.endDate = '';
     this.currentPage = 1;
     this.loadDonations();
+  }
+
+  getDateRangeSummary(): string {
+    if (this.startDate && this.endDate) {
+      if (this.startDate === this.endDate) {
+        return this.startDate;
+      }
+      return `${this.startDate} → ${this.endDate}`;
+    }
+    if (this.startDate) {
+      return `From ${this.startDate}`;
+    }
+    if (this.endDate) {
+      return `Up to ${this.endDate}`;
+    }
+    if (this.datePreset) {
+      const presetLabels: Record<string, string> = {
+        today: 'Today',
+        yesterday: 'Yesterday',
+        this_week: 'Last 7 Days',
+        this_month: 'This Month',
+        last_month: 'Last Month',
+        custom: 'Custom Range'
+      };
+      return presetLabels[this.datePreset] || this.datePreset;
+    }
+    return 'All Dates';
   }
 
   changePage(page: number): void {

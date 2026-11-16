@@ -147,7 +147,6 @@ import { AutoLogoutService } from '../../core/services/auto-logout.service';
               <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
                 <li><h6 class="dropdown-header">{{ authService.currentUser()?.email }}</h6></li>
                 <li><a class="dropdown-item" routerLink="/settings"><i class="bi bi-person me-2"></i>My Profile</a></li>
-                <li *ngIf="authService.hasPermission('roles')"><a class="dropdown-item" routerLink="/roles"><i class="bi bi-person-gear me-2"></i>Roles & Access</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><button class="dropdown-item text-danger" (click)="authService.logout()"><i class="bi bi-box-arrow-right me-2"></i>Log Out</button></li>
               </ul>

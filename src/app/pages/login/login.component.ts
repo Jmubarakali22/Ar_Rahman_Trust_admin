@@ -56,7 +56,7 @@ import { AuthService } from '../../core/services/auth.service';
             <!-- Middle Inspiration & Highlights -->
             <div class="hero-middle-section position-relative my-4">
               <!-- Quranic / Wisdom Quote Card -->
-              <div class="quote-glass-card p-3 mb-4">
+              <div class="quote-glass-card p-3 mb-2">
                 <div class="d-flex align-items-start gap-2">
                   <i class="bi bi-quote fs-3 text-warning opacity-75"></i>
                   <div>
@@ -64,39 +64,6 @@ import { AuthService } from '../../core/services/auth.service';
                       "Those who spend their wealth in charity day and night, secretly and openly, will have their reward with their Lord."
                     </p>
                     <span class="quote-author">&mdash; Holy Quran (2:274)</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Quick Pillars Grid -->
-              <div class="impact-grid">
-                <div class="impact-pill">
-                  <div class="impact-icon-circle bg-emerald-subtle">
-                    <i class="bi bi-heart-pulse-fill text-emerald"></i>
-                  </div>
-                  <div class="impact-content">
-                    <span class="impact-number">30+</span>
-                    <span class="impact-desc">Villages Served</span>
-                  </div>
-                </div>
-
-                <div class="impact-pill">
-                  <div class="impact-icon-circle bg-blue-subtle">
-                    <i class="bi bi-shield-check text-info"></i>
-                  </div>
-                  <div class="impact-content">
-                    <span class="impact-number">100%</span>
-                    <span class="impact-desc">Direct Aid Delivery</span>
-                  </div>
-                </div>
-
-                <div class="impact-pill">
-                  <div class="impact-icon-circle bg-amber-subtle">
-                    <i class="bi bi-cash-stack text-warning"></i>
-                  </div>
-                  <div class="impact-content">
-                    <span class="impact-number">Audited</span>
-                    <span class="impact-desc">Full Transparency</span>
                   </div>
                 </div>
               </div>
@@ -143,10 +110,7 @@ import { AuthService } from '../../core/services/auth.service';
                     <i class="bi bi-box-arrow-up-right ms-1"></i>
                   </a>
                 </div>
-                <h2 class="form-title mt-2">Sign in to console</h2>
-                <p class="form-subtitle text-muted">
-                  Enter your credentials to manage donations, causes, gallery and volunteers.
-                </p>
+                <h2 class="form-title mt-2">Sign in</h2>
               </div>
 
               <!-- Inactivity Auto-Logout Alert Banner -->
