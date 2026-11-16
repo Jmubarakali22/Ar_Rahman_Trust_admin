@@ -1255,6 +1255,7 @@ export class RolesComponent implements OnInit {
         this.isSubmitting.set(false);
         this.showAssignModal.set(false);
         this.successMessage.set(res.message || 'User access updated successfully.');
+        this.loadRoles();
         this.loadUsers();
         if (this.selectedUser?.id === this.authService.currentUser()?.id) {
           this.authService.getProfile().subscribe();

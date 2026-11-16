@@ -24,39 +24,37 @@ export class AuthService {
     if (!user) return false;
     const role = (user.role || '').toLowerCase().trim();
 
-    // Super Admin has unrestricted access across all modules
+    // 1. Super Admin has unrestricted access across all modules
     if (role === 'superadmin' || role === 'super admin' || role === 'super_admin') {
       return true;
     }
 
-    // Standard Admin / Managing Trustee / Trustee has full administrative access
-    if (role === 'admin' || role === 'managing trustee' || role === 'trustee' || role === 'administrator') {
-      return true;
+    // 2. Admins and Roles management pages are strictly reserved for Super Admin
+    if (pageKey === 'admins' || pageKey === 'roles') {
+      return false;
     }
 
-    // Dashboard overview is accessible to all authenticated staff
-    if (pageKey === 'dashboard') {
-      return true;
-    }
-
+    // 3. Check effective user permissions array
     const perms = user.permissions;
-    // Fallback: If permissions not defined (e.g. existing session before RBAC), grant access gracefully
-    if (!perms || !Array.isArray(perms) || perms.length === 0) {
-      return true;
+    if (Array.isArray(perms) && perms.length > 0) {
+      if (perms.includes('*')) return true;
+      return perms.includes(pageKey);
     }
 
-    if (perms.includes('*')) return true;
-    return perms.includes(pageKey);
+    return false;
   }
 
   getFirstAccessibleRoute(): string {
-    const pages = ['dashboard', 'donations', 'causes', 'gallery', 'volunteers', 'inquiries', 'settings', 'admins', 'roles'];
+    if (this.hasPermission('dashboard')) {
+      return '/dashboard';
+    }
+    const pages = ['causes', 'donations', 'gallery', 'volunteers', 'inquiries', 'settings'];
     for (const page of pages) {
       if (this.hasPermission(page)) {
         return `/${page}`;
       }
     }
-    return '/dashboard';
+    return '/login';
   }
 
   constructor(private http: HttpClient, private router: Router) {}

@@ -704,13 +704,18 @@ export class AdminsComponent implements OnInit {
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
+    const roleObj = this.roles().find(r => r.name.toLowerCase() === (this.formData.role || '').toLowerCase());
+    const effectivePerms = this.formData.customizePermissions 
+      ? this.formData.permissions 
+      : (roleObj ? roleObj.permissions : ['dashboard']);
+
     const payload = {
       name: this.formData.name.trim(),
       username: this.formData.username.trim(),
       email: this.formData.email.trim(),
       password: this.formData.password.trim(),
       role: this.formData.role,
-      permissions: this.formData.customizePermissions ? this.formData.permissions : undefined
+      permissions: effectivePerms
     };
 
     this.authService.createAdmin(payload).subscribe({
@@ -718,6 +723,7 @@ export class AdminsComponent implements OnInit {
         this.isSubmitting.set(false);
         this.showAddModal.set(false);
         this.successMessage.set(res.message || `Admin account for ${payload.name} created with role ${payload.role}.`);
+        this.loadRoles();
         this.loadAdmins();
         setTimeout(() => this.successMessage.set(null), 5000);
       },
@@ -768,6 +774,7 @@ export class AdminsComponent implements OnInit {
         this.isSubmitting.set(false);
         this.showAssignModal.set(false);
         this.successMessage.set(`Role for ${admin.name} updated to "${this.assignForm.role}".`);
+        this.loadRoles();
         this.loadAdmins();
         setTimeout(() => this.successMessage.set(null), 5000);
       },
