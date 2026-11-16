@@ -373,6 +373,16 @@ import { GalleryItem } from '../../core/models/models';
                 <i class="bi bi-chevron-double-right"></i>
               </button>
 
+              <!-- Scroll to Top Button -->
+              <button 
+                type="button" 
+                class="btn btn-sm page-nav-btn ms-1 text-primary fw-bold" 
+                (click)="scrollToTop()" 
+                title="Scroll to Top of Page"
+              >
+                <i class="bi bi-arrow-up"></i>
+              </button>
+
               
             </div>
           </div>
@@ -1487,7 +1497,7 @@ export class GalleryComponent implements OnInit {
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
-      window.scrollTo({ top: 120, behavior: 'smooth' });
+      this.scrollToTop();
     }
   }
 
