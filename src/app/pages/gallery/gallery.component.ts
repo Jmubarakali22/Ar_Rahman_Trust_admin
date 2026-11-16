@@ -11,217 +11,305 @@ import { GalleryItem } from '../../core/models/models';
   template: `
     <div class="gallery-page">
       <!-- Top Page Header -->
-      <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between mb-4 gap-3">
-        <div>
-          <div class="d-flex align-items-center gap-2">
-            <h2 class="h4 fw-bold mb-0" style="color: #0F3D63;">Gallery Photos</h2>
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 small fw-semibold">
-              {{ photos().length }} Photos
-            </span>
+      <div class="page-header-wrap mb-4">
+        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+          <div>
+            <div class="d-flex align-items-center gap-2.5">
+              <div class="header-icon-box shadow-2xs">
+                <i class="bi bi-images"></i>
+              </div>
+              <div>
+                <div class="d-flex align-items-center gap-2">
+                  <h2 class="h4 fw-bold mb-0 text-navy">Gallery Photos</h2>
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-0.5 small fw-semibold">
+                    {{ photos().length }} Photos
+                  </span>
+                </div>
+                <p class="text-muted small mb-0 mt-0.5">
+                  Organize program outreach photos, manage categories, and sync directly with ImageKit.
+                </p>
+              </div>
+            </div>
           </div>
-          <p class="text-muted small mb-0 mt-1">
-            Manage photos, create custom program categories, and upload files directly from your computer or ImageKit.
-          </p>
+
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <a 
+              href="https://arrahmantrust.netlify.app/gallery-full" 
+              target="_blank" 
+              class="btn btn-outline-success btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5 fw-semibold"
+              title="Open Live Netlify Gallery in new tab"
+            >
+              <i class="bi bi-box-arrow-up-right"></i>
+              <span>Live Website</span>
+            </a>
+
+            <button class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5 fw-semibold" (click)="openAddModal()">
+              <i class="bi bi-cloud-arrow-up-fill"></i>
+              <span>Upload Photo</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Metric KPI Row -->
+      <div class="row g-2.5 g-md-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div 
+            class="stat-kpi-card" 
+            [class.kpi-active]="activeCategory === ''"
+            (click)="selectCategory('')"
+            role="button"
+            title="Show All Photos"
+          >
+            <div>
+              <span class="stat-kpi-label">Total Photos</span>
+              <span class="stat-kpi-value text-navy">{{ photos().length }}</span>
+            </div>
+            <div class="kpi-icon-wrap bg-primary-subtle text-primary">
+              <i class="bi bi-images"></i>
+            </div>
+          </div>
         </div>
 
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-          <!-- Link to Public Website Gallery-Full -->
-          <a 
-            href="https://arrahmantrust.netlify.app/gallery-full" 
-            target="_blank" 
-            class="btn btn-outline-success btn-sm rounded-pill d-flex align-items-center gap-1.5 fw-semibold"
-            title="Open Live Netlify Gallery"
+        <div class="col-6 col-md-3">
+          <div 
+            class="stat-kpi-card" 
+            [class.kpi-active]="activeCategory === 'Ration Kits'"
+            (click)="selectCategory('Ration Kits')"
+            role="button"
+            title="Filter by Ration Kits"
           >
-            <i class="bi bi-box-arrow-up-right"></i>
-            <span>Live Public Gallery</span>
-          </a>
+            <div>
+              <span class="stat-kpi-label">Ration Kits</span>
+              <span class="stat-kpi-value text-danger">{{ countByCategory('Ration Kits') }}</span>
+            </div>
+            <div class="kpi-icon-wrap bg-danger-subtle text-danger">
+              <i class="bi bi-box2-heart-fill"></i>
+            </div>
+          </div>
+        </div>
 
-          <!-- Add Photo Button -->
-          <button class="btn btn-trust-primary btn-sm rounded-pill px-3 shadow-sm" (click)="openAddModal()">
-            <i class="bi bi-cloud-arrow-up-fill me-1.5"></i>
-            <span>Upload / Add Photo</span>
-          </button>
+        <div class="col-6 col-md-3">
+          <div 
+            class="stat-kpi-card" 
+            [class.kpi-active]="activeCategory === 'Tailoring Classes'"
+            (click)="selectCategory('Tailoring Classes')"
+            role="button"
+            title="Filter by Tailoring Classes"
+          >
+            <div>
+              <span class="stat-kpi-label">Tailoring Classes</span>
+              <span class="stat-kpi-value text-warning-emphasis">{{ countByCategory('Tailoring Classes') }}</span>
+            </div>
+            <div class="kpi-icon-wrap bg-warning-subtle text-warning-emphasis">
+              <i class="bi bi-scissors"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+          <div 
+            class="stat-kpi-card" 
+            [class.kpi-active]="activeCategory === 'Free Medicine & Medical Camp'"
+            (click)="selectCategory('Free Medicine & Medical Camp')"
+            role="button"
+            title="Filter by Medical Camps"
+          >
+            <div>
+              <span class="stat-kpi-label">Medical Camps</span>
+              <span class="stat-kpi-value text-success">{{ countByCategory('Free Medicine & Medical Camp') }}</span>
+            </div>
+            <div class="kpi-icon-wrap bg-success-subtle text-success">
+              <i class="bi bi-heart-pulse-fill"></i>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Filters & Search Toolbar -->
-      <div class="admin-card p-3 mb-4">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-          <!-- Dynamic Category Filter Pills (Auto-updates with any new category!) -->
-          <div class="d-flex flex-wrap gap-2 align-items-center">
+      <div class="gallery-toolbar-card p-3 mb-4 rounded-3 bg-white border">
+        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+          <!-- Dynamic Category Filter Pills -->
+          <div class="category-pills-wrap d-flex flex-wrap gap-1.5 align-items-center">
             <button 
               type="button"
-              class="btn btn-sm rounded-pill category-filter-btn" 
-              [ngClass]="activeCategory === '' ? 'btn-navy-active' : 'btn-outline-secondary'"
+              class="category-chip" 
+              [class.chip-active]="activeCategory === ''"
               (click)="selectCategory('')"
             >
-              All ({{ photos().length }})
+              <span>All</span>
+              <span class="chip-count">{{ photos().length }}</span>
             </button>
 
             @for (cat of dynamicCategories(); track cat) {
               <button 
                 type="button"
-                class="btn btn-sm rounded-pill category-filter-btn d-inline-flex align-items-center gap-1" 
-                [ngClass]="activeCategory === cat ? 'btn-navy-active' : 'btn-outline-secondary'"
+                class="category-chip" 
+                [class.chip-active]="activeCategory === cat"
                 (click)="selectCategory(cat)"
               >
                 <i [class]="getCategoryIcon(cat)"></i>
                 <span>{{ getCategoryDisplayName(cat) }}</span>
-                <span class="badge bg-light text-dark rounded-pill py-0 px-1.5 ms-0.5 border" [style.fontSize]="'0.7rem'">
-                  {{ countByCategory(cat) }}
-                </span>
+                <span class="chip-count">{{ countByCategory(cat) }}</span>
               </button>
             }
 
-            <!-- Quick Add Category Helper Button -->
             <button 
               type="button" 
-              class="btn btn-sm btn-outline-primary rounded-pill d-inline-flex align-items-center gap-1 border-dashed"
+              class="category-chip-dashed"
               (click)="openAddCategoryModal()"
-              title="Create a new gallery category"
+              title="Create a new custom gallery category"
             >
               <i class="bi bi-plus-circle-fill"></i>
               <span>+ Category</span>
             </button>
           </div>
 
-          <!-- Search Input -->
-          <div class="search-input-wrapper">
-            <i class="bi bi-search search-icon text-muted"></i>
-            <input 
-              type="text" 
-              class="form-control form-control-sm search-field" 
-              placeholder="Search by title, number or caption..."
-              [(ngModel)]="searchQuery"
-              (ngModelChange)="onSearchChange()"
-            >
-            @if (searchQuery) {
-              <button class="btn btn-sm clear-btn" (click)="searchQuery = ''; onSearchChange()">
-                <i class="bi bi-x-circle-fill text-muted"></i>
-              </button>
-            }
+          <!-- Search & Sort Controls -->
+          <div class="d-flex align-items-center gap-2 flex-wrap flex-sm-nowrap">
+            <div class="search-input-wrapper flex-grow-1 flex-sm-grow-0">
+              <i class="bi bi-search search-icon text-muted"></i>
+              <input 
+                type="text" 
+                class="form-control form-control-sm search-field" 
+                placeholder="Search photos..."
+                [(ngModel)]="searchQuery"
+                (ngModelChange)="onSearchChange()"
+              >
+              @if (searchQuery) {
+                <button class="btn btn-sm clear-btn" (click)="searchQuery = ''; onSearchChange()">
+                  <i class="bi bi-x-circle-fill text-muted"></i>
+                </button>
+              }
+            </div>
+
+            <!-- Sort By Select -->
+            <select class="form-select form-select-sm sort-select" [(ngModel)]="sortBy" (ngModelChange)="applyFilter()">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="order">Custom Order</option>
+            </select>
           </div>
         </div>
       </div>
 
       <!-- Loading State -->
       @if (isLoading()) {
-        <div class="spinner-container">
+        <div class="spinner-container py-5 text-center">
           <div class="spinner-border text-primary" role="status"></div>
+          <div class="small text-muted mt-2">Loading gallery photos...</div>
         </div>
       } @else {
         <!-- Summary & Pagination Controls Bar -->
-        <div class="d-flex justify-content-between align-items-center mb-3 text-muted small flex-wrap gap-2">
+        <div class="d-flex justify-content-between align-items-center mb-3 text-muted small flex-wrap gap-2 px-1">
           <div>
-            Showing <strong>{{ paginationInfo().start }} &ndash; {{ paginationInfo().end }}</strong> of <strong>{{ paginationInfo().total }}</strong> matching photos
+            Showing <strong class="text-dark">{{ paginationInfo().start }} &ndash; {{ paginationInfo().end }}</strong> of <strong class="text-dark">{{ paginationInfo().total }}</strong> photos
             @if (activeCategory) {
-              <span> in <strong>{{ getCategoryDisplayName(activeCategory) }}</strong></span>
+              <span> in <strong class="text-navy">{{ getCategoryDisplayName(activeCategory) }}</strong></span>
             }
             @if (searchQuery) {
               <span> matching "<em class="text-dark">{{ searchQuery }}</em>"</span>
             }
           </div>
-          <div class="d-flex align-items-center gap-3 flex-wrap">
-            <div class="d-flex align-items-center gap-1.5">
-              <span>Sort:</span>
-              <select class="form-select form-select-sm sort-select" [(ngModel)]="sortBy" (ngModelChange)="applyFilter()">
-                <option value="newest">Newest Uploads First</option>
-                <option value="order">Display Order (1 &rarr; 99)</option>
-                <option value="oldest">Oldest First</option>
-              </select>
-            </div>
-            <div class="d-flex align-items-center gap-1.5">
-              <span>Per page:</span>
-              <select class="form-select form-select-sm per-page-select" [ngModel]="pageSize()" (ngModelChange)="onPageSizeChange($event)">
-                <option [ngValue]="12">12</option>
-                <option [ngValue]="24">24</option>
-                <option [ngValue]="48">48</option>
-                <option [ngValue]="999">All Photos</option>
-              </select>
-            </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="text-muted">Per page:</span>
+            <select class="form-select form-select-sm per-page-select" [ngModel]="pageSize()" (ngModelChange)="onPageSizeChange($event)">
+              <option [ngValue]="12">12</option>
+              <option [ngValue]="24">24</option>
+              <option [ngValue]="48">48</option>
+              <option [ngValue]="999">All Photos</option>
+            </select>
           </div>
         </div>
 
         <!-- Photos Grid -->
-        <div class="row g-3 mb-4">
+        <div class="row g-3 g-xl-3.5 mb-4">
           @for (photo of pagedPhotos(); track photo.id) {
-            <div class="col-sm-6 col-md-4 col-xl-3">
-              <div class="admin-card overflow-hidden h-100 d-flex flex-column photo-card">
-                <!-- Image Container with Zoom Trigger -->
-                <div class="position-relative photo-thumb-wrapper" (click)="openLightbox(photo)">
+            <div class="col-6 col-md-4 col-xl-3">
+              <div class="photo-card shadow-2xs">
+                <!-- Thumbnail Image Wrap -->
+                <div class="photo-thumb-wrapper" (click)="openLightbox(photo)">
                   <img 
                     [src]="resolveImageUrl(photo.image_url)" 
-                    [alt]="photo.title"
+                    [alt]="getCategoryDisplayName(photo.category)"
                     loading="lazy"
                     decoding="async"
-                    class="w-100 h-100 object-fit-cover photo-thumb"
+                    class="photo-thumb"
                     (error)="onImageError($event)"
                   >
-                  <!-- Zoom overlay -->
+                  <!-- Zoom overlay on Hover -->
                   <div class="thumb-hover-overlay">
                     <span class="zoom-pill">
-                      <i class="bi bi-zoom-in me-1"></i> Full View
+                      <i class="bi bi-arrows-fullscreen me-1.5"></i> View Photo
                     </span>
                   </div>
 
                   <!-- Recent Upload Badge -->
                   @if (isRecent(photo)) {
-                    <span class="badge position-absolute top-0 start-0 m-2 bg-warning text-dark fw-bold shadow-sm" style="font-size: 0.7rem; z-index: 2;">
+                    <span class="recent-badge">
                       <i class="bi bi-stars me-1"></i>NEW
                     </span>
                   }
 
-                  <!-- Visibility Badge -->
+                  <!-- Visibility Badge Toggle -->
                   <span 
-                    class="badge position-absolute top-0 end-0 m-2 cursor-pointer shadow-sm" 
-                    [ngClass]="photo.is_visible ? 'bg-success' : 'bg-secondary'"
+                    class="photo-status-pill position-absolute top-0 end-0 m-2 cursor-pointer"
+                    [ngClass]="photo.is_visible ? 'status-live' : 'status-hidden'"
                     (click)="$event.stopPropagation(); toggleVisibility(photo)"
-                    title="Click to toggle public visibility"
+                    title="Click to toggle live website visibility"
                   >
+                    <span class="status-indicator-dot" [class.dot-pulsing]="photo.is_visible"></span>
                     {{ photo.is_visible ? 'Live on Site' : 'Hidden' }}
                   </span>
                 </div>
 
-                <!-- Details Footer -->
-                <div class="p-2.5 px-3 flex-grow-1 d-flex align-items-center justify-content-between border-top bg-white">
+                <!-- Clean Card Footer -->
+                <div class="photo-card-footer">
                   <span class="badge-category" [ngClass]="getCategoryBadgeClass(photo.category)">
                     {{ getCategoryDisplayName(photo.category) }}
                   </span>
                   
-                  <div class="d-flex align-items-center gap-1.5">
+                  <div class="action-btn-group">
                     <button 
-                      class="btn btn-sm btn-outline-secondary" 
+                      type="button"
+                      class="action-icon-btn btn-view" 
                       (click)="openLightbox(photo)" 
                       title="View Full Resolution"
                     >
                       <i class="bi bi-eye"></i>
                     </button>
                     <button 
-                      class="btn btn-sm btn-outline-primary" 
+                      type="button"
+                      class="action-icon-btn btn-edit" 
                       (click)="openEditModal(photo)"
-                      title="Edit Photo"
+                      title="Edit Category or Change Photo"
                     >
                       <i class="bi bi-pencil"></i>
                     </button>
                     <button 
-                      class="btn btn-sm btn-outline-danger" 
+                      type="button"
+                      class="action-icon-btn btn-delete" 
                       (click)="deletePhoto(photo.id)"
                       title="Delete Photo"
                     >
-                      <i class="bi bi-trash"></i>
+                      <i class="bi bi-trash3"></i>
                     </button>
                   </div>
                 </div>
               </div>
             </div>
           } @empty {
-            <div class="col-12 text-center py-5">
-              <i class="bi bi-images text-muted fs-1 mb-2 d-block"></i>
-              <div class="fw-semibold text-secondary">No photos found</div>
-              <p class="small text-muted">Try clearing your search query or uploading a photo into this category.</p>
-              <button class="btn btn-trust-primary btn-sm rounded-pill px-3" (click)="openAddModal()">
-                <i class="bi bi-plus-lg me-1"></i> Add Photo Now
-              </button>
+            <div class="col-12">
+              <div class="empty-state-card text-center py-5 px-4 bg-white rounded-3 border">
+                <div class="empty-state-icon mb-3">
+                  <i class="bi bi-images text-muted" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="fw-bold text-navy mb-1">No photos found</h5>
+                <p class="text-muted small mb-3">Try adjusting your filters, clearing your search, or uploading a new photo.</p>
+                <button class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5" (click)="openAddModal()">
+                  <i class="bi bi-cloud-arrow-up-fill me-1.5"></i> Upload Photo Now
+                </button>
+              </div>
             </div>
           }
         </div>
@@ -332,34 +420,39 @@ import { GalleryItem } from '../../core/models/models';
           <div class="lightbox-body text-center p-2 bg-black">
             <img 
               [src]="resolveImageUrl(lightboxPhoto()?.image_url)" 
-              [alt]="lightboxPhoto()?.title" 
+              [alt]="getCategoryDisplayName(lightboxPhoto()?.category || '')" 
               class="img-fluid rounded lightbox-full-img"
               (error)="onImageError($event)"
             >
           </div>
 
           <div class="lightbox-footer p-3 bg-dark text-white-50 small d-flex justify-content-between align-items-center">
-            <div>{{ lightboxPhoto()?.caption || 'Photo from Ar Rahman Trust gallery archives' }}</div>
+            <div>{{ getCategoryDisplayName(lightboxPhoto()?.category || '') }} &bull; Ar Rahman Trust Archives</div>
             <a [href]="resolveImageUrl(lightboxPhoto()?.image_url)" target="_blank" class="btn btn-sm btn-outline-light rounded-pill px-3">
-              <i class="bi bi-box-arrow-up-right me-1"></i> Open Raw
+              <i class="bi bi-box-arrow-up-right me-1"></i> Open Raw Image
             </a>
           </div>
         </div>
       </div>
     }
 
-    <!-- ADD / EDIT PHOTO MODAL (With File Upload & New Category Creation) -->
+    <!-- ADD / EDIT PHOTO MODAL -->
     @if (showModal()) {
       <div class="modal fade show d-block" style="background: rgba(0,0,0,0.65); backdrop-filter: blur(5px);" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-          <div class="modal-content border-0 shadow-2xl">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 560px;">
+          <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
             <!-- Modal Header -->
-            <div class="modal-header" style="background-color: #0F3D63; color: #fff;">
-              <div>
-                <h5 class="modal-title fw-bold mb-0">
-                  {{ isEditing() ? 'Edit Photo Details' : 'Upload & Add Gallery Photo' }}
-                </h5>
-                <span class="small text-white-50">Ar Rahman Trust Gallery System</span>
+            <div class="modal-header px-4 py-3" style="background-color: #0F3D63; color: #fff;">
+              <div class="d-flex align-items-center gap-2.5">
+                <div class="modal-icon-badge">
+                  <i class="bi" [class.bi-cloud-arrow-up-fill]="!isEditing()" [class.bi-pencil-square]="isEditing()"></i>
+                </div>
+                <div>
+                  <h5 class="modal-title fw-bold mb-0 text-white fs-6">
+                    {{ isEditing() ? 'Edit Gallery Photo' : 'Upload Gallery Photo' }}
+                  </h5>
+                  <span class="small text-white-50" style="font-size: 11px;">Ar Rahman Trust Gallery System</span>
+                </div>
               </div>
               <button type="button" class="btn-close btn-close-white" (click)="showModal.set(false)"></button>
             </div>
@@ -370,13 +463,13 @@ import { GalleryItem } from '../../core/models/models';
                 <div class="row g-3">
                   <!-- CATEGORY SELECTION & NEW CATEGORY OPTION -->
                   <div class="col-12">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                      <label class="form-label small fw-bold mb-0">Category *</label>
+                    <div class="d-flex justify-content-between align-items-center mb-1.5">
+                      <label class="form-label small fw-bold mb-0 text-navy">Category *</label>
                       <button 
                         type="button" 
-                        class="btn btn-sm btn-link p-0 text-decoration-none fw-bold"
+                        class="btn btn-sm btn-link p-0 text-decoration-none fw-semibold"
                         (click)="toggleNewCategoryMode()"
-                        style="color: #0F3D63;"
+                        style="color: #0F3D63; font-size: 0.8rem;"
                       >
                         @if (isCreatingNewCategory) {
                           <i class="bi bi-arrow-left-circle me-1"></i> Choose Existing Category
@@ -404,8 +497,8 @@ import { GalleryItem } from '../../core/models/models';
                           <i class="bi bi-plus-lg"></i> New
                         </button>
                       </div>
-                      <div class="form-text small text-muted d-flex align-items-center justify-content-between mt-1">
-                        <span>Select a category or click <strong>+ Add New Category</strong> to create a custom one.</span>
+                      <div class="form-text small text-muted d-flex align-items-center justify-content-between mt-1.5">
+                        <span style="font-size: 11.5px;">ImageKit Destination:</span>
                         <span class="badge bg-light text-primary border font-monospace" style="font-size: 10px;">
                           {{ targetImageKitFolder }}
                         </span>
@@ -436,7 +529,7 @@ import { GalleryItem } from '../../core/models/models';
                           </button>
                         </div>
                         <div class="small text-muted mt-1.5 d-flex align-items-center justify-content-between">
-                          <span>This new category will be created and added to your filter tabs automatically.</span>
+                          <span style="font-size: 11px;">Category will be created automatically.</span>
                           <span class="badge bg-white text-success border font-monospace" style="font-size: 10px;">
                             {{ targetImageKitFolder }}
                           </span>
@@ -447,25 +540,25 @@ import { GalleryItem } from '../../core/models/models';
 
                   <!-- IMAGE INPUT METHOD (FILE UPLOAD OR URL) -->
                   <div class="col-12">
-                    <label class="form-label small fw-bold d-block mb-2">Photo Source *</label>
+                    <label class="form-label small fw-bold d-block mb-2 text-navy">Photo Source *</label>
 
-                    <!-- Source Selector Tabs -->
-                    <div class="btn-group w-100 mb-3" role="group">
+                    <!-- Segmented Source Selector Tabs -->
+                    <div class="segmented-source-tabs mb-3">
                       <button 
                         type="button" 
-                        class="btn btn-sm" 
-                        [ngClass]="imageSourceMode === 'upload' ? 'btn-navy-active fw-bold' : 'btn-outline-secondary'"
+                        class="segmented-tab" 
+                        [class.tab-active]="imageSourceMode === 'upload'"
                         (click)="imageSourceMode = 'upload'"
                       >
-                        <i class="bi bi-upload me-1"></i> Upload from Computer / Device
+                        <i class="bi bi-cloud-arrow-up me-1.5"></i> Upload from Device
                       </button>
                       <button 
                         type="button" 
-                        class="btn btn-sm" 
-                        [ngClass]="imageSourceMode === 'url' ? 'btn-navy-active fw-bold' : 'btn-outline-secondary'"
+                        class="segmented-tab" 
+                        [class.tab-active]="imageSourceMode === 'url'"
                         (click)="imageSourceMode = 'url'"
                       >
-                        <i class="bi bi-link-45deg me-1"></i> Image URL / ImageKit Link
+                        <i class="bi bi-link-45deg me-1.5"></i> Image URL / ImageKit
                       </button>
                     </div>
 
@@ -484,7 +577,7 @@ import { GalleryItem } from '../../core/models/models';
                         @if (filePreviewUrl) {
                           <!-- Selected File Preview -->
                           <div class="preview-container position-relative d-inline-block">
-                            <img [src]="filePreviewUrl" alt="Upload preview" class="rounded shadow-sm file-preview-img mb-2">
+                            <img [src]="filePreviewUrl" alt="Upload preview" class="rounded-3 shadow-sm file-preview-img mb-2">
                             <button 
                               type="button" 
                               class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 rounded-circle p-1"
@@ -493,59 +586,59 @@ import { GalleryItem } from '../../core/models/models';
                             >
                               <i class="bi bi-x-lg"></i>
                             </button>
-                            <div class="small text-muted">
-                              <strong>{{ selectedFileName }}</strong> ({{ selectedFileSize }})
-                            </div>
+                            @if (selectedFileName) {
+                              <div class="small text-muted">
+                                <strong>{{ selectedFileName }}</strong> ({{ selectedFileSize }})
+                              </div>
+                            }
                             <button 
                               type="button" 
                               class="btn btn-sm btn-outline-primary mt-2 rounded-pill px-3"
                               (click)="fileInput.click()"
                             >
-                              <i class="bi bi-arrow-repeat me-1"></i> Change File
+                              <i class="bi bi-arrow-repeat me-1"></i> Change Photo
                             </button>
                           </div>
                         } @else {
                           <!-- Dropzone Placeholder -->
                           <div class="py-3 cursor-pointer" (click)="fileInput.click()">
                             <i class="bi bi-cloud-arrow-up text-primary display-6 mb-2 d-block"></i>
-                            <div class="fw-bold text-dark">Click to Browse Photo from Computer</div>
+                            <div class="fw-bold text-dark">Click to Choose Photo from Device</div>
                             <div class="small text-muted mt-1">Supports JPG, PNG, WEBP, GIF (Up to 10 MB)</div>
-                            <button type="button" class="btn btn-sm btn-trust-primary rounded-pill mt-3 px-3">
+                            <button type="button" class="btn btn-sm btn-trust-primary rounded-pill mt-3 px-3.5">
                               <i class="bi bi-folder2-open me-1"></i> Browse Files
                             </button>
                           </div>
                         }
 
-                        <!-- ImageKit Folder Destination Pill -->
-                        <div class="mt-3 p-2.5 bg-white border rounded-3 text-start shadow-sm">
+                        <!-- ImageKit Destination Folder Pill -->
+                        <div class="mt-3 p-2.5 bg-white border rounded-3 text-start shadow-2xs">
                           <div class="d-flex align-items-center justify-content-between mb-1.5">
-                            <span class="small fw-bold text-navy">
-                              <i class="bi bi-cloud-arrow-up-fill text-primary me-1"></i> ImageKit Destination Folder:
+                            <span class="small fw-semibold text-navy">
+                              <i class="bi bi-cloud-check-fill text-primary me-1"></i> Destination Folder:
                             </span>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace small" style="font-size: 10px;">
-                              <i class="bi bi-check2-circle me-1"></i>Auto-synced with Category
+                            <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace" style="font-size: 10px;">
+                              Auto-synced
                             </span>
                           </div>
                           <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-light text-muted font-monospace small">ik.imagekit.io/baaidzoik</span>
+                            <span class="input-group-text bg-light text-muted font-monospace small" style="font-size: 11px;">ik.imagekit.io/baaidzoik</span>
                             <input 
                               type="text" 
                               class="form-control font-monospace text-primary fw-semibold" 
                               [(ngModel)]="targetImageKitFolder" 
                               name="targetImageKitFolder" 
                               placeholder="/assets/gallery-full/..."
+                              style="font-size: 11.5px;"
                             >
-                          </div>
-                          <div class="text-muted small mt-1.5" style="font-size: 0.72rem;">
-                            Destination URL: <code>https://ik.imagekit.io/baaidzoik{{ targetImageKitFolder }}</code>
                           </div>
                         </div>
                       </div>
                     } @else {
                       <!-- 2. DIRECT IMAGE URL INPUT -->
-                      <div class="url-input-box">
+                      <div class="url-input-box p-3 border rounded-3 bg-light">
                         <div class="input-group">
-                          <span class="input-group-text bg-light"><i class="bi bi-link"></i></span>
+                          <span class="input-group-text bg-white"><i class="bi bi-link-45deg"></i></span>
                           <input 
                             type="text" 
                             class="form-control" 
@@ -555,12 +648,12 @@ import { GalleryItem } from '../../core/models/models';
                           >
                         </div>
                         @if (formData.image_url) {
-                          <div class="mt-2 text-center bg-light p-2 rounded border">
+                          <div class="mt-2.5 text-center bg-white p-2.5 rounded-3 border">
                             <img 
                               [src]="formData.image_url" 
                               alt="URL preview" 
                               class="rounded" 
-                              style="max-height: 120px; max-width: 100%; object-fit: contain;"
+                              style="max-height: 130px; max-width: 100%; object-fit: contain;"
                               (error)="onImageError($event)"
                             >
                           </div>
@@ -583,7 +676,7 @@ import { GalleryItem } from '../../core/models/models';
                       <label class="form-check-label fw-semibold text-dark user-select-none" for="visibleCheck" style="cursor: pointer;">
                         Display Live on Public Website
                       </label>
-                      <div class="small text-muted mt-1" style="font-size: 11.5px;">
+                      <div class="small text-muted mt-0.5" style="font-size: 11.5px;">
                         When checked, this photo will be published and visible to visitors on the live website.
                       </div>
                     </div>
@@ -618,9 +711,12 @@ import { GalleryItem } from '../../core/models/models';
     @if (showCategoryModal()) {
       <div class="modal fade show d-block" style="background: rgba(0,0,0,0.65);" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header" style="background-color: #0F3D63; color: #fff;">
-              <h5 class="modal-title fw-bold">Create New Gallery Category</h5>
+          <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header px-4 py-3" style="background-color: #0F3D63; color: #fff;">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-folder-plus fs-5"></i>
+                <h5 class="modal-title fw-bold mb-0 fs-6">Create New Gallery Category</h5>
+              </div>
               <button type="button" class="btn-close btn-close-white" (click)="showCategoryModal.set(false)"></button>
             </div>
             <div class="modal-body p-4">
@@ -628,7 +724,7 @@ import { GalleryItem } from '../../core/models/models';
                 Create a dedicated category (e.g., <em>Ramadan Ration</em>, <em>Clean Water Borewells</em>, <em>Orphan Care</em>) to organize your photos.
               </p>
               <div class="mb-3">
-                <label class="form-label small fw-bold">Category Name *</label>
+                <label class="form-label small fw-bold text-navy">Category Name *</label>
                 <input 
                   type="text" 
                   class="form-control" 
@@ -637,11 +733,11 @@ import { GalleryItem } from '../../core/models/models';
                   autofocus
                 >
               </div>
-              <div class="d-flex justify-content-end gap-2 mt-3">
-                <button type="button" class="btn btn-light" (click)="showCategoryModal.set(false)">Cancel</button>
+              <div class="d-flex justify-content-end gap-2 mt-4 pt-2 border-top">
+                <button type="button" class="btn btn-light rounded-pill px-3" (click)="showCategoryModal.set(false)">Cancel</button>
                 <button 
                   type="button" 
-                  class="btn btn-trust-primary" 
+                  class="btn btn-trust-primary rounded-pill px-4" 
                   [disabled]="!standaloneCategoryName.trim()"
                   (click)="confirmCreateCategory()"
                 >
@@ -655,28 +751,145 @@ import { GalleryItem } from '../../core/models/models';
     }
   `,
   styles: [`
-    .btn-navy-active {
-      background-color: #0F3D63 !important;
-      color: #ffffff !important;
-      border-color: #0F3D63 !important;
+    .text-navy {
+      color: #0F3D63 !important;
     }
 
-    .category-filter-btn {
+    .header-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: #eff6ff;
+      color: #0F3D63;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+    }
+
+    .shadow-2xs {
+      box-shadow: 0 1px 3px rgba(15, 61, 99, 0.05);
+    }
+
+    /* Stat KPI Cards */
+    .stat-kpi-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.85rem 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .stat-kpi-card:hover {
+      border-color: #cbd5e1;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(15, 61, 99, 0.08);
+    }
+    .stat-kpi-card.kpi-active {
+      border-color: #0F3D63;
+      background: #f8fafc;
+      box-shadow: 0 4px 12px rgba(15, 61, 99, 0.1);
+    }
+    .stat-kpi-label {
+      display: block;
+      font-size: 0.72rem;
       font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .stat-kpi-value {
+      display: block;
+      font-size: 1.45rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .kpi-icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    /* Toolbar & Filter Chips */
+    .gallery-toolbar-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(15, 61, 99, 0.04);
+    }
+
+    .category-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.38rem 0.85rem;
+      border-radius: 20px;
       font-size: 0.82rem;
-      padding: 0.4rem 0.9rem;
+      font-weight: 600;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #475569;
+      cursor: pointer;
       transition: all 0.15s ease;
     }
-
-    .border-dashed {
-      border: 1.5px dashed #0F3D63 !important;
+    .category-chip:hover {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      color: #0F3D63;
+    }
+    .category-chip.chip-active {
+      background: #0F3D63 !important;
+      border-color: #0F3D63 !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 8px rgba(15, 61, 99, 0.25);
+    }
+    .chip-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.05rem 0.45rem;
+      border-radius: 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.08);
+      color: inherit;
+    }
+    .category-chip.chip-active .chip-count {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
     }
 
+    .category-chip-dashed {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.38rem 0.85rem;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1.5px dashed #0F3D63;
+      background: #ffffff;
+      color: #0F3D63;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .category-chip-dashed:hover {
+      background: #eff6ff;
+      border-color: #0b2f4c;
+    }
+
+    /* Search and Sort */
     .search-input-wrapper {
       position: relative;
-      min-width: 270px;
+      min-width: 250px;
     }
-
     .search-icon {
       position: absolute;
       left: 12px;
@@ -684,29 +897,257 @@ import { GalleryItem } from '../../core/models/models';
       transform: translateY(-50%);
       font-size: 0.85rem;
     }
-
     .search-field {
       padding-left: 32px;
       padding-right: 30px;
       border-radius: 20px;
+      border: 1px solid #cbd5e1;
     }
-
+    .search-field:focus {
+      border-color: #0F3D63;
+      box-shadow: 0 0 0 3px rgba(15, 61, 99, 0.12);
+    }
     .clear-btn {
       position: absolute;
-      right: 4px;
+      right: 6px;
       top: 50%;
       transform: translateY(-50%);
       padding: 0 4px;
       background: none;
       border: none;
     }
+    .sort-select {
+      border-radius: 20px;
+      border: 1px solid #cbd5e1;
+      padding-left: 0.85rem;
+      padding-right: 1.8rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #334155;
+    }
 
-    .per-page-select, .sort-select {
-      width: auto;
+    /* Photo Cards */
+    .photo-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .photo-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(15, 61, 99, 0.12);
+      border-color: #cbd5e1;
+    }
+    .photo-thumb-wrapper {
+      position: relative;
+      height: 195px;
+      background: #f1f5f9;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .photo-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.35s ease;
+    }
+    .photo-card:hover .photo-thumb {
+      transform: scale(1.04);
+    }
+    .thumb-hover-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 61, 99, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      backdrop-filter: blur(2px);
+    }
+    .photo-card:hover .thumb-hover-overlay {
+      opacity: 1;
+    }
+    .zoom-pill {
+      background: #ffffff;
+      color: #0F3D63;
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .recent-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: #f59e0b;
+      color: #000;
+      font-weight: 800;
+      font-size: 0.68rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      z-index: 2;
+    }
+
+    .photo-status-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(6px);
+      transition: all 0.2s ease;
+      z-index: 2;
+    }
+    .photo-status-pill.status-live {
+      background: rgba(16, 185, 129, 0.92);
+      color: #ffffff;
+    }
+    .photo-status-pill.status-hidden {
+      background: rgba(30, 41, 59, 0.85);
+      color: #cbd5e1;
+    }
+    .photo-status-pill:hover {
+      transform: scale(1.05);
+    }
+    .status-indicator-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ffffff;
       display: inline-block;
-      padding-top: 0.2rem;
-      padding-bottom: 0.2rem;
-      font-weight: 500;
+    }
+    .status-indicator-dot.dot-pulsing {
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+    }
+
+    /* Card Footer & Action Buttons */
+    .photo-card-footer {
+      padding: 0.65rem 0.85rem;
+      background: #ffffff;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .action-btn-group {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .action-icon-btn {
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #64748b;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .action-icon-btn:hover {
+      background: #e2e8f0;
+      color: #0F3D63;
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+    .action-icon-btn.btn-edit:hover {
+      background: #eff6ff;
+      color: #0F3D63;
+      border-color: #bfdbfe;
+    }
+    .action-icon-btn.btn-delete:hover {
+      background: #fef2f2;
+      color: #dc2626;
+      border-color: #fecaca;
+    }
+
+    .badge-category {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      padding: 0.28rem 0.6rem;
+      border-radius: 6px;
+      display: inline-block;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+    .badge-food { background: #fee2e2; color: #991b1b; }
+    .badge-skill { background: #fef3c7; color: #92400e; }
+    .badge-medical { background: #d1fae5; color: #065f46; }
+    .badge-general { background: #e0f2fe; color: #0369a1; }
+    .badge-custom { background: #ede9fe; color: #5b21b6; }
+
+    /* Segmented source tabs in modal */
+    .segmented-source-tabs {
+      display: flex;
+      background: #f1f5f9;
+      padding: 3px;
+      border-radius: 10px;
+      gap: 3px;
+    }
+    .segmented-tab {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 0.45rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .segmented-tab.tab-active {
+      background: #0F3D63;
+      color: #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-icon-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      color: #ffffff;
+    }
+
+    .file-dropzone {
+      background: #f8fafc;
+      border: 2px dashed #cbd5e1;
+      transition: all 0.2s ease;
+    }
+    .file-dropzone:hover {
+      border-color: #0F3D63;
+      background: #eff6ff;
+    }
+
+    .file-preview-img {
+      max-height: 180px;
+      max-width: 100%;
+      object-fit: contain;
     }
 
     .page-nav-btn {
@@ -776,104 +1217,14 @@ import { GalleryItem } from '../../core/models/models';
       background-color: #ffffff;
     }
 
-    .photo-card {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .photo-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(15, 61, 99, 0.12);
-    }
-
-    .photo-thumb-wrapper {
-      height: 190px;
-      background: #f1f5f9;
-      overflow: hidden;
-      cursor: pointer;
-    }
-
-    .photo-thumb {
-      transition: transform 0.3s ease;
-    }
-    .photo-card:hover .photo-thumb {
-      transform: scale(1.05);
-    }
-
-    .thumb-hover-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(15, 61, 99, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-    .photo-card:hover .thumb-hover-overlay {
-      opacity: 1;
-    }
-
-    .zoom-pill {
-      background: #ffffff;
-      color: #0F3D63;
-      font-weight: 700;
-      font-size: 0.75rem;
-      padding: 0.35rem 0.8rem;
-      border-radius: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    .badge-category {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      padding: 0.25rem 0.55rem;
-      border-radius: 6px;
-    }
-    .badge-food { background: #fee2e2; color: #991b1b; }
-    .badge-skill { background: #fef3c7; color: #92400e; }
-    .badge-medical { background: #d1fae5; color: #065f46; }
-    .badge-general { background: #e0f2fe; color: #0369a1; }
-    .badge-custom { background: #ede9fe; color: #5b21b6; }
-
-    .line-clamp-2 {
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .cursor-pointer {
-      cursor: pointer;
-    }
-
-    .file-dropzone {
-      background: #f8fafc;
-      border: 2px dashed #cbd5e1;
-      transition: all 0.2s ease;
-    }
-    .file-dropzone:hover {
-      border-color: #0F3D63;
-      background: #eff6ff;
-    }
-
-    .file-preview-img {
-      max-height: 180px;
-      max-width: 100%;
-      object-fit: contain;
-    }
-
     .lightbox-overlay {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(5, 18, 30, 0.88);
-      backdrop-filter: blur(8px);
+      background: rgba(5, 18, 30, 0.92);
+      backdrop-filter: blur(10px);
       z-index: 1060;
       display: flex;
       align-items: center;
