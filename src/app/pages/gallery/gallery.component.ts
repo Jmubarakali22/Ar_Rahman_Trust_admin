@@ -180,30 +180,15 @@ import { GalleryItem } from '../../core/models/models';
                   >
                     {{ photo.is_visible ? 'Live on Site' : 'Hidden' }}
                   </span>
-
-                  <!-- Index Tag -->
-                  <span class="badge position-absolute bottom-0 start-0 m-2 bg-dark bg-opacity-75 font-monospace small">
-                    #{{ photo.order_num || photo.id }}
-                  </span>
                 </div>
 
-                <!-- Details -->
-                <div class="p-3 flex-grow-1 d-flex flex-column">
-                  <div class="d-flex align-items-center justify-content-between mb-1">
-                    <span class="badge-category" [ngClass]="getCategoryBadgeClass(photo.category)">
-                      {{ getCategoryDisplayName(photo.category) }}
-                    </span>
-                  </div>
-
-                  <h6 class="fw-bold mb-1 text-dark text-truncate" [title]="photo.title">
-                    {{ photo.title }}
-                  </h6>
-
-                  <p class="small text-muted mb-3 flex-grow-1 line-clamp-2" [title]="photo.caption || ''">
-                    {{ photo.caption || 'No caption provided.' }}
-                  </p>
+                <!-- Details Footer -->
+                <div class="p-2.5 px-3 flex-grow-1 d-flex align-items-center justify-content-between border-top bg-white">
+                  <span class="badge-category" [ngClass]="getCategoryBadgeClass(photo.category)">
+                    {{ getCategoryDisplayName(photo.category) }}
+                  </span>
                   
-                  <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                  <div class="d-flex align-items-center gap-1.5">
                     <button 
                       class="btn btn-sm btn-outline-secondary" 
                       (click)="openLightbox(photo)" 
@@ -211,22 +196,20 @@ import { GalleryItem } from '../../core/models/models';
                     >
                       <i class="bi bi-eye"></i>
                     </button>
-                    <div class="d-flex gap-1">
-                      <button 
-                        class="btn btn-sm btn-outline-primary" 
-                        (click)="openEditModal(photo)"
-                        title="Edit Details"
-                      >
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button 
-                        class="btn btn-sm btn-outline-danger" 
-                        (click)="deletePhoto(photo.id)"
-                        title="Delete Photo"
-                      >
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
+                    <button 
+                      class="btn btn-sm btn-outline-primary" 
+                      (click)="openEditModal(photo)"
+                      title="Edit Photo"
+                    >
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button 
+                      class="btn btn-sm btn-outline-danger" 
+                      (click)="deletePhoto(photo.id)"
+                      title="Delete Photo"
+                    >
+                      <i class="bi bi-trash"></i>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -341,8 +324,7 @@ import { GalleryItem } from '../../core/models/models';
         <div class="lightbox-dialog" (click)="$event.stopPropagation()">
           <div class="lightbox-header d-flex justify-content-between align-items-center p-3 text-white">
             <div>
-              <span class="badge bg-primary me-2">{{ getCategoryDisplayName(lightboxPhoto()?.category || '') }}</span>
-              <strong class="fs-6">{{ lightboxPhoto()?.title }}</strong>
+              <span class="badge bg-primary px-3 py-1.5 fs-6">{{ getCategoryDisplayName(lightboxPhoto()?.category || '') }}</span>
             </div>
             <button type="button" class="btn-close btn-close-white" (click)="closeLightbox()"></button>
           </div>
@@ -386,19 +368,6 @@ import { GalleryItem } from '../../core/models/models';
             <div class="modal-body p-4">
               <form (ngSubmit)="savePhoto()">
                 <div class="row g-3">
-                  <!-- Photo Title -->
-                  <div class="col-12">
-                    <label class="form-label small fw-bold">Photo Title *</label>
-                    <input 
-                      type="text" 
-                      class="form-control" 
-                      [(ngModel)]="formData.title" 
-                      name="title" 
-                      required 
-                      placeholder="e.g. Ramadan Ration Kit Distribution #5"
-                    >
-                  </div>
-
                   <!-- CATEGORY SELECTION & NEW CATEGORY OPTION -->
                   <div class="col-12">
                     <div class="d-flex justify-content-between align-items-center mb-1">
@@ -600,30 +569,23 @@ import { GalleryItem } from '../../core/models/models';
                     }
                   </div>
 
-                  <!-- Caption -->
+                  <!-- Public Visibility Switch -->
                   <div class="col-12">
-                    <label class="form-label small fw-bold">Caption & Activity Description</label>
-                    <textarea 
-                      class="form-control" 
-                      rows="2" 
-                      [(ngModel)]="formData.caption" 
-                      name="caption" 
-                      placeholder="e.g. Free grocery distribution to 50 rural families in Pernambut..."
-                    ></textarea>
-                  </div>
-
-                  <!-- Sort Order & Visibility Switch -->
-                  <div class="col-sm-6">
-                    <label class="form-label small fw-bold">Sort Order Number</label>
-                    <input type="number" class="form-control" [(ngModel)]="formData.order_num" name="order_num">
-                  </div>
-
-                  <div class="col-sm-6 d-flex align-items-center">
-                    <div class="form-check form-switch mt-3">
-                      <input class="form-check-input" type="checkbox" id="visibleCheck" [(ngModel)]="formData.is_visible" name="is_visible">
-                      <label class="form-check-label small fw-semibold" for="visibleCheck">
+                    <div class="form-check form-switch p-3 ps-5 bg-light rounded-3 border">
+                      <input 
+                        class="form-check-input ms-n4 me-2" 
+                        type="checkbox" 
+                        id="visibleCheck" 
+                        [(ngModel)]="formData.is_visible" 
+                        name="is_visible"
+                        style="cursor: pointer; transform: scale(1.15);"
+                      >
+                      <label class="form-check-label fw-semibold text-dark user-select-none" for="visibleCheck" style="cursor: pointer;">
                         Display Live on Public Website
                       </label>
+                      <div class="small text-muted mt-1" style="font-size: 11.5px;">
+                        When checked, this photo will be published and visible to visitors on the live website.
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -634,7 +596,7 @@ import { GalleryItem } from '../../core/models/models';
                   <button 
                     type="submit" 
                     class="btn btn-trust-primary rounded-pill px-4" 
-                    [disabled]="isSubmitting() || !formData.title || (!selectedFile && !formData.image_url)"
+                    [disabled]="isSubmitting() || (!selectedFile && !formData.image_url && !filePreviewUrl)"
                   >
                     @if (isSubmitting()) {
                       <span class="spinner-border spinner-border-sm me-1" role="status"></span>
@@ -1294,11 +1256,11 @@ export class GalleryComponent implements OnInit {
     this.imageSourceMode = 'upload';
 
     // If currently filtered by category, default to it
-    const defaultCat = this.activeCategory || 'Ration Kits';
+    const defaultCat = this.activeCategory ? this.getCategoryDisplayName(this.activeCategory) : 'Ration Kits';
     this.targetImageKitFolder = this.getFolderForCategory(defaultCat);
 
     this.formData = {
-      title: '',
+      title: defaultCat,
       category: defaultCat,
       image_url: '',
       caption: '',
@@ -1313,9 +1275,16 @@ export class GalleryComponent implements OnInit {
     this.isCreatingNewCategory = false;
     this.newCategoryName = '';
     this.clearSelectedFile();
-    this.formData = { ...item };
-    this.targetImageKitFolder = this.getFolderForCategory(item.category);
+
+    const normalizedCategory = this.getCategoryDisplayName(item.category);
+    this.formData = {
+      ...item,
+      category: normalizedCategory,
+      is_visible: Boolean(item.is_visible)
+    };
+    this.targetImageKitFolder = this.getFolderForCategory(normalizedCategory);
     this.imageSourceMode = 'url';
+    this.filePreviewUrl = item.image_url || null;
     this.showModal.set(true);
   }
 
@@ -1330,13 +1299,14 @@ export class GalleryComponent implements OnInit {
     }
 
     const finalFolder = this.targetImageKitFolder || this.getFolderForCategory(targetCategory);
+    const finalTitle = this.formData.title || targetCategory || 'Gallery Photo';
 
     this.isSubmitting.set(true);
 
     if (this.imageSourceMode === 'upload' && this.selectedFile) {
       // Build FormData for multipart upload
       const fd = new FormData();
-      fd.append('title', this.formData.title);
+      fd.append('title', finalTitle);
       fd.append('category', targetCategory);
       fd.append('caption', this.formData.caption || '');
       fd.append('order_num', (this.formData.order_num || 0).toString());
@@ -1359,7 +1329,9 @@ export class GalleryComponent implements OnInit {
       // Standard JSON update / create with image_url
       const payload = {
         ...this.formData,
-        category: targetCategory
+        title: finalTitle,
+        category: targetCategory,
+        is_visible: this.formData.is_visible ? 1 : 0
       };
 
       if (this.isEditing()) {
