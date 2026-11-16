@@ -265,7 +265,7 @@ import { GalleryItem } from '../../core/models/models';
 
                 <!-- Clean Card Footer -->
                 <div class="photo-card-footer">
-                  <span class="badge-category" [ngClass]="getCategoryBadgeClass(photo.category)">
+                  <span class="badge-category" [ngClass]="getCategoryBadgeClass(photo.category)" [title]="getCategoryDisplayName(photo.category)">
                     {{ getCategoryDisplayName(photo.category) }}
                   </span>
                   
@@ -1027,32 +1027,36 @@ import { GalleryItem } from '../../core/models/models';
 
     /* Card Footer & Action Buttons */
     .photo-card-footer {
-      padding: 0.65rem 0.85rem;
+      padding: 0.55rem 0.75rem;
       background: #ffffff;
       border-top: 1px solid #f1f5f9;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 0.5rem;
+      gap: 0.4rem;
+      min-width: 0;
     }
     .action-btn-group {
       display: flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 0.28rem;
+      flex-shrink: 0;
+      margin-left: auto;
     }
     .action-icon-btn {
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       padding: 0;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid #e2e8f0;
       background: #f8fafc;
       color: #64748b;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       cursor: pointer;
+      flex-shrink: 0;
       transition: all 0.15s ease;
     }
     .action-icon-btn:hover {
@@ -1073,14 +1077,18 @@ import { GalleryItem } from '../../core/models/models';
     }
 
     .badge-category {
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      padding: 0.28rem 0.6rem;
+      font-size: 0.69rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      padding: 0.22rem 0.5rem;
       border-radius: 6px;
       display: inline-block;
       white-space: nowrap;
-      text-transform: uppercase;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1 1 auto;
+      min-width: 0;
+      max-width: 100%;
     }
     .badge-food { background: #fee2e2; color: #991b1b; }
     .badge-skill { background: #fef3c7; color: #92400e; }
