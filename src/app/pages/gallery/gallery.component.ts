@@ -66,7 +66,7 @@ import { GalleryItem } from '../../core/models/models';
                 (click)="selectCategory(cat)"
               >
                 <i [class]="getCategoryIcon(cat)"></i>
-                <span>{{ cat }}</span>
+                <span>{{ getCategoryDisplayName(cat) }}</span>
                 <span class="badge bg-light text-dark rounded-pill py-0 px-1.5 ms-0.5 border" [style.fontSize]="'0.7rem'">
                   {{ countByCategory(cat) }}
                 </span>
@@ -115,20 +115,30 @@ import { GalleryItem } from '../../core/models/models';
           <div>
             Showing <strong>{{ pagedPhotos().length }}</strong> of <strong>{{ filteredPhotos().length }}</strong> matching photos
             @if (activeCategory) {
-              <span> in <strong>{{ activeCategory }}</strong></span>
+              <span> in <strong>{{ getCategoryDisplayName(activeCategory) }}</strong></span>
             }
             @if (searchQuery) {
               <span> matching "<em class="text-dark">{{ searchQuery }}</em>"</span>
             }
           </div>
-          <div class="d-flex align-items-center gap-2">
-            <span>Per page:</span>
-            <select class="form-select form-select-sm per-page-select" [(ngModel)]="pageSize" (ngModelChange)="currentPage = 1">
-              <option [ngValue]="12">12</option>
-              <option [ngValue]="24">24</option>
-              <option [ngValue]="48">48</option>
-              <option [ngValue]="999">All Photos</option>
-            </select>
+          <div class="d-flex align-items-center gap-3 flex-wrap">
+            <div class="d-flex align-items-center gap-1.5">
+              <span>Sort:</span>
+              <select class="form-select form-select-sm sort-select" [(ngModel)]="sortBy" (ngModelChange)="applyFilter()">
+                <option value="newest">Newest Uploads First</option>
+                <option value="order">Display Order (1 &rarr; 99)</option>
+                <option value="oldest">Oldest First</option>
+              </select>
+            </div>
+            <div class="d-flex align-items-center gap-1.5">
+              <span>Per page:</span>
+              <select class="form-select form-select-sm per-page-select" [(ngModel)]="pageSize" (ngModelChange)="currentPage = 1">
+                <option [ngValue]="12">12</option>
+                <option [ngValue]="24">24</option>
+                <option [ngValue]="48">48</option>
+                <option [ngValue]="999">All Photos</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -145,6 +155,7 @@ import { GalleryItem } from '../../core/models/models';
                     loading="lazy"
                     decoding="async"
                     class="w-100 h-100 object-fit-cover photo-thumb"
+                    (error)="onImageError($event)"
                   >
                   <!-- Zoom overlay -->
                   <div class="thumb-hover-overlay">
@@ -152,6 +163,13 @@ import { GalleryItem } from '../../core/models/models';
                       <i class="bi bi-zoom-in me-1"></i> Full View
                     </span>
                   </div>
+
+                  <!-- Recent Upload Badge -->
+                  @if (isRecent(photo)) {
+                    <span class="badge position-absolute top-0 start-0 m-2 bg-warning text-dark fw-bold shadow-sm" style="font-size: 0.7rem; z-index: 2;">
+                      <i class="bi bi-stars me-1"></i>NEW
+                    </span>
+                  }
 
                   <!-- Visibility Badge -->
                   <span 
@@ -269,6 +287,7 @@ import { GalleryItem } from '../../core/models/models';
               [src]="resolveImageUrl(lightboxPhoto()?.image_url)" 
               [alt]="lightboxPhoto()?.title" 
               class="img-fluid rounded lightbox-full-img"
+              (error)="onImageError($event)"
             >
           </div>
 
@@ -655,11 +674,12 @@ import { GalleryItem } from '../../core/models/models';
       border: none;
     }
 
-    .per-page-select {
+    .per-page-select, .sort-select {
       width: auto;
       display: inline-block;
       padding-top: 0.2rem;
       padding-bottom: 0.2rem;
+      font-weight: 500;
     }
 
     .photo-card {
@@ -800,6 +820,18 @@ export class GalleryComponent implements OnInit {
   filteredPhotos = signal<GalleryItem[]>([]);
   activeCategory = '';
   searchQuery = '';
+  sortBy: 'newest' | 'order' | 'oldest' = 'newest';
+
+  isRecent(photo: GalleryItem): boolean {
+    if (!photo) return false;
+    if (photo.id && photo.id >= 1000) return true;
+    if (photo.created_at) {
+      const created = new Date(photo.created_at).getTime();
+      const diffHours = (Date.now() - created) / (1000 * 60 * 60);
+      return diffHours <= 72; // within last 3 days
+    }
+    return false;
+  }
 
   // Dynamic Categories tracking
   userAddedCategories = signal<string[]>([]);
@@ -956,7 +988,7 @@ export class GalleryComponent implements OnInit {
   }
 
   applyFilter(): void {
-    let list = this.photos();
+    let list = [...this.photos()];
 
     // Category filter
     if (this.activeCategory) {
@@ -979,6 +1011,19 @@ export class GalleryComponent implements OnInit {
         (p.category && p.category.toLowerCase().includes(q)) ||
         (p.image_url && p.image_url.toLowerCase().includes(q))
       );
+    }
+
+    // Sort order
+    if (this.sortBy === 'newest') {
+      list.sort((a, b) => (b.id || 0) - (a.id || 0));
+    } else if (this.sortBy === 'oldest') {
+      list.sort((a, b) => (a.id || 0) - (b.id || 0));
+    } else if (this.sortBy === 'order') {
+      list.sort((a, b) => {
+        const orderDiff = (a.order_num || 0) - (b.order_num || 0);
+        if (orderDiff !== 0) return orderDiff;
+        return (b.id || 0) - (a.id || 0);
+      });
     }
 
     this.filteredPhotos.set(list);
@@ -1082,7 +1127,7 @@ export class GalleryComponent implements OnInit {
       image_url: '',
       caption: '',
       is_visible: true,
-      order_num: this.photos().length + 1
+      order_num: 1
     };
     this.showModal.set(true);
   }
@@ -1158,8 +1203,9 @@ export class GalleryComponent implements OnInit {
   private handleSaveSuccess(category: string): void {
     this.isSubmitting.set(false);
     this.showModal.set(false);
-    // Switch to that category so user sees their new upload immediately
+    // Switch to that category and jump to Page 1 so user sees their new upload immediately at the top
     this.activeCategory = category;
+    this.currentPage = 1;
     this.loadPhotos();
   }
 
