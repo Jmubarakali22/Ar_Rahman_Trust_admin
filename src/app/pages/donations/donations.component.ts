@@ -199,17 +199,15 @@ import { Donation } from '../../core/models/models';
                 <th>Donor Name &amp; Phone</th>
                 <th>Amount</th>
                 <th>Type</th>
-                <th>Method</th>
-                <th>Txn Ref / UTR</th>
                 <th>Status</th>
                 <th>Date</th>
-                <th class="text-end" style="min-width: 155px; width: 155px;">Actions</th>
+                <th class="text-end" style="min-width: 175px;">Actions</th>
               </tr>
             </thead>
             <tbody>
               @if (isLoading()) {
                 <tr>
-                  <td colspan="10" class="text-center py-5">
+                  <td colspan="8" class="text-center py-5">
                     <div class="spinner-border text-primary" role="status"></div>
                   </td>
                 </tr>
@@ -247,14 +245,6 @@ import { Donation } from '../../core/models/models';
                       </span>
                     </td>
                     <td>
-                      <span class="badge bg-secondary text-uppercase" style="font-size: 10px; padding: 2.5px 5px;">{{ item.payment_method }}</span>
-                    </td>
-                    <td>
-                      <span class="font-monospace text-muted text-truncate d-inline-block" style="max-width: 95px; font-size: 10.5px;" [title]="item.transaction_id || '-'">
-                        {{ item.transaction_id || '-' }}
-                      </span>
-                    </td>
-                    <td>
                       <span class="badge" [ngClass]="{
                         'badge-soft-success': item.status === 'verified' || item.status === 'completed',
                         'badge-soft-warning': item.status === 'pending',
@@ -264,30 +254,26 @@ import { Donation } from '../../core/models/models';
                       </span>
                     </td>
                     <td class="text-muted text-nowrap" style="font-size: 11px;">{{ item.created_at | date:'mediumDate' }}</td>
-                    <td class="text-end" style="min-width: 155px; width: 155px; white-space: nowrap;">
-                      <div class="btn-group btn-group-sm action-btn-group">
-                        <!-- Download PDF Receipt -->
-                        <button class="btn btn-outline-danger" title="Download Official PDF Receipt" (click)="downloadReceiptPDF(item)">
-                          <i class="bi bi-file-earmark-pdf"></i>
-                        </button>
-                        <!-- Send PDF Receipt on WhatsApp -->
-                        <button class="btn btn-outline-success" title="Send Official PDF Receipt on WhatsApp" (click)="openWhatsAppModal(item)" style="color: #25D366; border-color: #25D366;">
+                    <td class="text-end" style="min-width: 175px; white-space: nowrap;">
+                      <div class="d-flex align-items-center justify-content-end gap-1.5">
+                        <!-- Send Receipt on WhatsApp -->
+                        <button type="button" class="btn btn-outline-success action-btn" title="Send Receipt on WhatsApp" (click)="openWhatsAppModal(item)" style="color: #25D366; border-color: #25D366;">
                           <i class="bi bi-whatsapp"></i>
                         </button>
                         <!-- Send WhatsApp Reminder (Single) -->
-                        <button class="btn btn-outline-warning" title="Send WhatsApp Donation Reminder to this donor" (click)="openSingleReminderModal(item)" style="color: #d97706; border-color: #f59e0b;">
+                        <button type="button" class="btn btn-outline-warning action-btn" title="Send WhatsApp Donation Reminder to this donor" (click)="openSingleReminderModal(item)" style="color: #d97706; border-color: #f59e0b;">
                           <i class="bi bi-bell-fill"></i>
                         </button>
                         <!-- Receipt View / Print -->
-                        <button class="btn btn-outline-secondary" title="View Full Receipt" (click)="viewReceipt(item)">
+                        <button type="button" class="btn btn-outline-secondary action-btn" title="View & Print Full Receipt" (click)="viewReceipt(item)">
                           <i class="bi bi-printer"></i>
                         </button>
                         <!-- Edit -->
-                        <button class="btn btn-outline-primary" title="Edit Donation" (click)="openEditModal(item)">
+                        <button type="button" class="btn btn-outline-primary action-btn" title="Edit Donation" (click)="openEditModal(item)">
                           <i class="bi bi-pencil"></i>
                         </button>
                         <!-- Delete -->
-                        <button class="btn btn-outline-danger" title="Delete Donation" (click)="deleteDonation(item.id)">
+                        <button type="button" class="btn btn-outline-danger action-btn" title="Delete Donation" (click)="deleteDonation(item.id)">
                           <i class="bi bi-trash"></i>
                         </button>
                       </div>
@@ -295,7 +281,7 @@ import { Donation } from '../../core/models/models';
                   </tr>
                 } @empty {
                   <tr>
-                    <td colspan="10" class="text-center py-5 text-muted">
+                    <td colspan="8" class="text-center py-5 text-muted">
                       No donations match your filter criteria.
                     </td>
                   </tr>
@@ -470,12 +456,9 @@ import { Donation } from '../../core/models/models';
             <!-- Modal Header (Sticky & Compact) -->
             <div class="modal-header bg-light border-bottom py-2 px-3 d-flex justify-content-between align-items-center">
               <h6 class="modal-title fw-bold text-dark mb-0 d-flex align-items-center">
-                <i class="bi bi-file-earmark-pdf-fill me-2 text-danger"></i>Official Donation Receipt Voucher
+                <i class="bi bi-receipt-cutoff me-2 text-primary"></i>Official Donation Receipt Voucher
               </h6>
               <div class="d-flex align-items-center gap-1 gap-sm-2">
-                <button type="button" class="btn btn-outline-danger btn-sm py-1 px-2 d-none d-sm-inline-flex align-items-center" [disabled]="isGeneratingPdf()" (click)="downloadReceiptPDF(activeReceipt)">
-                  <i class="bi bi-file-earmark-pdf me-1"></i> PDF
-                </button>
                 <button type="button" class="btn btn-outline-success btn-sm py-1 px-2 d-none d-sm-inline-flex align-items-center" (click)="openWhatsAppModal(activeReceipt)">
                   <i class="bi bi-whatsapp me-1"></i> WhatsApp
                 </button>
@@ -603,18 +586,11 @@ import { Donation } from '../../core/models/models';
             <div class="modal-footer bg-light border-top py-2 px-3 d-flex flex-wrap justify-content-between gap-2">
               <button type="button" class="btn btn-secondary btn-sm" (click)="showReceiptModal.set(false)">Close</button>
               <div class="d-flex flex-wrap gap-2">
-                <button type="button" class="btn btn-outline-danger btn-sm" [disabled]="isGeneratingPdf()" (click)="downloadReceiptPDF(activeReceipt)">
-                  @if (isGeneratingPdf()) {
-                    <span class="spinner-border spinner-border-sm me-1" role="status"></span> Generating PDF...
-                  } @else {
-                    <i class="bi bi-file-earmark-pdf-fill me-1"></i> Download PDF Receipt
-                  }
-                </button>
                 <button type="button" class="btn btn-success btn-sm" (click)="openWhatsAppModal(activeReceipt)" style="background-color: #25D366; border-color: #25D366;">
                   <i class="bi bi-whatsapp me-1"></i> Send on WhatsApp
                 </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="printReceipt()">
-                  <i class="bi bi-printer me-1"></i> Print
+                <button type="button" class="btn btn-trust-primary btn-sm" (click)="printReceipt()">
+                  <i class="bi bi-printer me-1"></i> Print Receipt
                 </button>
               </div>
             </div>
@@ -1147,6 +1123,22 @@ import { Donation } from '../../core/models/models';
       border-color: #cbd5e1;
       color: #0F3D63;
       background-color: #ffffff;
+    }
+
+    .action-btn {
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 7px;
+      font-size: 0.8rem;
+      transition: all 0.15s ease;
+    }
+    .action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
     }
   `]
 })
