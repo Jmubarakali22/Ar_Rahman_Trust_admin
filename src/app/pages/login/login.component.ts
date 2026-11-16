@@ -69,8 +69,8 @@ import { AuthService } from '../../core/services/auth.service';
                     class="mobile-logo-img"
                   >
                 </div>
-                <h3 class="fw-bold text-navy mb-0">Ar Rahman Trust</h3>
-                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 mt-1 small">
+                <h3 class="fw-bold text-white mb-0">Ar Rahman Trust</h3>
+                <span class="badge bg-white bg-opacity-15 text-white border border-white border-opacity-25 rounded-pill px-3 py-1 mt-1 small">
                   Reg. Charity No. 04/16/2020
                 </span>
               </div>
@@ -249,12 +249,12 @@ import { AuthService } from '../../core/services/auth.service';
             </div>
 
             <!-- Footer Details -->
-            <div class="form-panel-footer mt-4 pt-3 border-top d-flex flex-wrap align-items-center justify-content-between gap-2 text-muted small">
+            <div class="form-panel-footer mt-4 pt-3 border-top d-flex flex-wrap align-items-center justify-content-between gap-2 text-white-50 small">
               <div class="d-flex align-items-center gap-1">
                 <i class="bi bi-shield-check text-success"></i>
                 <span>Authorized Trustee & Admin Access Only</span>
               </div>
-              <div class="text-secondary opacity-75">
+              <div class="text-white-50 opacity-75">
                 v2.0 &bull; Ar Rahman Trust
               </div>
             </div>
@@ -406,10 +406,11 @@ import { AuthService } from '../../core/services/auth.service';
     .login-hero-panel {
       position: relative;
       width: 46%;
-      background: linear-gradient(145deg, #071f36 0%, #0F3D63 60%, #0d4b7d 100%);
+      background: #ffffff;
       padding: 3rem 2.5rem;
-      color: #ffffff;
+      color: #0f172a;
       overflow: hidden;
+      border-right: 1px solid #e2e8f0;
     }
 
     
@@ -425,15 +426,17 @@ import { AuthService } from '../../core/services/auth.service';
       height: 150px;
       border-radius: 26px;
       background: #ffffff;
-      padding: 18px;
+      padding: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 0 0 6px rgba(255, 255, 255, 0.2);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 12px 30px rgba(15, 61, 99, 0.12), 0 0 0 4px rgba(15, 61, 99, 0.03);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .hero-logo-circle:hover {
       transform: scale(1.04);
+      box-shadow: 0 16px 36px rgba(15, 61, 99, 0.18), 0 0 0 4px rgba(15, 61, 99, 0.06);
     }
     .hero-logo-img {
       width: 100%;
@@ -444,13 +447,12 @@ import { AuthService } from '../../core/services/auth.service';
       font-size: 1.65rem;
       font-weight: 800;
       letter-spacing: -0.02em;
-      color: #ffffff;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      color: #0F3D63;
     }
     .hero-logo-subtitle {
       font-size: 0.88rem;
-      color: rgba(255, 255, 255, 0.75);
-      font-weight: 500;
+      color: #64748b;
+      font-weight: 600;
       letter-spacing: 0.05em;
     }
 
@@ -460,9 +462,9 @@ import { AuthService } from '../../core/services/auth.service';
       left: 0;
       right: 0;
       bottom: 0;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-image: radial-gradient(rgba(15, 61, 99, 0.06) 1px, transparent 1px);
       background-size: 24px 24px;
-      opacity: 0.6;
+      opacity: 0.8;
       pointer-events: none;
     }
 
@@ -494,14 +496,14 @@ import { AuthService } from '../../core/services/auth.service';
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
       border-radius: 20px;
       padding: 0.35rem 0.85rem;
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.02em;
+      color: #0F3D63;
     }
 
     .hero-brand-name {
@@ -643,13 +645,13 @@ import { AuthService } from '../../core/services/auth.service';
 
     .server-status-text {
       font-size: 0.75rem;
-      color: #94a3b8;
+      color: #64748b;
       font-weight: 500;
     }
 
     .encryption-tag {
       font-size: 0.72rem;
-      color: #cbd5e1;
+      color: #64748b;
       font-weight: 600;
     }
 
@@ -658,9 +660,10 @@ import { AuthService } from '../../core/services/auth.service';
        ========================================================================== */
     .login-form-panel {
       flex: 1;
-      background: #ffffff;
+      background: linear-gradient(145deg, #071f36 0%, #0F3D63 60%, #0d4b7d 100%);
       padding: 3rem 3rem 2.25rem 3rem;
       min-width: 0;
+      color: #ffffff;
     }
 
     @media (max-width: 991px) {
@@ -768,12 +771,12 @@ import { AuthService } from '../../core/services/auth.service';
       gap: 0.25rem;
       font-size: 0.83rem;
       font-weight: 600;
-      color: #334155;
+      color: #f1f5f9;
       margin-bottom: 0.4rem;
     }
 
     .required-star {
-      color: #ef4444;
+      color: #f87171;
       font-size: 0.85rem;
     }
 
@@ -782,35 +785,35 @@ import { AuthService } from '../../core/services/auth.service';
       border: none;
       padding: 0;
       font-size: 0.78rem;
-      color: #0284c7;
+      color: #38bdf8;
       font-weight: 600;
       text-decoration: underline;
       cursor: pointer;
     }
     .help-link-btn:hover {
-      color: #0369a1;
+      color: #7dd3fc;
     }
 
     .input-container {
       position: relative;
       display: flex;
       align-items: center;
-      background: #f8fafc;
-      border: 1.5px solid #e2e8f0;
+      background: #ffffff;
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
       border-radius: 12px;
       transition: all 0.2s ease;
       overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
     }
 
     .input-container:hover {
-      border-color: #cbd5e1;
-      background: #ffffff;
+      border-color: #38bdf8;
     }
 
     .input-container.is-focused {
-      border-color: #0F3D63;
+      border-color: #38bdf8;
       background: #ffffff;
-      box-shadow: 0 0 0 4px rgba(15, 61, 99, 0.12);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.35);
     }
 
     .input-icon-lead {
@@ -884,9 +887,10 @@ import { AuthService } from '../../core/services/auth.service';
 
     .session-badge {
       font-size: 0.73rem;
-      color: #64748b;
+      color: #cbd5e1;
       font-weight: 500;
-      background: #f1f5f9;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       padding: 0.2rem 0.5rem;
       border-radius: 6px;
     }
@@ -895,8 +899,8 @@ import { AuthService } from '../../core/services/auth.service';
     .btn-login-primary {
       width: auto;
       min-width: 170px;
-      background: linear-gradient(135deg, #0F3D63 0%, #16568A 100%);
-      color: #ffffff;
+      background: #ffffff;
+      color: #0F3D63;
       border: none;
       border-radius: 12px;
       padding: 0.75rem 2rem;
@@ -907,14 +911,15 @@ import { AuthService } from '../../core/services/auth.service';
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 14px rgba(15, 61, 99, 0.25);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .btn-login-primary:hover:not(:disabled) {
-      background: linear-gradient(135deg, #0a2740 0%, #0F3D63 100%);
+      background: #f1f5f9;
+      color: #0a2740;
       transform: translateY(-2px);
-      box-shadow: 0 8px 22px rgba(15, 61, 99, 0.35);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     }
 
     .btn-login-primary:active:not(:disabled) {
