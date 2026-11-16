@@ -306,20 +306,84 @@ import { Donation } from '../../core/models/models';
         </div>
 
         <!-- Pagination Controls -->
-        <div class="p-3 border-top d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
-          <div class="small text-muted">
-            Showing {{ donations().length }} of {{ totalDonations() }} records
+        @if (totalPages() > 1 || totalDonations() > 0) {
+          <div class="px-3 py-3 border-top d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 bg-light bg-opacity-25 rounded-bottom">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+              <span class="small text-muted">
+                Showing <strong>{{ paginationInfo().start }} &ndash; {{ paginationInfo().end }}</strong> of <strong>{{ paginationInfo().total }}</strong> records
+                &bull; Page <strong>{{ currentPage() }}</strong> of <strong>{{ totalPages() }}</strong>
+              </span>
+
+              <div class="d-flex align-items-center gap-1.5 small text-muted">
+                <span>Per page:</span>
+                <select class="form-select form-select-sm per-page-select" [ngModel]="pageSize()" (ngModelChange)="onPageSizeChange($event)">
+                  <option [ngValue]="10">10</option>
+                  <option [ngValue]="25">25</option>
+                  <option [ngValue]="50">50</option>
+                  <option [ngValue]="100">100</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-1.5 flex-wrap justify-content-center">
+              <!-- First Page Button -->
+              <button 
+                type="button"
+                class="btn btn-sm page-nav-btn" 
+                [disabled]="currentPage() === 1"
+                (click)="changePage(1)"
+                title="First Page"
+              >
+                <i class="bi bi-chevron-double-left"></i>
+              </button>
+
+              <!-- Prev Page Button -->
+              <button 
+                type="button"
+                class="btn btn-sm page-nav-btn" 
+                [disabled]="currentPage() === 1"
+                (click)="changePage(currentPage() - 1)"
+                title="Previous Page"
+              >
+                <i class="bi bi-chevron-left"></i>
+              </button>
+
+              <!-- Numbered Page Buttons -->
+              @for (p of visiblePages(); track p) {
+                <button 
+                  type="button"
+                  class="btn btn-sm page-num-btn"
+                  [ngClass]="currentPage() === p ? 'active-page' : ''"
+                  (click)="changePage(p)"
+                >
+                  {{ p }}
+                </button>
+              }
+
+              <!-- Next Page Button -->
+              <button 
+                type="button"
+                class="btn btn-sm page-nav-btn" 
+                [disabled]="currentPage() === totalPages()"
+                (click)="changePage(currentPage() + 1)"
+                title="Next Page"
+              >
+                <i class="bi bi-chevron-right"></i>
+              </button>
+
+              <!-- Last Page Button -->
+              <button 
+                type="button"
+                class="btn btn-sm page-nav-btn" 
+                [disabled]="currentPage() === totalPages()"
+                (click)="changePage(totalPages())"
+                title="Last Page"
+              >
+                <i class="bi bi-chevron-double-right"></i>
+              </button>
+            </div>
           </div>
-          <div class="btn-group btn-group-sm">
-            <button class="btn btn-outline-secondary" [disabled]="currentPage <= 1" (click)="changePage(currentPage - 1)">
-              Previous
-            </button>
-            <span class="btn btn-light disabled text-dark fw-bold">Page {{ currentPage }} of {{ totalPages() || 1 }}</span>
-            <button class="btn btn-outline-secondary" [disabled]="currentPage >= totalPages()" (click)="changePage(currentPage + 1)">
-              Next
-            </button>
-          </div>
-        </div>
+        }
       </div>
     </div>
 
@@ -1023,7 +1087,75 @@ import { Donation } from '../../core/models/models';
         </div>
       </div>
     }
-  `
+  `,
+  styles: [`
+    .page-nav-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .page-nav-btn:hover:not(:disabled) {
+      background: #eff6ff;
+      border-color: #0F3D63;
+      color: #0F3D63;
+    }
+    .page-nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: #f8fafc;
+      border-color: #e2e8f0;
+      color: #94a3b8;
+    }
+
+    .page-num-btn {
+      min-width: 34px;
+      height: 32px;
+      padding: 0 8px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .page-num-btn:hover:not(.active-page) {
+      background: #eff6ff;
+      border-color: #0F3D63;
+      color: #0F3D63;
+    }
+
+    .active-page {
+      background: #0F3D63 !important;
+      border-color: #0F3D63 !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 6px rgba(15, 61, 99, 0.3);
+      cursor: default;
+    }
+
+    .per-page-select {
+      width: auto;
+      display: inline-block;
+      padding: 0.2rem 1.6rem 0.2rem 0.55rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border-color: #cbd5e1;
+      color: #0F3D63;
+      background-color: #ffffff;
+    }
+  `]
 })
 export class DonationsComponent implements OnInit {
   isLoading = signal(true);
@@ -1031,7 +1163,32 @@ export class DonationsComponent implements OnInit {
   donations = signal<Donation[]>([]);
   totalDonations = signal(0);
   totalPages = signal(1);
-  currentPage = 1;
+  currentPage = signal(1);
+  pageSize = signal(10);
+
+  paginationInfo = computed(() => {
+    const total = this.totalDonations();
+    if (total === 0) return { start: 0, end: 0, total: 0 };
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size + 1;
+    const end = Math.min(page * size, total);
+    return { start, end, total };
+  });
+
+  visiblePages = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: number[] = [];
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+      return pages;
+    }
+    const start = Math.max(1, current - 2);
+    const end = Math.min(total, current + 2);
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  });
 
   searchQuery = '';
   selectedType = '';
@@ -1204,8 +1361,8 @@ Jazakallahu Khairan for your continuous benevolence and trust.
   loadDonations(): void {
     this.isLoading.set(true);
     this.apiService.getDonations({
-      page: this.currentPage,
-      limit: 10,
+      page: this.currentPage(),
+      limit: this.pageSize(),
       search: this.searchQuery,
       type: this.selectedType,
       status: this.selectedStatus,
@@ -1228,7 +1385,7 @@ Jazakallahu Khairan for your continuous benevolence and trust.
   private dateDebounceTimer: any = null;
 
   onSearchChange(): void {
-    this.currentPage = 1;
+    this.currentPage.set(1);
     if (this.searchDebounceTimer) {
       clearTimeout(this.searchDebounceTimer);
     }
@@ -1241,7 +1398,7 @@ Jazakallahu Khairan for your continuous benevolence and trust.
     if (this.searchDebounceTimer) {
       clearTimeout(this.searchDebounceTimer);
     }
-    this.currentPage = 1;
+    this.currentPage.set(1);
     this.loadDonations();
   }
 
@@ -1259,7 +1416,7 @@ Jazakallahu Khairan for your continuous benevolence and trust.
     this.datePreset = '';
     this.startDate = '';
     this.endDate = '';
-    this.currentPage = 1;
+    this.currentPage.set(1);
     this.loadDonations();
   }
 
@@ -1272,7 +1429,7 @@ Jazakallahu Khairan for your continuous benevolence and trust.
 
   onDatePresetChange(): void {
     const now = new Date();
-    this.currentPage = 1;
+    this.currentPage.set(1);
 
     switch (this.datePreset) {
       case 'today': {
@@ -1323,7 +1480,7 @@ Jazakallahu Khairan for your continuous benevolence and trust.
 
   onCustomDateChange(): void {
     this.datePreset = 'custom';
-    this.currentPage = 1;
+    this.currentPage.set(1);
     if (this.dateDebounceTimer) {
       clearTimeout(this.dateDebounceTimer);
     }
@@ -1339,7 +1496,7 @@ Jazakallahu Khairan for your continuous benevolence and trust.
     this.datePreset = '';
     this.startDate = '';
     this.endDate = '';
-    this.currentPage = 1;
+    this.currentPage.set(1);
     this.loadDonations();
   }
 
@@ -1371,7 +1528,17 @@ Jazakallahu Khairan for your continuous benevolence and trust.
   }
 
   changePage(page: number): void {
-    this.currentPage = page;
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+      this.loadDonations();
+      window.scrollTo({ top: 120, behavior: 'smooth' });
+    }
+  }
+
+  onPageSizeChange(newSize: any): void {
+    const size = Number(newSize) || 10;
+    this.pageSize.set(size);
+    this.currentPage.set(1);
     this.loadDonations();
   }
 

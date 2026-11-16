@@ -244,17 +244,30 @@ import { GalleryItem } from '../../core/models/models';
         </div>
 
         <!-- Pagination Controls -->
-        @if (totalPages() > 1) {
-          <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 mt-4 pt-3 border-top">
-            <div class="text-muted small">
-              Page <strong>{{ currentPage() }}</strong> of <strong>{{ totalPages() }}</strong> ({{ paginationInfo().total }} total photos)
+        @if (totalPages() > 1 || filteredPhotos().length > 0) {
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mt-4 pt-3 border-top">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+              <span class="small text-muted">
+                Showing <strong>{{ paginationInfo().start }} &ndash; {{ paginationInfo().end }}</strong> of <strong>{{ paginationInfo().total }}</strong> photos
+                &bull; Page <strong>{{ currentPage() }}</strong> of <strong>{{ totalPages() }}</strong>
+              </span>
+
+              <div class="d-flex align-items-center gap-1.5 small text-muted">
+                <span>Per page:</span>
+                <select class="form-select form-select-sm per-page-select" [ngModel]="pageSize()" (ngModelChange)="onPageSizeChange($event)">
+                  <option [ngValue]="12">12</option>
+                  <option [ngValue]="24">24</option>
+                  <option [ngValue]="48">48</option>
+                  <option [ngValue]="96">96</option>
+                </select>
+              </div>
             </div>
 
             <div class="d-flex align-items-center gap-1.5 flex-wrap justify-content-center">
               <!-- First Page Button -->
               <button 
                 type="button"
-                class="btn btn-sm btn-outline-secondary page-nav-btn" 
+                class="btn btn-sm page-nav-btn" 
                 [disabled]="currentPage() === 1"
                 (click)="goToPage(1)"
                 title="First Page"
@@ -265,7 +278,7 @@ import { GalleryItem } from '../../core/models/models';
               <!-- Prev Page Button -->
               <button 
                 type="button"
-                class="btn btn-sm btn-outline-secondary page-nav-btn" 
+                class="btn btn-sm page-nav-btn" 
                 [disabled]="currentPage() === 1"
                 (click)="goToPage(currentPage() - 1)"
                 title="Previous Page"
@@ -278,7 +291,7 @@ import { GalleryItem } from '../../core/models/models';
                 <button 
                   type="button"
                   class="btn btn-sm page-num-btn"
-                  [ngClass]="currentPage() === p ? 'btn-navy-active active-page' : 'btn-outline-secondary'"
+                  [ngClass]="currentPage() === p ? 'active-page' : ''"
                   (click)="goToPage(p)"
                 >
                   {{ p }}
@@ -288,7 +301,7 @@ import { GalleryItem } from '../../core/models/models';
               <!-- Next Page Button -->
               <button 
                 type="button"
-                class="btn btn-sm btn-outline-secondary page-nav-btn" 
+                class="btn btn-sm page-nav-btn" 
                 [disabled]="currentPage() === totalPages()"
                 (click)="goToPage(currentPage() + 1)"
                 title="Next Page"
@@ -299,7 +312,7 @@ import { GalleryItem } from '../../core/models/models';
               <!-- Last Page Button -->
               <button 
                 type="button"
-                class="btn btn-sm btn-outline-secondary page-nav-btn" 
+                class="btn btn-sm page-nav-btn" 
                 [disabled]="currentPage() === totalPages()"
                 (click)="goToPage(totalPages())"
                 title="Last Page"
@@ -733,6 +746,23 @@ import { GalleryItem } from '../../core/models/models';
       justify-content: center;
       border-radius: 8px;
       font-size: 0.75rem;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .page-nav-btn:hover:not(:disabled) {
+      background: #eff6ff;
+      border-color: #0F3D63;
+      color: #0F3D63;
+    }
+    .page-nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: #f8fafc;
+      border-color: #e2e8f0;
+      color: #94a3b8;
     }
 
     .page-num-btn {
@@ -742,14 +772,36 @@ import { GalleryItem } from '../../core/models/models';
       font-weight: 600;
       font-size: 0.82rem;
       border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #334155;
+      cursor: pointer;
       transition: all 0.15s ease;
+    }
+    .page-num-btn:hover:not(.active-page) {
+      background: #eff6ff;
+      border-color: #0F3D63;
+      color: #0F3D63;
     }
 
     .active-page {
-      background-color: #0F3D63 !important;
+      background: #0F3D63 !important;
       border-color: #0F3D63 !important;
       color: #ffffff !important;
       box-shadow: 0 2px 6px rgba(15, 61, 99, 0.3);
+      cursor: default;
+    }
+
+    .per-page-select {
+      width: auto;
+      display: inline-block;
+      padding: 0.2rem 1.6rem 0.2rem 0.55rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border-color: #cbd5e1;
+      color: #0F3D63;
+      background-color: #ffffff;
     }
 
     .photo-card {
