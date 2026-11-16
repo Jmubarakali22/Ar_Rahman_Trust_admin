@@ -361,15 +361,15 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                     </td>
 
                     <!-- Actions -->
-                    <td class="text-end">
-                      <div class="d-inline-flex gap-1">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="viewVoucher(item)" title="View & Print Voucher Slip">
-                          <i class="bi bi-eye"></i>
+                    <td class="text-end" style="min-width: 140px; white-space: nowrap;">
+                      <div class="d-inline-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 8px;" (click)="viewVoucher(item)" title="View & Print Voucher Slip">
+                          <i class="bi bi-printer"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="openEditModal(item)" title="Edit Expense">
+                        <button type="button" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 8px;" (click)="openEditModal(item)" title="Edit Expense">
                           <i class="bi bi-pencil-square"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteExpense(item)" title="Delete Record">
+                        <button type="button" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 8px;" (click)="deleteExpense(item)" title="Delete Record">
                           <i class="bi bi-trash"></i>
                         </button>
                       </div>

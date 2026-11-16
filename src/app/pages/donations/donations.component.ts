@@ -201,7 +201,7 @@ import { Donation } from '../../core/models/models';
                 <th>Type</th>
                 <th>Status</th>
                 <th>Date</th>
-                <th class="text-end" style="min-width: 175px;">Actions</th>
+                <th class="text-end" style="min-width: 210px; width: 210px;">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -254,8 +254,8 @@ import { Donation } from '../../core/models/models';
                       </span>
                     </td>
                     <td class="text-muted text-nowrap" style="font-size: 11px;">{{ item.created_at | date:'mediumDate' }}</td>
-                    <td class="text-end" style="min-width: 175px; white-space: nowrap;">
-                      <div class="d-flex align-items-center justify-content-end gap-1.5">
+                    <td class="text-end" style="min-width: 210px; width: 210px; white-space: nowrap;">
+                      <div class="actions-wrapper">
                         <!-- Send Receipt on WhatsApp -->
                         <button type="button" class="btn btn-outline-success action-btn" title="Send Receipt on WhatsApp" (click)="openWhatsAppModal(item)" style="color: #25D366; border-color: #25D366;">
                           <i class="bi bi-whatsapp"></i>
@@ -1125,20 +1125,27 @@ import { Donation } from '../../core/models/models';
       background-color: #ffffff;
     }
 
+    .actions-wrapper {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
     .action-btn {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       padding: 0;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: 7px;
-      font-size: 0.8rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
       transition: all 0.15s ease;
     }
     .action-btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
     }
   `]
 })
