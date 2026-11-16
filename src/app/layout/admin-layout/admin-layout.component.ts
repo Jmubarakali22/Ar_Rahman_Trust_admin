@@ -170,18 +170,7 @@ import { AutoLogoutService } from '../../core/services/auto-logout.service';
           </div>
         </footer>
 
-        <!-- Floating Scroll to Top Button -->
-        @if (showScrollTop()) {
-          <button 
-            type="button" 
-            class="btn-scroll-top shadow-lg" 
-            (click)="scrollToTop()" 
-            title="Scroll to Top"
-            aria-label="Scroll to Top"
-          >
-            <i class="bi bi-chevron-up"></i>
-          </button>
-        }
+        
 
         <!-- Inactivity Countdown Warning Modal -->
         @if (autoLogoutService.showWarningModal()) {
