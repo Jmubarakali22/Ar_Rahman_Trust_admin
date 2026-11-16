@@ -80,16 +80,16 @@ import { DashboardStats, Donation } from '../../core/models/models';
             </div>
           </div>
 
-          <!-- Monthly Contribution -->
+          <!-- Fitra -->
           <div class="col-sm-6 col-xl-3">
             <div class="stat-card">
               <div class="stat-icon-wrapper" style="background: #e0f2fe; color: #0284c7;">
                 <i class="bi bi-calendar-check-fill"></i>
               </div>
               <div>
-                <div class="stat-label">Monthly Contribution</div>
+                <div class="stat-label">Fitra</div>
                 <div class="stat-value" style="color: #0284c7;">₹{{ getMonthlyContribution() | number:'1.0-0' }}</div>
-                <div class="small text-muted mt-1">{{ getMonthlyDonorsCount() }} regular contributions</div>
+                <div class="small text-muted mt-1">{{ getMonthlyDonorsCount() }} Fitra contributions</div>
               </div>
             </div>
           </div>
@@ -186,9 +186,9 @@ import { DashboardStats, Donation } from '../../core/models/models';
                           <span class="badge" [ngClass]="{
                             'bg-success': item.donation_type === 'zakat' || item.donation_type === 'zakath',
                             'bg-primary': item.donation_type === 'sadaqah',
-                            'bg-info text-dark': item.donation_type === 'monthly_donation' || item.donation_type === 'monthly_contribution' || item.donation_type === 'monthly'
+                            'bg-info text-dark': item.donation_type === 'monthly_donation' || item.donation_type === 'monthly_contribution' || item.donation_type === 'monthly' || item.donation_type === 'fitra'
                           }" style="font-size: 10px; padding: 2.5px 5.5px;">
-                            {{ (item.donation_type === 'monthly_donation' || item.donation_type === 'monthly_contribution' || item.donation_type === 'monthly') ? 'MONTHLY' : (item.donation_type === 'zakat' ? 'ZAKATH' : (item.donation_type | uppercase)) }}
+                            {{ (item.donation_type === 'monthly_donation' || item.donation_type === 'monthly_contribution' || item.donation_type === 'monthly' || item.donation_type === 'fitra') ? 'FITRA' : (item.donation_type === 'zakat' ? 'ZAKATH' : (item.donation_type | uppercase)) }}
                           </span>
                         </td>
                         <td class="fw-bold text-dark text-nowrap">₹{{ item.amount | number:'1.2-2' }}</td>
@@ -304,7 +304,8 @@ export class DashboardComponent implements OnInit {
     const item = this.typeBreakdown().find(t => 
       t.donation_type === 'monthly_donation' || 
       t.donation_type === 'monthly' || 
-      t.donation_type === 'monthly_contribution'
+      t.donation_type === 'monthly_contribution' ||
+      t.donation_type === 'fitra'
     );
     return item ? parseFloat(item.total_amount || 0) : 0;
   }
@@ -317,7 +318,8 @@ export class DashboardComponent implements OnInit {
     const item = this.typeBreakdown().find(t => 
       t.donation_type === 'monthly_donation' || 
       t.donation_type === 'monthly' || 
-      t.donation_type === 'monthly_contribution'
+      t.donation_type === 'monthly_contribution' ||
+      t.donation_type === 'fitra'
     );
     return item ? parseInt(item.count || 0, 10) : 0;
   }
