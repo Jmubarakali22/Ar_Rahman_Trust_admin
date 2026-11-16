@@ -289,29 +289,38 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #f8fafc;
 }
 
-/* Compact Table Action Button Group */
-.action-btn-group {
+/* Table Action Button Group & Spacing */
+.action-btn-group, .actions-wrapper {
   display: inline-flex !important;
   flex-wrap: nowrap !important;
-  gap: 1.5px !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
 }
 
-.action-btn-group .btn {
+.action-btn-group .btn, .actions-wrapper .btn, .action-btn {
   padding: 0 !important;
-  width: 25px !important;
-  height: 25px !important;
-  min-width: 25px !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  font-size: 0.78rem !important;
-  border-radius: 4px !important;
-  box-shadow: none !important;
+  font-size: 0.85rem !important;
+  border-radius: 8px !important;
+  margin: 0 3px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
   flex-shrink: 0 !important;
+  transition: all 0.15s ease !important;
 }
 
-.action-btn-group .btn i {
-  font-size: 0.8rem !important;
+.action-btn-group .btn:hover, .actions-wrapper .btn:hover, .action-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14) !important;
+}
+
+.action-btn-group .btn i, .actions-wrapper .btn i, .action-btn i {
+  font-size: 0.9rem !important;
   line-height: 1 !important;
 }
 

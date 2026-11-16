@@ -201,7 +201,7 @@ import { Donation } from '../../core/models/models';
                 <th>Type</th>
                 <th>Status</th>
                 <th>Date</th>
-                <th class="text-end" style="min-width: 210px; width: 210px;">Actions</th>
+                <th class="text-end" style="min-width: 230px; width: 230px;">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -254,7 +254,7 @@ import { Donation } from '../../core/models/models';
                       </span>
                     </td>
                     <td class="text-muted text-nowrap" style="font-size: 11px;">{{ item.created_at | date:'mediumDate' }}</td>
-                    <td class="text-end" style="min-width: 210px; width: 210px; white-space: nowrap;">
+                    <td class="text-end" style="min-width: 230px; width: 230px; white-space: nowrap;">
                       <div class="actions-wrapper">
                         <!-- Send Receipt on WhatsApp -->
                         <button type="button" class="btn btn-outline-success action-btn" title="Send Receipt on WhatsApp" (click)="openWhatsAppModal(item)" style="color: #25D366; border-color: #25D366;">
@@ -1126,26 +1126,28 @@ import { Donation } from '../../core/models/models';
     }
 
     .actions-wrapper {
-      display: inline-flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: flex-end !important;
+      gap: 10px !important;
     }
 
     .action-btn {
-      width: 32px;
-      height: 32px;
-      padding: 0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      transition: all 0.15s ease;
+      width: 32px !important;
+      height: 32px !important;
+      min-width: 32px !important;
+      padding: 0 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 8px !important;
+      font-size: 0.85rem !important;
+      margin: 0 2px !important;
+      transition: all 0.15s ease !important;
     }
     .action-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px) !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
     }
   `]
 })
