@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Donation, Cause, GalleryItem, Volunteer, ContactInquiry, DashboardStats } from '../models/models';
+import { Donation, Cause, GalleryItem, Volunteer, ContactInquiry, DashboardStats, Expense, ExpenseSummary } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -151,5 +151,56 @@ export class ApiService {
 
   getActivityLogs(): Observable<{ success: boolean; logs: any[] }> {
     return this.http.get<any>(`${this.base}/settings/activity-logs`);
+  }
+
+  // 8. Expenses Tracking
+  getExpenses(params: any = {}): Observable<{ success: boolean; data: Expense[]; pagination: any; summary: ExpenseSummary }> {
+    let httpParams = new HttpParams();
+    Object.keys(params).forEach(key => {
+      if (params[key] !== null && params[key] !== undefined && params[key] !== '') {
+        httpParams = httpParams.set(key, params[key]);
+      }
+    });
+    return this.http.get<any>(`${this.base}/expenses`, { params: httpParams });
+  }
+
+  getExpenseStats(): Observable<any> {
+    return this.http.get<any>(`${this.base}/expenses/stats`);
+  }
+
+  getExpense(id: number): Observable<{ success: boolean; data: Expense }> {
+    return this.http.get<any>(`${this.base}/expenses/${id}`);
+  }
+
+  createExpense(data: any, receiptFile?: File): Observable<any> {
+    if (receiptFile) {
+      const formData = new FormData();
+      Object.keys(data).forEach(key => {
+        if (data[key] !== null && data[key] !== undefined) {
+          formData.append(key, data[key]);
+        }
+      });
+      formData.append('receipt', receiptFile);
+      return this.http.post<any>(`${this.base}/expenses`, formData);
+    }
+    return this.http.post<any>(`${this.base}/expenses`, data);
+  }
+
+  updateExpense(id: number, data: any, receiptFile?: File): Observable<any> {
+    if (receiptFile) {
+      const formData = new FormData();
+      Object.keys(data).forEach(key => {
+        if (data[key] !== null && data[key] !== undefined) {
+          formData.append(key, data[key]);
+        }
+      });
+      formData.append('receipt', receiptFile);
+      return this.http.put<any>(`${this.base}/expenses/${id}`, formData);
+    }
+    return this.http.put<any>(`${this.base}/expenses/${id}`, data);
+  }
+
+  deleteExpense(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.base}/expenses/${id}`);
   }
 }

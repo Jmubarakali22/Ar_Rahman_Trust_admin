@@ -122,3 +122,29 @@ export interface DashboardStats {
   totalInquiries: number;
   unreadInquiries: number;
 }
+
+export interface Expense {
+  id: number;
+  title: string;
+  category: 'Tailoring' | 'Ration Kit' | 'Monthly Ration Kit' | string;
+  amount: number;
+  expense_date: string;
+  payment_method: 'Cash' | 'UPI' | 'Bank Transfer' | 'Cheque' | string;
+  vendor_payee?: string;
+  voucher_number?: string;
+  receipt_url?: string;
+  status: 'Paid' | 'Pending' | 'Verified' | string;
+  notes?: string;
+  recorded_by?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ExpenseSummary {
+  overall_total: number;
+  tailoring_total: number;
+  ration_kit_total: number;
+  monthly_ration_kit_total: number;
+  current_month_total: number;
+  total_count: number;
+}

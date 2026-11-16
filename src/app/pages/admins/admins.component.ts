@@ -644,8 +644,8 @@ export class AdminsComponent implements OnInit {
   // Standard fallback roles if backend API is temporarily offline
   readonly defaultRoles: Role[] = [
     { id: 1, name: 'Super Admin', description: 'Full access to all modules and account settings', permissions: ['*'], is_system: true },
-    { id: 2, name: 'Managing Trustee', description: 'Full management access to operations, finances, causes, and public media', permissions: ['dashboard', 'donations', 'causes', 'gallery', 'volunteers', 'inquiries', 'settings'], is_system: false },
-    { id: 3, name: 'Finance / Accountant', description: 'Access to financial donation records, receipt vouchers, and revenue stats', permissions: ['dashboard', 'donations'], is_system: false },
+    { id: 2, name: 'Managing Trustee', description: 'Full management access to operations, finances, causes, and public media', permissions: ['dashboard', 'donations', 'expenses', 'causes', 'gallery', 'volunteers', 'inquiries', 'settings'], is_system: false },
+    { id: 3, name: 'Finance / Accountant', description: 'Access to financial donation records, receipt vouchers, and revenue stats', permissions: ['dashboard', 'donations', 'expenses'], is_system: false },
     { id: 4, name: 'Welfare Coordinator', description: 'Management of charity causes, ration kits, relief programs, and inquiries', permissions: ['dashboard', 'causes', 'volunteers', 'inquiries'], is_system: false },
     { id: 5, name: 'Media & Communications', description: 'Responsible for public photo gallery, relief events, and inquiry responses', permissions: ['gallery', 'inquiries'], is_system: false }
   ];
@@ -654,6 +654,7 @@ export class AdminsComponent implements OnInit {
   readonly defaultPages: AvailablePage[] = [
     { key: 'dashboard', name: 'Dashboard', description: 'Overview stats and recent donations' },
     { key: 'donations', name: 'Donations & Receipts', description: 'Voucher tracking and WhatsApp dispatch' },
+    { key: 'expenses', name: 'Expenses & Relief Tracking', description: 'Tailoring, ration kits, relief expenditures & vouchers' },
     { key: 'causes', name: 'Causes & Programs', description: 'Charity causes and relief goals' },
     { key: 'gallery', name: 'Photo Gallery', description: 'Event photos and activities' },
     { key: 'volunteers', name: 'Volunteers', description: 'Volunteer registrations and applications' },
@@ -990,6 +991,7 @@ export class AdminsComponent implements OnInit {
     switch (key) {
       case 'dashboard': return 'bi-speedometer2 text-primary';
       case 'donations': return 'bi-cash-coin text-success';
+      case 'expenses': return 'bi-wallet2 text-warning';
       case 'causes': return 'bi-heart-pulse-fill text-danger';
       case 'gallery': return 'bi-images text-info';
       case 'volunteers': return 'bi-people-fill text-warning';

@@ -59,6 +59,11 @@ import { AutoLogoutService } from '../../core/services/auto-logout.service';
             <span *ngIf="!isSidebarCollapsed()">Donations</span>
           </a>
 
+          <a routerLink="/expenses" routerLinkActive="active" class="nav-item-link" *ngIf="authService.hasPermission('expenses')" (click)="closeMobileSidebar()">
+            <i class="bi bi-wallet2"></i>
+            <span *ngIf="!isSidebarCollapsed()">Expenses</span>
+          </a>
+
           <a routerLink="/causes" routerLinkActive="active" class="nav-item-link" *ngIf="authService.hasPermission('causes')" (click)="closeMobileSidebar()">
             <i class="bi bi-heart-pulse-fill"></i>
             <span *ngIf="!isSidebarCollapsed()">Causes / Programs</span>

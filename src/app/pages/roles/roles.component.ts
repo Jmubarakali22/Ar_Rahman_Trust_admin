@@ -745,6 +745,7 @@ export class RolesComponent implements OnInit {
     switch (key) {
       case 'dashboard': return 'bi-speedometer2';
       case 'donations': return 'bi-cash-coin';
+      case 'expenses': return 'bi-wallet2';
       case 'causes': return 'bi-heart-pulse-fill';
       case 'gallery': return 'bi-images';
       case 'volunteers': return 'bi-people-fill';

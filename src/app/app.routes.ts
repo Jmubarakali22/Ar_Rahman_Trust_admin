@@ -4,6 +4,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { AdminLayoutComponent } from './layout/admin-layout/admin-layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { DonationsComponent } from './pages/donations/donations.component';
+import { ExpensesComponent } from './pages/expenses/expenses.component';
 import { CausesComponent } from './pages/causes/causes.component';
 import { GalleryComponent } from './pages/gallery/gallery.component';
 import { VolunteersComponent } from './pages/volunteers/volunteers.component';
@@ -26,6 +27,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent, data: { page: 'dashboard' } },
       { path: 'donations', component: DonationsComponent, data: { page: 'donations' } },
+      { path: 'expenses', component: ExpensesComponent, data: { page: 'expenses' } },
       { path: 'causes', component: CausesComponent, data: { page: 'causes' } },
       { path: 'gallery', component: GalleryComponent, data: { page: 'gallery' } },
       { path: 'volunteers', component: VolunteersComponent, data: { page: 'volunteers' } },
