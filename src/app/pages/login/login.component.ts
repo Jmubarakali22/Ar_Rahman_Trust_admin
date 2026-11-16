@@ -42,7 +42,7 @@ import { AuthService } from '../../core/services/auth.service';
                 >
               </div>
               <h2 class="hero-logo-title mb-1">Ar Rahman Trust</h2>
-              <div class="hero-logo-subtitle">Pernambut &bull; Vellore Dist</div>
+              <div class="hero-logo-subtitle">Pernambut</div>
             </div>
 
             <!-- Bottom Hero Status -->
@@ -423,7 +423,7 @@ import { AuthService } from '../../core/services/auth.service';
     .hero-logo-circle {
       width: 150px;
       height: 150px;
-      border-radius: 50%;
+      border-radius: 26px;
       background: #ffffff;
       padding: 18px;
       display: flex;
