@@ -303,24 +303,7 @@ import { GalleryItem } from '../../core/models/models';
 
         <!-- Pagination Controls -->
         @if (totalPages() > 1 || filteredPhotos().length > 0) {
-          <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mt-4 pt-3 border-top">
-            <div class="d-flex align-items-center gap-3 flex-wrap">
-              <span class="small text-muted">
-                Showing <strong>{{ paginationInfo().start }} &ndash; {{ paginationInfo().end }}</strong> of <strong>{{ paginationInfo().total }}</strong> photos
-                &bull; Page <strong>{{ currentPage() }}</strong> of <strong>{{ totalPages() }}</strong>
-              </span>
-
-              <div class="d-flex align-items-center gap-1.5 small text-muted">
-                <span>Per page:</span>
-                <select class="form-select form-select-sm per-page-select" [ngModel]="pageSize()" (ngModelChange)="onPageSizeChange($event)">
-                  <option [ngValue]="12">12</option>
-                  <option [ngValue]="24">24</option>
-                  <option [ngValue]="48">48</option>
-                  <option [ngValue]="96">96</option>
-                </select>
-              </div>
-            </div>
-
+          <div class="d-flex justify-content-center align-items-center mt-4 pt-3 border-top">
             <div class="d-flex align-items-center gap-1.5 flex-wrap justify-content-center">
               <!-- First Page Button -->
               <button 
