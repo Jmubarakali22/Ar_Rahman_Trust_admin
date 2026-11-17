@@ -146,10 +146,10 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
         <button 
           type="button" 
           class="btn btn-sm category-pill-btn" 
-          [class.active]="selectedCategory() === 'Tailoring'" 
-          (click)="filterByCategory('Tailoring')"
+          [class.active]="selectedCategory() === 'Tailoring' || selectedCategory() === 'Tailoring Class'" 
+          (click)="filterByCategory('Tailoring Class')"
         >
-          <i class="bi bi-scissors me-1 text-purple"></i> Tailoring
+          <i class="bi bi-scissors me-1 text-purple"></i> Tailoring Class
         </button>
 
         <button 
@@ -169,6 +169,17 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
         >
           <i class="bi bi-heart-pulse-fill me-1 text-danger"></i> Medical Aid
         </button>
+
+        @for (cat of customCategories(); track cat) {
+          <button 
+            type="button" 
+            class="btn btn-sm category-pill-btn" 
+            [class.active]="selectedCategory() === cat" 
+            (click)="filterByCategory(cat)"
+          >
+            <i class="bi bi-tag-fill me-1 text-primary"></i> {{ cat }}
+          </button>
+        }
       </div>
 
       <!-- Filter Controls Toolbar Card -->
@@ -275,16 +286,14 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                 <th style="min-width: 260px;">Expense Title & Vendor</th>
                 <th style="min-width: 160px;">Category</th>
                 <th style="min-width: 130px;" class="text-end">Amount (₹)</th>
-                <th style="min-width: 110px;">Method</th>
                 <th style="min-width: 110px;">Status</th>
-                <th style="min-width: 90px;" class="text-center">Receipt</th>
-                <th style="min-width: 120px;" class="text-end">Actions</th>
+                <th style="min-width: 160px;" class="text-end">Actions</th>
               </tr>
             </thead>
             <tbody>
               @if (isLoading()) {
                 <tr>
-                  <td colspan="9" class="text-center py-5 text-muted">
+                  <td colspan="7" class="text-center py-5 text-muted">
                     <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
                     <span>Loading expense vouchers and financial records...</span>
                   </td>
@@ -333,14 +342,6 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                       ₹{{ item.amount | number:'1.2-2' }}
                     </td>
 
-                    <!-- Method -->
-                    <td>
-                      <span class="badge bg-light text-dark border px-2 py-1 small">
-                        <i class="bi" [ngClass]="getMethodIcon(item.payment_method)"></i>
-                        {{ item.payment_method || 'Cash' }}
-                      </span>
-                    </td>
-
                     <!-- Status -->
                     <td>
                       <span class="status-pill" [ngClass]="getStatusPillClass(item.status)">
@@ -349,27 +350,12 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                       </span>
                     </td>
 
-                    <!-- Receipt Bill (PDF or Image) -->
-                    <td class="text-center">
-                      @if (item.receipt_url) {
-                        <a 
-                          [href]="item.receipt_url" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          class="btn btn-sm p-1 rounded-circle" 
-                          [ngClass]="item.receipt_url.toLowerCase().includes('.pdf') ? 'btn-outline-danger' : 'btn-outline-primary'"
-                          [title]="item.receipt_url.toLowerCase().includes('.pdf') ? 'Open PDF Bill Attachment' : 'View Bill / Receipt Image'"
-                        >
-                          <i class="bi" [ngClass]="item.receipt_url.toLowerCase().includes('.pdf') ? 'bi-file-earmark-pdf-fill' : 'bi-file-earmark-image'"></i>
-                        </a>
-                      } @else {
-                        <span class="text-muted small" title="No document attached">&mdash;</span>
-                      }
-                    </td>
-
                     <!-- Actions -->
-                    <td class="text-end" style="min-width: 140px; white-space: nowrap;">
+                    <td class="text-end" style="min-width: 160px; white-space: nowrap;">
                       <div class="action-btn-group">
+                        <button type="button" class="btn btn-outline-info action-btn" (click)="viewExpense(item)" title="View Expense Details">
+                          <i class="bi bi-eye"></i>
+                        </button>
                         <button type="button" class="btn btn-outline-secondary action-btn" (click)="viewVoucher(item)" title="View & Print Voucher Slip">
                           <i class="bi bi-printer"></i>
                         </button>
@@ -384,7 +370,7 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                   </tr>
                 } @empty {
                   <tr>
-                    <td colspan="9" class="text-center py-5 text-muted">
+                    <td colspan="7" class="text-center py-5 text-muted">
                       <i class="bi bi-wallet-fill fs-1 text-secondary opacity-50 d-block mb-2"></i>
                       <div class="fw-semibold">No expense records found</div>
                       <div class="small">Try clearing search filters or click "Record Expense" to add one.</div>
@@ -488,55 +474,106 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
 
               <form (ngSubmit)="saveExpense()" autocomplete="off">
                 <div class="modal-body p-4 bg-light">
-                  <!-- Category Quick Selection -->
+                  <!-- Category Selection & Creation -->
                   <div class="bg-white p-3 rounded-3 border mb-3 shadow-sm">
-                    <label class="form-label small fw-bold text-dark mb-2 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
-                      <i class="bi bi-tags text-primary me-1"></i> Designated Category *
-                    </label>
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                      <label class="form-label small fw-bold text-dark mb-0 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
+                        <i class="bi bi-tags text-primary me-1"></i> Designated Category *
+                      </label>
+                      <button 
+                        type="button" 
+                        class="btn btn-xs rounded-pill px-2.5 py-1 fw-semibold"
+                        [ngClass]="isCreatingNewCategory() ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="toggleNewCategoryMode()"
+                        style="font-size: 11px;"
+                      >
+                        <i class="bi" [ngClass]="isCreatingNewCategory() ? 'bi-x-circle me-1' : 'bi-plus-circle-fill me-1'"></i>
+                        {{ isCreatingNewCategory() ? 'Select Existing' : '+ Create New Category' }}
+                      </button>
+                    </div>
+
+                    <!-- Category Choice Pills -->
                     <div class="d-flex gap-2 flex-wrap mb-2">
                       <button 
                         type="button" 
                         class="btn btn-sm preset-cat-btn" 
-                        [class.active]="formData.category === 'Tailoring' || formData.category === 'Tailoring Class'" 
-                        (click)="formData.category = 'Tailoring Class'"
+                        [class.active]="!isCreatingNewCategory() && (formData.category === 'Tailoring' || formData.category === 'Tailoring Class')" 
+                        (click)="selectCategory('Tailoring Class')"
                       >
                         <i class="bi bi-scissors me-1 text-purple"></i> Tailoring Class
                       </button>
                       <button 
                         type="button" 
                         class="btn btn-sm preset-cat-btn" 
-                        [class.active]="formData.category === 'Ration Kit'" 
-                        (click)="formData.category = 'Ration Kit'"
+                        [class.active]="!isCreatingNewCategory() && formData.category === 'Ration Kit'" 
+                        (click)="selectCategory('Ration Kit')"
                       >
                         <i class="bi bi-box2-heart me-1 text-success"></i> Ration Kit
                       </button>
                       <button 
                         type="button" 
                         class="btn btn-sm preset-cat-btn" 
-                        [class.active]="formData.category === 'Medical Aid'" 
-                        (click)="formData.category = 'Medical Aid'"
+                        [class.active]="!isCreatingNewCategory() && formData.category === 'Medical Aid'" 
+                        (click)="selectCategory('Medical Aid')"
                       >
                         <i class="bi bi-heart-pulse-fill me-1 text-danger"></i> Medical Aid
                       </button>
+
+                      @for (cat of customCategories(); track cat) {
+                        <button 
+                          type="button" 
+                          class="btn btn-sm preset-cat-btn" 
+                          [class.active]="!isCreatingNewCategory() && formData.category === cat" 
+                          (click)="selectCategory(cat)"
+                        >
+                          <i class="bi bi-tag-fill me-1 text-primary"></i> {{ cat }}
+                        </button>
+                      }
+
+                      <button 
+                        type="button" 
+                        class="btn btn-sm preset-cat-btn border-primary border-dashed text-primary fw-semibold" 
+                        [class.active]="isCreatingNewCategory()" 
+                        (click)="toggleNewCategoryMode()"
+                      >
+                        <i class="bi bi-plus-circle me-1"></i> + New Category
+                      </button>
                     </div>
 
-                    <div class="row g-2 align-items-center">
-                      <div class="col-sm-6">
-                        <input 
-                          type="text" 
-                          class="form-control form-control-sm" 
-                          placeholder="Or enter custom category name..." 
-                          [(ngModel)]="formData.category" 
-                          name="category" 
-                          required
-                        >
+                    <!-- Dynamic Create New Category Input -->
+                    @if (isCreatingNewCategory()) {
+                      <div class="p-2.5 rounded-3 bg-light border mt-2">
+                        <label class="form-label small fw-bold text-dark mb-1" style="font-size: 11.5px;">
+                          <i class="bi bi-folder-plus text-primary me-1"></i> Enter New Category Name *
+                        </label>
+                        <div class="input-group input-group-sm">
+                          <span class="input-group-text bg-white text-primary border-end-0"><i class="bi bi-tag"></i></span>
+                          <input 
+                            type="text" 
+                            class="form-control form-control-sm border-start-0" 
+                            placeholder="Type new category (e.g. Office Rent, Education Aid, Food Drive)..." 
+                            [(ngModel)]="customCategoryName" 
+                            (ngModelChange)="onCustomCategoryChange()"
+                            name="customCategory"
+                            required
+                          >
+                        </div>
+                        <div class="small text-muted mt-1.5 d-flex align-items-center gap-1.5 flex-wrap" style="font-size: 11px;">
+                          <i class="bi bi-check-circle-fill text-success"></i>
+                          <span>ImageKit folder will be auto-created:</span>
+                          <code class="text-primary font-monospace bg-white px-1.5 py-0.5 rounded border">/assets/expenses-management/{{ getFolderSlug(formData.category) }}</code>
+                        </div>
                       </div>
-                      <div class="col-sm-6">
-                        <span class="small text-muted" style="font-size: 11px;">
-                          Selected: <strong class="text-dark">{{ formData.category || 'None' }}</strong>
+                    } @else {
+                      <div class="d-flex align-items-center justify-content-between p-2 rounded bg-light border">
+                        <span class="small text-muted" style="font-size: 11.5px;">
+                          Active Category: <strong class="text-dark">{{ formData.category || 'None selected' }}</strong>
+                        </span>
+                        <span class="badge bg-light text-secondary border font-monospace" style="font-size: 10.5px;">
+                          /assets/expenses-management/{{ getFolderSlug(formData.category) }}
                         </span>
                       </div>
-                    </div>
+                    }
                   </div>
 
                   <!-- Expense Details -->
@@ -774,6 +811,143 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                 <button type="button" class="btn btn-trust-primary" (click)="printVoucher()">
                   <i class="bi bi-printer me-1"></i> Print Voucher
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- MODAL 3: VIEW EXPENSE DETAILS MODAL -->
+      @if (showViewModal() && activeExpenseView()) {
+        <div class="modal fade show d-block" style="background: rgba(10, 39, 64, 0.65); z-index: 1060; backdrop-filter: blur(3px);" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+              <div class="modal-header border-0 px-4 py-3 text-white" style="background: linear-gradient(135deg, #0a2740 0%, #0F3D63 100%);">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 38px; height: 38px; background: rgba(255,255,255,0.18);">
+                    <i class="bi bi-receipt-cutoff fs-5"></i>
+                  </div>
+                  <div>
+                    <h5 class="modal-title fw-bold mb-0 fs-6">Expense Record Details</h5>
+                    <div class="small text-white-50" style="font-size: 11.5px;">
+                      Voucher Reference: <strong class="text-white font-monospace">{{ activeExpenseView()!.voucher_number || ('EXP-' + activeExpenseView()!.id) }}</strong>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" (click)="showViewModal.set(false)"></button>
+              </div>
+
+              <div class="modal-body p-4 bg-light">
+                <!-- Amount Banner Card -->
+                <div class="bg-white p-3.5 rounded-3 border mb-3 shadow-sm">
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div>
+                      <div class="text-uppercase small fw-bold text-muted" style="font-size: 11px; letter-spacing: 0.5px;">Disbursed Amount</div>
+                      <div class="fw-bold fs-3 text-danger">₹{{ activeExpenseView()!.amount | number:'1.2-2' }}</div>
+                      <div class="text-muted small">Indian Rupees</div>
+                    </div>
+                    <div class="d-flex flex-column align-items-end gap-1.5">
+                      <span class="status-pill" [ngClass]="getStatusPillClass(activeExpenseView()!.status)">
+                        <span class="status-dot"></span>
+                        Status: {{ activeExpenseView()!.status || 'Paid' }}
+                      </span>
+                      <span class="badge rounded-pill px-2.5 py-1 text-uppercase fw-semibold" [ngClass]="getCategoryBadgeClass(activeExpenseView()!.category)" style="font-size: 11px;">
+                        <i class="bi me-1" [ngClass]="getCategoryIcon(activeExpenseView()!.category)"></i>
+                        {{ activeExpenseView()!.category }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Transaction Details Grid -->
+                <div class="bg-white p-3 rounded-3 border mb-3 shadow-sm">
+                  <div class="fw-bold small text-dark mb-2.5 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
+                    <i class="bi bi-info-circle-fill text-primary me-1"></i> Transaction Record Information
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-sm-6">
+                      <div class="small text-muted mb-0.5">Title / Description:</div>
+                      <div class="fw-semibold text-dark">{{ activeExpenseView()!.title }}</div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="small text-muted mb-0.5">Paid To / Payee:</div>
+                      <div class="fw-semibold text-dark">{{ activeExpenseView()!.vendor_payee || 'Not specified' }}</div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="small text-muted mb-0.5">Disbursement Date:</div>
+                      <div class="fw-semibold text-dark font-monospace">{{ activeExpenseView()!.expense_date | date:'mediumDate' }}</div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="small text-muted mb-0.5">Payment Method:</div>
+                      <div class="fw-semibold text-dark">
+                        <i class="bi" [ngClass]="getMethodIcon(activeExpenseView()!.payment_method)"></i>
+                        {{ activeExpenseView()!.payment_method || 'Cash' }}
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="small text-muted mb-0.5">Voucher Number:</div>
+                      <div class="fw-semibold text-dark font-monospace">{{ activeExpenseView()!.voucher_number || ('EXP-' + activeExpenseView()!.id) }}</div>
+                    </div>
+                    @if (activeExpenseView()!.notes) {
+                      <div class="col-12">
+                        <div class="small text-muted mb-0.5">Audit Notes / Justification:</div>
+                        <div class="p-2.5 rounded bg-light border text-secondary small">{{ activeExpenseView()!.notes }}</div>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Attached Bill / Receipt Section -->
+                <div class="bg-white p-3 rounded-3 border shadow-sm">
+                  <div class="fw-bold small text-dark mb-2.5 text-uppercase d-flex align-items-center justify-content-between" style="font-size: 11px; letter-spacing: 0.5px;">
+                    <span><i class="bi bi-paperclip text-primary me-1"></i> Bill / Receipt Attachment</span>
+                    @if (activeExpenseView()!.receipt_url) {
+                      <span class="badge bg-success-subtle text-success border">Attached in ImageKit</span>
+                    } @else {
+                      <span class="badge bg-light text-muted border">No Document Attached</span>
+                    }
+                  </div>
+
+                  @if (activeExpenseView()!.receipt_url) {
+                    <div class="p-3 rounded-3 border bg-light">
+                      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                          <i class="bi fs-4" [ngClass]="activeExpenseView()!.receipt_url!.toLowerCase().includes('.pdf') ? 'bi-file-earmark-pdf-fill text-danger' : 'bi-file-earmark-image text-primary'"></i>
+                          <div>
+                            <div class="fw-bold small text-dark">{{ activeExpenseView()!.receipt_url!.toLowerCase().includes('.pdf') ? 'PDF Bill Document' : 'Receipt Image Attachment' }}</div>
+                            <div class="text-muted" style="font-size: 11px;">Saved in ImageKit Media Storage</div>
+                          </div>
+                        </div>
+                        <a [href]="activeExpenseView()!.receipt_url" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-trust-primary rounded-pill px-3 py-1.5 shadow-sm fw-semibold">
+                          <i class="bi bi-box-arrow-up-right me-1"></i> Open Original Document
+                        </a>
+                      </div>
+
+                      @if (!activeExpenseView()!.receipt_url!.toLowerCase().includes('.pdf')) {
+                        <div class="text-center mt-3 pt-3 border-top">
+                          <img [src]="activeExpenseView()!.receipt_url" alt="Receipt Preview" class="img-fluid rounded border shadow-sm" style="max-height: 260px; object-fit: contain;">
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="text-center py-3 text-muted">
+                      <i class="bi bi-file-earmark-x fs-3 d-block mb-1 text-secondary opacity-50"></i>
+                      <div class="small">No receipt or bill file was attached for this transaction.</div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="modal-footer bg-white border-top px-4 py-3 d-flex justify-content-between">
+                <button type="button" class="btn btn-light rounded-pill px-3.5 py-1.5" (click)="showViewModal.set(false)">Close</button>
+                <div class="d-flex align-items-center gap-2">
+                  <button type="button" class="btn btn-outline-secondary rounded-pill px-3.5 py-1.5 fw-semibold" (click)="printFromViewModal()">
+                    <i class="bi bi-printer me-1"></i> Print Voucher Slip
+                  </button>
+                  <button type="button" class="btn btn-trust-primary rounded-pill px-3.5 py-1.5 shadow-sm fw-semibold" (click)="editFromViewModal()">
+                    <i class="bi bi-pencil-square me-1"></i> Edit Expense
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1043,6 +1217,27 @@ export class ExpensesComponent implements OnInit {
   showVoucherModal = signal(false);
   activeVoucher = signal<Expense | null>(null);
 
+  showViewModal = signal(false);
+  activeExpenseView = signal<Expense | null>(null);
+
+  // Custom Category creation in modal
+  isCreatingNewCategory = signal(false);
+  customCategoryName = '';
+
+  // Dynamic custom categories derived from records
+  customCategories = computed(() => {
+    const dynamicCats = new Set<string>();
+    for (const exp of this.expenses()) {
+      if (exp.category) {
+        const c = exp.category.trim();
+        if (this.isCustomCategory(c)) {
+          dynamicCats.add(c);
+        }
+      }
+    }
+    return Array.from(dynamicCats);
+  });
+
   // Alerts
   successMessage = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
@@ -1213,7 +1408,9 @@ export class ExpensesComponent implements OnInit {
     this.isEditing.set(false);
     this.selectedExpense = null;
     this.selectedFile = null;
-    const cat = this.selectedCategory() !== 'all' ? this.selectedCategory() : 'Tailoring';
+    this.isCreatingNewCategory.set(false);
+    this.customCategoryName = '';
+    const cat = (this.selectedCategory() !== 'all' && this.selectedCategory() !== 'All') ? this.selectedCategory() : 'Tailoring Class';
     this.formData = {
       title: '',
       category: cat,
@@ -1233,10 +1430,14 @@ export class ExpensesComponent implements OnInit {
     this.isEditing.set(true);
     this.selectedExpense = item;
     this.selectedFile = null;
+    const cat = item.category || 'Tailoring Class';
+    const isCustom = this.isCustomCategory(cat);
+    this.isCreatingNewCategory.set(isCustom);
+    this.customCategoryName = isCustom ? cat : '';
     const dateStr = item.expense_date ? item.expense_date.split('T')[0] : new Date().toISOString().split('T')[0];
     this.formData = {
       title: item.title,
-      category: item.category,
+      category: cat,
       amount: item.amount,
       expense_date: dateStr,
       payment_method: item.payment_method || 'Cash',
@@ -1253,6 +1454,51 @@ export class ExpensesComponent implements OnInit {
     this.showFormModal.set(false);
     this.selectedExpense = null;
     this.selectedFile = null;
+    this.isCreatingNewCategory.set(false);
+    this.customCategoryName = '';
+  }
+
+  // View Details Modal Handlers
+  viewExpense(item: Expense): void {
+    this.activeExpenseView.set(item);
+    this.showViewModal.set(true);
+  }
+
+  printFromViewModal(): void {
+    if (this.activeExpenseView()) {
+      const exp = this.activeExpenseView()!;
+      this.showViewModal.set(false);
+      this.viewVoucher(exp);
+    }
+  }
+
+  editFromViewModal(): void {
+    if (this.activeExpenseView()) {
+      const exp = this.activeExpenseView()!;
+      this.showViewModal.set(false);
+      this.openEditModal(exp);
+    }
+  }
+
+  // Category Selection & Creation in Modal
+  toggleNewCategoryMode(): void {
+    const nextState = !this.isCreatingNewCategory();
+    this.isCreatingNewCategory.set(nextState);
+    if (nextState) {
+      this.formData.category = this.customCategoryName.trim() || '';
+    } else {
+      this.formData.category = 'Tailoring Class';
+    }
+  }
+
+  onCustomCategoryChange(): void {
+    this.formData.category = this.customCategoryName.trim();
+  }
+
+  selectCategory(category: string): void {
+    this.isCreatingNewCategory.set(false);
+    this.customCategoryName = '';
+    this.formData.category = category;
   }
 
   onFileSelected(event: any): void {
