@@ -759,6 +759,7 @@ export class RolesComponent implements OnInit {
       case 'causes': return 'bi-heart-pulse-fill';
       case 'gallery': return 'bi-images';
       case 'volunteers': return 'bi-people-fill';
+      case 'students': return 'bi-scissors';
       case 'inquiries': return 'bi-envelope-paper-fill';
       case 'settings': return 'bi-gear-fill';
       case 'admins': return 'bi-shield-lock-fill';

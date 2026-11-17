@@ -156,3 +156,34 @@ export interface ExpenseSummary {
   current_month_total: number;
   total_count: number;
 }
+
+export interface TailoringStudent {
+  id: number;
+  student_code: string;
+  full_name: string;
+  phone: string;
+  whatsapp_number?: string;
+  age?: number;
+  address?: string;
+  qualification?: string;
+  batch_preference: 'Morning' | 'Afternoon' | 'Evening' | string;
+  has_prior_experience?: string;
+  family_income?: string;
+  guardian_name?: string;
+  status: 'applied' | 'selected' | 'in_training' | 'completed' | 'rejected' | string;
+  selected_date?: string;
+  completed_date?: string;
+  notes?: string;
+  source?: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface StudentStats {
+  total: number;
+  applied: number;
+  selected: number;
+  in_training: number;
+  completed: number;
+  rejected: number;
+}

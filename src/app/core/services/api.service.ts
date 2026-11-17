@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Donation, Cause, GalleryItem, Volunteer, ContactInquiry, DashboardStats, Expense, ExpenseSummary } from '../models/models';
+import { Donation, Cause, GalleryItem, Volunteer, ContactInquiry, DashboardStats, Expense, ExpenseSummary, TailoringStudent, StudentStats } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -202,5 +202,40 @@ export class ApiService {
 
   deleteExpense(id: number): Observable<any> {
     return this.http.delete<any>(`${this.base}/expenses/${id}`);
+  }
+
+  // 9. Tailoring Students
+  getStudents(params: any = {}): Observable<{ success: boolean; data: TailoringStudent[] }> {
+    let httpParams = new HttpParams();
+    Object.keys(params).forEach(key => {
+      if (params[key] !== null && params[key] !== undefined && params[key] !== '') {
+        httpParams = httpParams.set(key, params[key]);
+      }
+    });
+    return this.http.get<any>(`${this.base}/students`, { params: httpParams });
+  }
+
+  getStudentStats(): Observable<{ success: boolean; data: StudentStats }> {
+    return this.http.get<any>(`${this.base}/students/stats`);
+  }
+
+  getStudent(id: number): Observable<{ success: boolean; data: TailoringStudent }> {
+    return this.http.get<any>(`${this.base}/students/${id}`);
+  }
+
+  createStudent(data: Partial<TailoringStudent>): Observable<any> {
+    return this.http.post<any>(`${this.base}/students`, data);
+  }
+
+  updateStudent(id: number, data: Partial<TailoringStudent>): Observable<any> {
+    return this.http.put<any>(`${this.base}/students/${id}`, data);
+  }
+
+  updateStudentStatus(id: number, status: string, notes?: string): Observable<any> {
+    return this.http.patch<any>(`${this.base}/students/${id}/status`, { status, notes });
+  }
+
+  deleteStudent(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.base}/students/${id}`);
   }
 }

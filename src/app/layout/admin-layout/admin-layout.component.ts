@@ -78,13 +78,18 @@ import { AutoLogoutService } from '../../core/services/auto-logout.service';
             <span *ngIf="!isSidebarCollapsed()">Gallery Photos</span>
           </a>
 
-          <div class="nav-section-title px-3 mt-4 mb-2" *ngIf="!isSidebarCollapsed() && (authService.hasPermission('volunteers') || authService.hasPermission('inquiries'))">
+          <div class="nav-section-title px-3 mt-4 mb-2" *ngIf="!isSidebarCollapsed() && (authService.hasPermission('volunteers') || authService.hasPermission('students') || authService.hasPermission('inquiries'))">
             COMMUNITY & ENGAGEMENT
           </div>
 
           <a routerLink="/volunteers" routerLinkActive="active" class="nav-item-link" *ngIf="authService.hasPermission('volunteers')" (click)="closeMobileSidebar()">
             <i class="bi bi-people-fill"></i>
             <span *ngIf="!isSidebarCollapsed()">Volunteers</span>
+          </a>
+
+          <a routerLink="/students" routerLinkActive="active" class="nav-item-link" *ngIf="authService.hasPermission('students')" (click)="closeMobileSidebar()">
+            <i class="bi bi-scissors"></i>
+            <span *ngIf="!isSidebarCollapsed()">Tailoring Students</span>
           </a>
 
           <a routerLink="/inquiries" routerLinkActive="active" class="nav-item-link" *ngIf="authService.hasPermission('inquiries')" (click)="closeMobileSidebar()">
