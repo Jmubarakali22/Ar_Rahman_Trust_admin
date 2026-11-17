@@ -305,7 +305,7 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                     <td>
                       <span class="font-monospace fw-bold small text-dark d-inline-flex align-items-center gap-1">
                         <i class="bi bi-receipt text-primary"></i>
-                        {{ item.voucher_number || ('EXP-' + item.id) }}
+                        {{ formatVoucherNo(item) }}
                       </span>
                     </td>
 
@@ -657,7 +657,7 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                         <input 
                           type="text" 
                           class="form-control" 
-                          placeholder="Leave blank for automatic EXP-YYYY-XXXX" 
+                          placeholder="Leave blank for automatic EXPYYYYXXXX (e.g. EXP20260008)" 
                           [(ngModel)]="formData.voucher_number" 
                           name="voucher_number"
                         >
@@ -729,9 +729,9 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
       <!-- MODAL 2: VIEW EXPENSE VOUCHER SLIP -->
       @if (showVoucherModal() && activeVoucher()) {
         <div class="modal fade show d-block" style="background: rgba(10, 39, 64, 0.7); z-index: 1060; backdrop-filter: blur(3px);" tabindex="-1">
-          <div class="modal-dialog modal-dialog-centered" style="max-width: 580px;">
+          <div class="modal-dialog modal-dialog-centered" style="max-width: 620px;">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-              <div class="modal-header border-0 px-4 py-3 text-white" style="background: #0F3D63;">
+              <div class="modal-header border-0 px-4 py-3 text-white d-print-none" style="background: #0F3D63;">
                 <div class="d-flex align-items-center gap-2">
                   <i class="bi bi-receipt-cutoff fs-5"></i>
                   <h5 class="modal-title fw-bold mb-0 fs-6">Official Payment Voucher</h5>
@@ -739,77 +739,105 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                 <button type="button" class="btn-close btn-close-white" (click)="showVoucherModal.set(false)"></button>
               </div>
 
-              <div class="modal-body p-4" id="printableVoucher">
-                <!-- Trust Header -->
-                <div class="text-center pb-3 mb-3 border-bottom">
-                  <div class="d-inline-flex align-items-center justify-content-center p-2 rounded-circle bg-light border mb-2" style="width: 56px; height: 56px;">
-                    <img src="https://ik.imagekit.io/baaidzoik/assets/header-logo/ar_logo_1.png" alt="Trust Logo" style="width: 40px; height: 40px; object-fit: contain;">
-                  </div>
-                  <h5 class="fw-bold text-dark mb-0">Ar Rahman Trust</h5>
-                  <div class="small text-muted">Pernambut, Tamil Nadu &bull; Reg. No. 04/16/2020</div>
-                  <span class="badge bg-secondary-subtle text-secondary font-monospace mt-1">
-                    VOUCHER: {{ activeVoucher()!.voucher_number || ('EXP-' + activeVoucher()!.id) }}
-                  </span>
-                </div>
-
-                <!-- Voucher Fields -->
-                <div class="row g-2 mb-3 small">
-                  <div class="col-6">
-                    <span class="text-muted d-block">Disbursement Date:</span>
-                    <strong class="text-dark">{{ activeVoucher()!.expense_date | date:'mediumDate' }}</strong>
-                  </div>
-                  <div class="col-6 text-end">
-                    <span class="text-muted d-block">Category:</span>
-                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ activeVoucher()!.category }}</span>
+              <div class="modal-body p-3 p-sm-4 bg-light">
+                <!-- Printable Voucher Paper with Framing -->
+                <div id="printableVoucher" class="p-3 p-sm-4 bg-white rounded-3 position-relative" style="border: 2px solid #0F3D63; outline: 1px solid #cbd5e1; outline-offset: -5px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                  
+                  <!-- Trust Header Branding -->
+                  <div class="text-center pb-3 border-bottom mb-3" style="border-bottom: 2px solid #e2e8f0 !important;">
+                    <img src="https://ik.imagekit.io/baaidzoik/assets/header-logo/ar_logo_1.png" alt="Ar Rahman Trust" height="46" class="mb-2" crossorigin="anonymous">
+                    <h4 class="fw-bold mb-0" style="color: #0F3D63; letter-spacing: 0.5px; font-size: 20px;">AR RAHMAN TRUST</h4>
+                    <div class="small fw-semibold text-secondary" style="font-size: 11.5px;">Helping Needy People &bull; Pernambut &amp; Surrounding Rural Villages</div>
+                    <div class="small text-muted mt-0.5" style="font-size: 10.5px;">
+                      Registered Charity No. <strong style="color: #0F3D63;">04/16/2020</strong> &bull; 112, Small Mosque Street, Pernambut, Vellore Dist., Tamil Nadu - 635810
+                    </div>
+                    <div class="d-inline-block mt-2 px-3 py-0.5 text-uppercase fw-bold" style="background: #e0f2fe; color: #0369a1; font-size: 11px; border-radius: 20px; border: 1px solid #bae6fd; letter-spacing: 0.5px;">
+                      Payment &amp; Disbursement Voucher
+                    </div>
                   </div>
 
-                  <div class="col-12 pt-2 border-top">
-                    <span class="text-muted d-block">Purpose / Title:</span>
-                    <strong class="text-dark fs-6">{{ activeVoucher()!.title }}</strong>
+                  <!-- Voucher Meta Bar -->
+                  <div class="row g-2 mb-3 p-2 rounded-2" style="background: #f8fafc; font-size: 12px; border: 1px solid #e2e8f0;">
+                    <div class="col-6 col-sm-4">
+                      <span class="text-muted" style="font-size: 10.5px;">Voucher Number:</span><br>
+                      <strong class="font-monospace text-primary fs-6">{{ formatVoucherNo(activeVoucher()) }}</strong>
+                    </div>
+                    <div class="col-6 col-sm-4 text-center">
+                      <span class="text-muted" style="font-size: 10.5px;">Date:</span><br>
+                      <strong class="text-dark">{{ activeVoucher()!.expense_date | date:'mediumDate' }}</strong>
+                    </div>
+                    <div class="col-12 col-sm-4 text-sm-end">
+                      <span class="text-muted" style="font-size: 10.5px;">Category:</span><br>
+                      <span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ activeVoucher()!.category }}</span>
+                    </div>
                   </div>
 
-                  @if (activeVoucher()!.vendor_payee) {
-                    <div class="col-12 pt-2">
-                      <span class="text-muted d-block">Paid To / Recipient:</span>
-                      <strong class="text-dark">{{ activeVoucher()!.vendor_payee }}</strong>
+                  <!-- Voucher Details Table -->
+                  <table class="table table-sm table-bordered mb-3" style="font-size: 12.5px;">
+                    <tbody>
+                      <tr>
+                        <th style="width: 32%; background: #f8fafc; color: #475569;">Expenditure Title / Purpose:</th>
+                        <td class="fw-bold text-dark">{{ activeVoucher()!.title }}</td>
+                      </tr>
+                      <tr>
+                        <th style="background: #f8fafc; color: #475569;">Paid To / Payee:</th>
+                        <td class="fw-semibold text-dark">{{ activeVoucher()!.vendor_payee || 'Direct Beneficiary / Trust Work' }}</td>
+                      </tr>
+                      <tr>
+                        <th style="background: #f8fafc; color: #475569;">Payment Method:</th>
+                        <td>
+                          <span class="badge bg-light text-dark border">{{ activeVoucher()!.payment_method || 'Cash' }}</span>
+                          <span class="badge bg-success-subtle text-success border ms-2">Status: {{ activeVoucher()!.status || 'Paid' }}</span>
+                        </td>
+                      </tr>
+                      @if (activeVoucher()!.notes) {
+                        <tr>
+                          <th style="background: #f8fafc; color: #475569;">Audit Justification:</th>
+                          <td class="text-secondary small">{{ activeVoucher()!.notes }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+
+                  <!-- Amount Highlight Box -->
+                  <div class="p-2.5 rounded-2 text-center mb-3" style="background: #eff6ff; border: 1.5px solid #bfdbfe;">
+                    <div class="small text-muted text-uppercase fw-bold" style="font-size: 10.5px; letter-spacing: 0.5px;">Total Disbursed Amount</div>
+                    <div class="fw-bold text-primary font-monospace fs-4">₹{{ activeVoucher()!.amount | number:'1.2-2' }}</div>
+                    <div class="small fw-semibold text-dark" style="font-size: 11.5px;">
+                      Amount in words: <em>{{ numberToWords(activeVoucher()!.amount) }}</em>
+                    </div>
+                  </div>
+
+                  <!-- Authorisation Signatures -->
+                  <div class="row pt-4 mt-3 border-top text-center" style="font-size: 11px; border-top: 1px dashed #cbd5e1 !important;">
+                    <div class="col-4">
+                      <div style="height: 35px;"></div>
+                      <div class="border-top pt-1 text-muted fw-semibold">Prepared By</div>
+                    </div>
+                    <div class="col-4">
+                      <div style="height: 35px;"></div>
+                      <div class="border-top pt-1 text-muted fw-semibold">Receiver's Signature</div>
+                    </div>
+                    <div class="col-4">
+                      <div style="height: 35px;"></div>
+                      <div class="border-top pt-1 text-muted fw-semibold">Trustee / Authorised</div>
+                    </div>
+                  </div>
+
+                  @if (activeVoucher()!.receipt_url) {
+                    <div class="text-center pt-2 mt-2 border-top d-print-none">
+                      <a [href]="activeVoucher()!.receipt_url" target="_blank" class="small text-primary text-decoration-none">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> View Original Bill Attachment (ImageKit)
+                      </a>
                     </div>
                   }
-
-                  <div class="col-6 pt-2">
-                    <span class="text-muted d-block">Payment Mode:</span>
-                    <span class="text-dark fw-semibold">{{ activeVoucher()!.payment_method || 'Cash' }}</span>
-                  </div>
-                  <div class="col-6 pt-2 text-end">
-                    <span class="text-muted d-block">Audit Status:</span>
-                    <span class="text-success fw-bold">{{ activeVoucher()!.status || 'Paid' }}</span>
-                  </div>
                 </div>
-
-                <!-- Amount Box -->
-                <div class="p-3 bg-light rounded-3 border text-center my-3">
-                  <div class="small text-muted mb-0.5">TOTAL DISBURSED AMOUNT</div>
-                  <div class="display-6 fw-bold text-dark font-monospace">₹{{ activeVoucher()!.amount | number:'1.2-2' }}</div>
-                </div>
-
-                @if (activeVoucher()!.notes) {
-                  <div class="small text-muted p-2 rounded bg-light border mb-3">
-                    <strong>Notes:</strong> {{ activeVoucher()!.notes }}
-                  </div>
-                }
-
-                @if (activeVoucher()!.receipt_url) {
-                  <div class="text-center pt-2 border-top">
-                    <a [href]="activeVoucher()!.receipt_url" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">
-                      <i class="bi bi-box-arrow-up-right me-1"></i> View Original Bill / Invoice
-                    </a>
-                  </div>
-                }
               </div>
 
-              <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-between">
-                <button type="button" class="btn btn-light" (click)="showVoucherModal.set(false)">Close</button>
-                <button type="button" class="btn btn-trust-primary" (click)="printVoucher()">
-                  <i class="bi bi-printer me-1"></i> Print Voucher
+              <div class="modal-footer bg-white border-top px-4 py-3 d-flex justify-content-between d-print-none">
+                <button type="button" class="btn btn-light rounded-pill px-4 py-1.5" (click)="showVoucherModal.set(false)">Close</button>
+                <button type="button" class="btn btn-trust-primary rounded-pill px-4 py-1.5 shadow-sm fw-semibold" (click)="printVoucher()">
+                  <i class="bi bi-printer me-1"></i> Print Voucher Slip
                 </button>
               </div>
             </div>
@@ -830,7 +858,7 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                   <div>
                     <h5 class="modal-title fw-bold mb-0 fs-6">Expense Record Details</h5>
                     <div class="small text-white-50" style="font-size: 11.5px;">
-                      Voucher Reference: <strong class="text-white font-monospace">{{ activeExpenseView()!.voucher_number || ('EXP-' + activeExpenseView()!.id) }}</strong>
+                      Voucher Reference: <strong class="text-white font-monospace">{{ formatVoucherNo(activeExpenseView()) }}</strong>
                     </div>
                   </div>
                 </div>
@@ -886,7 +914,7 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                     </div>
                     <div class="col-sm-4">
                       <div class="small text-muted mb-0.5">Voucher Number:</div>
-                      <div class="fw-semibold text-dark font-monospace">{{ activeExpenseView()!.voucher_number || ('EXP-' + activeExpenseView()!.id) }}</div>
+                      <div class="fw-semibold text-dark font-monospace">{{ formatVoucherNo(activeExpenseView()) }}</div>
                     </div>
                     @if (activeExpenseView()!.notes) {
                       <div class="col-12">
@@ -1569,7 +1597,54 @@ export class ExpensesComponent implements OnInit {
   }
 
   printVoucher(): void {
-    window.print();
+    setTimeout(() => {
+      window.print();
+    }, 150);
+  }
+
+  formatVoucherNo(item?: Expense | null): string {
+    if (!item) return 'EXP20260001';
+    if (item.voucher_number) {
+      return item.voucher_number.replace(/EXP[-_ ]?(\d{4})[-_ ]?/i, 'EXP$1').replace(/-/g, '').toUpperCase();
+    }
+    const year = item.expense_date ? new Date(item.expense_date).getFullYear() : 2026;
+    return `EXP${year}${String(item.id).padStart(4, '0')}`;
+  }
+
+  numberToWords(num: number | null | undefined): string {
+    if (!num) return 'Zero Rupees Only';
+    const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+    const inWords = (n: number): string => {
+      let str = '';
+      if (n >= 10000000) {
+        str += inWords(Math.floor(n / 10000000)) + ' Crore ';
+        n %= 10000000;
+      }
+      if (n >= 100000) {
+        str += inWords(Math.floor(n / 100000)) + ' Lakh ';
+        n %= 100000;
+      }
+      if (n >= 1000) {
+        str += inWords(Math.floor(n / 1000)) + ' Thousand ';
+        n %= 1000;
+      }
+      if (n >= 100) {
+        str += inWords(Math.floor(n / 100)) + ' Hundred ';
+        n %= 100;
+      }
+      if (n > 0) {
+        if (n < 20) {
+          str += a[n] + ' ';
+        } else {
+          str += b[Math.floor(n / 10)] + ' ' + a[n % 10] + ' ';
+        }
+      }
+      return str.trim();
+    };
+
+    return inWords(Math.round(num)) + ' Rupees Only';
   }
 
   // Export CSV Helper
@@ -1579,7 +1654,7 @@ export class ExpensesComponent implements OnInit {
 
     const headers = ['Voucher Number', 'Date', 'Category', 'Title', 'Amount (INR)', 'Payment Method', 'Paid To / Vendor', 'Status', 'Notes'];
     const rows = data.map(e => [
-      `"${e.voucher_number || ('EXP-' + e.id)}"`,
+      `"${this.formatVoucherNo(e)}"`,
       `"${e.expense_date ? e.expense_date.split('T')[0] : ''}"`,
       `"${e.category || ''}"`,
       `"${(e.title || '').replace(/"/g, '""')}"`,

@@ -386,7 +386,7 @@ import { DashboardStats, Donation, Expense, ExpenseSummary } from '../../core/mo
                         <tr>
                           <td>
                             <span class="badge bg-light text-dark border font-monospace px-1.5 py-0.5" style="font-size: 11px;">
-                              {{ exp.voucher_number || ('VCH-' + exp.id) }}
+                              {{ exp.voucher_number || ('EXP' + exp.id) }}
                             </span>
                           </td>
                           <td>

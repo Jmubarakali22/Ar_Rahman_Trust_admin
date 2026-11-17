@@ -482,7 +482,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* Print Styles: When printing or saving to PDF, show ONLY the receipt voucher */
+/* Print Styles: When printing or saving to PDF, show ONLY the receipt voucher or expense voucher */
 @media print {
   /* Set clean background and zero margins for A4 print */
   body {
@@ -496,31 +496,45 @@ h1, h2, h3, h4, h5, h6 {
     visibility: hidden !important;
   }
 
-  /* Make ONLY the receipt paper and all its children visible */
+  /* Make ONLY the receipt paper and expense voucher visible */
   #printableReceiptModal,
   #printableReceiptModal *,
   #printableReceiptA4,
   #printableReceiptA4 *,
   #printableReceipt,
-  #printableReceipt * {
+  #printableReceipt *,
+  #printableVoucher,
+  #printableVoucher * {
     visibility: visible !important;
   }
 
-  /* Position the receipt cleanly at the top-left of the printed page */
+  /* Force-hide any elements explicitly marked as d-print-none */
+  .d-print-none,
+  .d-print-none *,
+  .modal-header,
+  .modal-footer,
+  .btn-close {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Position the receipt / voucher cleanly at the top-left of the printed page */
   #printableReceiptModal,
-  #printableReceipt {
+  #printableReceipt,
+  #printableVoucher {
     position: fixed !important;
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
-    padding: 16px !important;
+    padding: 18px !important;
     border: 2px solid #0F3D63 !important;
     box-shadow: none !important;
     background: #ffffff !important;
     box-sizing: border-box !important;
     page-break-inside: avoid !important;
+    border-radius: 8px !important;
   }
 
   @page {
