@@ -25,11 +25,21 @@ import { Role, UserRoleItem, AvailablePage } from '../../core/models/models';
         </div>
 
         <div class="d-flex align-items-center gap-2 flex-shrink-0">
-          <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1.5" (click)="refreshAll()" [disabled]="isLoading()" title="Reload roles and permissions">
-            <i class="bi bi-arrow-clockwise" [class.spin]="isLoading()"></i>
+          <button 
+            type="button" 
+            class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5" 
+            (click)="refreshAll()" 
+            [disabled]="isLoading()" 
+            title="Reload roles and permissions"
+          >
+            <i class="bi bi-arrow-clockwise" [class.spin-icon]="isLoading()"></i>
             <span>Refresh</span>
           </button>
-          <button class="btn btn-trust-primary btn-sm d-flex align-items-center gap-1.5 shadow-sm" (click)="openCreateRoleModal()">
+          <button 
+            type="button" 
+            class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5 fw-semibold" 
+            (click)="openCreateRoleModal()"
+          >
             <i class="bi bi-plus-circle-fill"></i>
             <span>Create New Role</span>
           </button>

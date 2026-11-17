@@ -21,11 +21,22 @@ import { DashboardStats, Donation } from '../../core/models/models';
           </p>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
-          <button class="btn btn-outline-secondary btn-sm" (click)="loadDashboard()">
-            <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+          <button 
+            type="button" 
+            class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5" 
+            (click)="loadDashboard()" 
+            [disabled]="isLoading()"
+            title="Reload overview data"
+          >
+            <i class="bi bi-arrow-clockwise" [class.spin-icon]="isLoading()"></i>
+            <span>Refresh</span>
           </button>
-          <a routerLink="/donations" class="btn btn-trust-primary btn-sm">
-            <i class="bi bi-plus-lg me-1"></i> New Donation
+          <a 
+            routerLink="/donations" 
+            class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5 fw-semibold text-decoration-none"
+          >
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>Record Donation</span>
           </a>
         </div>
       </div>

@@ -16,9 +16,16 @@ import { ContactInquiry } from '../../core/models/models';
           <h2 class="h4 fw-bold mb-1" style="color: #0F3D63;">Contact Inquiries & Feedback</h2>
           <p class="text-muted small mb-0">Messages and requests submitted through the official website contact portal.</p>
         </div>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-secondary btn-sm" (click)="loadInquiries()">
-            <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <button 
+            type="button" 
+            class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5" 
+            (click)="loadInquiries()" 
+            [disabled]="isLoading()" 
+            title="Reload inquiries"
+          >
+            <i class="bi bi-arrow-clockwise" [class.spin-icon]="isLoading()"></i>
+            <span>Refresh</span>
           </button>
         </div>
       </div>

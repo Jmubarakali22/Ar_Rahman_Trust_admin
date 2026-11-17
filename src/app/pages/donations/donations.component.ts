@@ -18,11 +18,35 @@ import { Donation } from '../../core/models/models';
           <p class="text-muted small mb-0" style="font-size: 12px;">Record, verify, and generate official receipts for Zakat and Sadaqah donors.</p>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
-          <button class="btn btn-outline-secondary btn-sm" (click)="exportToCSV()">
-            <i class="bi bi-download me-1"></i> Export CSV
+          <button 
+            type="button" 
+            class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5" 
+            (click)="loadDonations()" 
+            [disabled]="isLoading()"
+            title="Reload records"
+          >
+            <i class="bi bi-arrow-clockwise" [class.spin-icon]="isLoading()"></i>
+            <span>Refresh</span>
           </button>
-          <button class="btn btn-trust-primary btn-sm" (click)="openAddModal()">
-            <i class="bi bi-plus-lg me-1"></i> Record Donation
+
+          <button 
+            type="button" 
+            class="btn btn-outline-success btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5" 
+            (click)="exportToCSV()" 
+            [disabled]="donations().length === 0"
+            title="Download filtered donations in CSV format"
+          >
+            <i class="bi bi-file-earmark-spreadsheet"></i>
+            <span>Export CSV</span>
+          </button>
+
+          <button 
+            type="button" 
+            class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5 fw-semibold" 
+            (click)="openAddModal()"
+          >
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>Record Donation</span>
           </button>
         </div>
       </div>

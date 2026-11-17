@@ -16,9 +16,25 @@ import { Volunteer } from '../../core/models/models';
           <h2 class="h4 fw-bold mb-1" style="color: #0F3D63;">Volunteers & Community Members</h2>
           <p class="text-muted small mb-0">Review sign-ups, approve active members, and coordinate field workers.</p>
         </div>
-        <div class="flex-shrink-0">
-          <button class="btn btn-trust-primary btn-sm" (click)="openAddModal()">
-            <i class="bi bi-person-plus me-1"></i> Register Volunteer
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <button 
+            type="button" 
+            class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5" 
+            (click)="loadVolunteers()" 
+            [disabled]="isLoading()"
+            title="Reload volunteers"
+          >
+            <i class="bi bi-arrow-clockwise" [class.spin-icon]="isLoading()"></i>
+            <span>Refresh</span>
+          </button>
+
+          <button 
+            type="button" 
+            class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5 fw-semibold" 
+            (click)="openAddModal()"
+          >
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>Register Volunteer</span>
           </button>
         </div>
       </div>

@@ -21,12 +21,25 @@ import { Admin, Role, AvailablePage } from '../../core/models/models';
           <h2 class="h4 fw-bold mb-1" style="color: #0F3D63;">Admin Accounts & Access Control</h2>
           <p class="text-muted small mb-0">Create staff logins, assign dynamic roles, and manage module permissions.</p>
         </div>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-secondary btn-sm" (click)="refreshAll()">
-            <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <button 
+            type="button" 
+            class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5" 
+            (click)="refreshAll()"
+            [disabled]="isLoading()"
+            title="Reload users"
+          >
+            <i class="bi bi-arrow-clockwise" [class.spin-icon]="isLoading()"></i>
+            <span>Refresh</span>
           </button>
-          <button class="btn btn-trust-primary btn-sm px-3" (click)="openAddModal()">
-            <i class="bi bi-person-plus-fill me-1"></i> Add New User
+
+          <button 
+            type="button" 
+            class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5 fw-semibold" 
+            (click)="openAddModal()"
+          >
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>Add New User</span>
           </button>
         </div>
       </div>

@@ -16,9 +16,25 @@ import { Cause } from '../../core/models/models';
           <h2 class="h4 fw-bold mb-1" style="color: #0F3D63;">Our Causes</h2>
           <p class="text-muted small mb-0">Small acts, when multiplied by millions of people, can transform the world.</p>
         </div>
-        <div class="flex-shrink-0">
-          <button class="btn btn-trust-primary btn-sm" (click)="openAddModal()">
-            <i class="bi bi-plus-lg me-1"></i> Add New Cause
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <button 
+            type="button" 
+            class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5" 
+            (click)="loadCauses()" 
+            [disabled]="isLoading()"
+            title="Reload causes"
+          >
+            <i class="bi bi-arrow-clockwise" [class.spin-icon]="isLoading()"></i>
+            <span>Refresh</span>
+          </button>
+
+          <button 
+            type="button" 
+            class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5 fw-semibold" 
+            (click)="openAddModal()"
+          >
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>Add New Cause</span>
           </button>
         </div>
       </div>

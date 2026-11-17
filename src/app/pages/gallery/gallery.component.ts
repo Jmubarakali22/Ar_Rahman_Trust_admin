@@ -33,8 +33,23 @@ import { GalleryItem } from '../../core/models/models';
           </div>
 
           <div class="d-flex align-items-center gap-2 flex-wrap">
-            <button class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5 fw-semibold" (click)="openAddModal()">
-              <i class="bi bi-cloud-arrow-up-fill"></i>
+            <button 
+              type="button" 
+              class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5" 
+              (click)="loadPhotos()" 
+              [disabled]="isLoading()" 
+              title="Reload gallery photos"
+            >
+              <i class="bi bi-arrow-clockwise" [class.spin-icon]="isLoading()"></i>
+              <span>Refresh</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5 fw-semibold" 
+              (click)="openAddModal()"
+            >
+              <i class="bi bi-plus-circle-fill"></i>
               <span>Upload Photo</span>
             </button>
           </div>
