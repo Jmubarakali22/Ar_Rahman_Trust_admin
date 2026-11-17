@@ -25,15 +25,29 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
         </div>
 
         <div class="d-flex align-items-center gap-2 flex-wrap">
+          <!-- Quick Sync from Google Sheet if URL exists -->
+          @if (googleSheetUrl) {
+            <button 
+              type="button" 
+              class="btn btn-success btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5 shadow-xs fw-semibold"
+              [disabled]="isSyncingSheet"
+              (click)="syncFromGoogleSheet()"
+              title="Sync latest responses from Google Sheet"
+            >
+              <i class="bi bi-arrow-repeat" [class.spin-icon]="isSyncingSheet"></i>
+              <span>{{ isSyncingSheet ? 'Syncing...' : 'Sync Google Sheet' }}</span>
+            </button>
+          }
+
           <!-- Share Application Form Modal Trigger -->
           <button 
             type="button" 
             class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5 shadow-xs fw-semibold"
             (click)="showWebhookModal = true"
-            title="Share Application Form Link or Setup Google Form"
+            title="Get Application Form Link or Connect Google Form"
           >
             <i class="bi bi-share-fill"></i>
-            <span>Share Application Link</span>
+            <span>Application Form & Links</span>
           </button>
 
           <!-- Export CSV -->
@@ -504,17 +518,17 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
             </div>
 
             <div class="modal-body p-4">
-              <!-- METHOD 1: RECOMMENDED OFFICIAL WEBSITE FORM -->
+              <!-- METHOD 1: RECOMMENDED OFFICIAL ONLINE APPLICATION FORM (ZERO SETUP) -->
               <div class="p-3.5 bg-white border border-success-subtle rounded-3 mb-4 shadow-2xs">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                   <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-success text-white px-2.5 py-1 text-uppercase" style="font-size: 10px;">Recommended</span>
-                    <strong class="text-dark">Official Online Application Page (Zero Setup)</strong>
+                    <strong class="text-dark">Official Online Form Link (Zero Setup)</strong>
                   </div>
-                  <span class="badge bg-light text-muted border">No Coding Needed</span>
+                  <span class="badge bg-light text-muted border">No Code Needed</span>
                 </div>
                 <p class="text-muted small mb-3">
-                  Share this official link on WhatsApp or social media. Students can open it directly on their phones, register their details, and they will immediately appear on this screen!
+                  Share this ready-made link on WhatsApp status or groups. Students open it directly on their phones, register their details, and they immediately appear on your Admin Panel!
                 </p>
 
                 <div class="input-group mb-2.5">
@@ -525,30 +539,70 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                     {{ copiedType === 'website_url' ? 'Copied Link!' : 'Copy Link' }}
                   </button>
                   <a [href]="websiteFormUrl" target="_blank" class="btn btn-outline-secondary">
-                    <i class="bi bi-box-arrow-up-right"></i> Open
+                    <i class="bi bi-box-arrow-up-right"></i> Open Form
                   </a>
                 </div>
 
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-1">
                   <button type="button" class="btn btn-sm btn-success rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1.5 fw-semibold" (click)="shareApplicationLinkOnWa()">
-                    <i class="bi bi-whatsapp"></i> Share on WhatsApp Status / Group
+                    <i class="bi bi-whatsapp"></i> Share Link on WhatsApp Status / Group
                   </button>
-                  <span class="small text-muted"><i class="bi bi-lightning-charge-fill text-warning"></i> Real-time sync with database</span>
+                  <span class="small text-muted"><i class="bi bi-lightning-charge-fill text-warning"></i> Real-time direct database sync</span>
                 </div>
               </div>
 
-              <!-- METHOD 2: GOOGLE FORM INTEGRATION -->
+              <!-- METHOD 2: 1-CLICK GOOGLE SHEET SYNC (NO SCRIPT / NO CODE) -->
+              <div class="p-3.5 bg-white border border-primary-subtle rounded-3 mb-4 shadow-2xs">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary text-white px-2.5 py-1 text-uppercase" style="font-size: 10px;">Google Form</span>
+                    <strong class="text-dark">Connect Existing Google Form via Sheet Link</strong>
+                  </div>
+                  <span class="badge bg-light text-muted border">Zero Apps Script</span>
+                </div>
+                <p class="text-muted small mb-2">
+                  If you already have a Google Form: In your Google Form, go to <strong>Responses</strong> &rarr; click <strong>"Link to Sheets"</strong> &rarr; click <strong>Share</strong> (set to "Anyone with the link can view") &rarr; paste the Google Sheet URL here and click <strong>Sync Responses</strong>!
+                </p>
+
+                <div class="input-group mb-2">
+                  <span class="input-group-text bg-light"><i class="bi bi-file-earmark-spreadsheet-fill text-success"></i></span>
+                  <input 
+                    type="text" 
+                    class="form-control small" 
+                    [(ngModel)]="googleSheetUrl" 
+                    placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id/edit"
+                  >
+                  <button 
+                    type="button" 
+                    class="btn btn-success d-inline-flex align-items-center gap-1.5 fw-semibold"
+                    [disabled]="isSyncingSheet || !googleSheetUrl"
+                    (click)="syncFromGoogleSheet()"
+                  >
+                    <i class="bi bi-arrow-repeat" [class.spin-icon]="isSyncingSheet"></i>
+                    <span>{{ isSyncingSheet ? 'Syncing...' : 'Sync Responses' }}</span>
+                  </button>
+                </div>
+
+                @if (syncStatusMessage) {
+                  <div class="alert small py-2 px-3 mb-0" [class.alert-success]="syncSuccess" [class.alert-danger]="!syncSuccess">
+                    <i class="bi" [class.bi-check-circle-fill]="syncSuccess" [class.bi-exclamation-triangle-fill]="!syncSuccess"></i>
+                    {{ syncStatusMessage }}
+                  </div>
+                }
+              </div>
+
+              <!-- METHOD 3: OPTIONAL GOOGLE APPS SCRIPT WEBHOOK -->
               <div class="accordion" id="accordionGoogleForm">
                 <div class="accordion-item border rounded-3 overflow-hidden">
                   <h2 class="accordion-header">
                     <button class="accordion-button collapsed py-2.5 small fw-bold text-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGoogle">
-                      <i class="bi bi-google me-2 text-danger"></i> Alternative: Connect an Existing Google Form (via Webhook)
+                      <i class="bi bi-code-slash me-2 text-dark"></i> Advanced: Instant Google Apps Script Webhook (Optional)
                     </button>
                   </h2>
                   <div id="collapseGoogle" class="accordion-collapse collapse" data-bs-parent="#accordionGoogleForm">
                     <div class="accordion-body p-3 bg-light">
                       <p class="text-muted small mb-2">
-                        If you already have a Google Form, you can forward its submissions to our public endpoint:
+                        If you want Google Form to push submissions instantly the millisecond a student clicks Submit (without clicking "Sync"):
                       </p>
 
                       <div class="mb-3">
@@ -670,6 +724,172 @@ export class StudentsComponent implements OnInit {
   readonly websiteFormUrl = 'https://arrahmantrust.netlify.app/tailoring-apply';
   readonly webhookUrl = 'https://ar-rehman-backend.onrender.com/api/students/public';
 
+  // Google Sheet Direct Sync (No Coding / No Apps Script)
+  googleSheetUrl = typeof localStorage !== 'undefined' ? (localStorage.getItem('tailoring_google_sheet_url') || '') : '';
+  isSyncingSheet = false;
+  syncStatusMessage = '';
+  syncSuccess = false;
+
+  async syncFromGoogleSheet(): Promise<void> {
+    const url = this.googleSheetUrl?.trim();
+    if (!url) return;
+
+    this.isSyncingSheet = true;
+    this.syncStatusMessage = '';
+
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('tailoring_google_sheet_url', url);
+      }
+
+      // Extract Sheet ID
+      const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+      if (!match || !match[1]) {
+        throw new Error('Invalid Google Sheet URL. Please copy the full link from your browser.');
+      }
+      const sheetId = match[1];
+
+      // Extract GID if present
+      const gidMatch = url.match(/[#&]gid=([0-9]+)/);
+      const gidParam = gidMatch ? `&gid=${gidMatch[1]}` : '';
+
+      const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv${gidParam}`;
+
+      const res = await fetch(csvUrl);
+      if (!res.ok) {
+        throw new Error('Could not access Google Sheet. Please ensure Sheet Sharing is set to "Anyone with the link can view".');
+      }
+
+      const csvText = await res.text();
+      const rows = this.parseCSV(csvText);
+
+      if (rows.length < 2) {
+        throw new Error('Google Sheet is empty or contains only the header row.');
+      }
+
+      // Headers (Row 0)
+      const headers = rows[0].map(h => h.trim().toLowerCase());
+      
+      let nameIdx = headers.findIndex(h => h.includes('name'));
+      let phoneIdx = headers.findIndex(h => h.includes('phone') || h.includes('mobile') || h.includes('contact') || h.includes('whatsapp') || h.includes('number'));
+      let ageIdx = headers.findIndex(h => h.includes('age'));
+      let addrIdx = headers.findIndex(h => h.includes('address') || h.includes('place') || h.includes('village') || h.includes('area') || h.includes('city'));
+      let batchIdx = headers.findIndex(h => h.includes('batch') || h.includes('time') || h.includes('preference'));
+      let qualIdx = headers.findIndex(h => h.includes('qualification') || h.includes('education') || h.includes('study'));
+
+      // Sensible defaults based on standard Google Form column order (0: Timestamp, 1: Name, 2: Phone...)
+      if (nameIdx === -1) nameIdx = 1;
+      if (phoneIdx === -1) phoneIdx = 2;
+      if (ageIdx === -1) ageIdx = 3;
+      if (addrIdx === -1) addrIdx = 4;
+      if (batchIdx === -1) batchIdx = 5;
+      if (qualIdx === -1) qualIdx = 6;
+
+      const existingPhones = new Set(this.students().map(s => this.cleanPhoneForWa(s.phone || '')));
+      let newCount = 0;
+      let skippedCount = 0;
+
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const rawName = row[nameIdx]?.trim();
+        const rawPhone = row[phoneIdx]?.trim();
+
+        if (!rawName || !rawPhone) continue;
+
+        const cleanPhone = this.cleanPhoneForWa(rawPhone);
+        if (existingPhones.has(cleanPhone)) {
+          skippedCount++;
+          continue;
+        }
+
+        const rawBatch = (row[batchIdx] || '').trim().toLowerCase();
+        let batchPref = 'Morning';
+        if (rawBatch.includes('afternoon') || rawBatch.includes('noon')) batchPref = 'Afternoon';
+        else if (rawBatch.includes('eve')) batchPref = 'Evening';
+
+        const studentData: Partial<TailoringStudent> = {
+          full_name: rawName,
+          phone: rawPhone,
+          whatsapp_number: rawPhone,
+          age: row[ageIdx] ? parseInt(row[ageIdx], 10) || undefined : undefined,
+          address: row[addrIdx]?.trim() || '',
+          batch_preference: batchPref,
+          qualification: row[qualIdx]?.trim() || '',
+          source: 'google_form',
+          status: 'applied'
+        };
+
+        try {
+          await new Promise<void>((resolve, reject) => {
+            this.api.createStudent(studentData).subscribe({
+              next: () => resolve(),
+              error: (e) => reject(e)
+            });
+          });
+          existingPhones.add(cleanPhone);
+          newCount++;
+        } catch (e) {
+          console.warn('Failed to import student row', row, e);
+        }
+      }
+
+      this.isSyncingSheet = false;
+      this.syncSuccess = true;
+      this.syncStatusMessage = `Sync successful! Imported ${newCount} new student${newCount === 1 ? '' : 's'}${skippedCount > 0 ? ` (${skippedCount} already in database skipped)` : ''}.`;
+      this.loadStudents();
+      this.loadStats();
+    } catch (err: any) {
+      this.isSyncingSheet = false;
+      this.syncSuccess = false;
+      this.syncStatusMessage = err.message || 'Sync failed. Please check your sheet link and sharing permissions.';
+    }
+  }
+
+  parseCSV(text: string): string[][] {
+    const lines: string[][] = [];
+    let currentRow: string[] = [];
+    let currentCell = '';
+    let insideQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      const next = text[i + 1];
+
+      if (c === '"') {
+        if (insideQuotes && next === '"') {
+          currentCell += '"';
+          i++;
+        } else {
+          insideQuotes = !insideQuotes;
+        }
+      } else if (c === ',' && !insideQuotes) {
+        currentRow.push(currentCell);
+        currentCell = '';
+      } else if ((c === '\r' || c === '\n') && !insideQuotes) {
+        if (c === '\r' && next === '\n') {
+          i++;
+        }
+        currentRow.push(currentCell);
+        if (currentRow.some(cell => cell.trim().length > 0)) {
+          lines.push(currentRow);
+        }
+        currentRow = [];
+        currentCell = '';
+      } else {
+        currentCell += c;
+      }
+    }
+
+    if (currentCell.length > 0 || currentRow.length > 0) {
+      currentRow.push(currentCell);
+      if (currentRow.some(cell => cell.trim().length > 0)) {
+        lines.push(currentRow);
+      }
+    }
+
+    return lines;
+  }
+
   shareApplicationLinkOnWa(): void {
     const text = encodeURIComponent(
       `📢 *Free Tailoring Classes Registration - Ar Rahman Trust, Pernambut*\\n\\n` +
@@ -767,7 +987,21 @@ export class StudentsComponent implements OnInit {
   }
 
   quickSelectStudent(student: TailoringStudent): void {
-    this.updateStatus(student.id, 'selected');
+    this.api.updateStudentStatus(student.id, 'selected').subscribe({
+      next: () => {
+        this.students.update(list => list.map(s => s.id === student.id ? { ...s, status: 'selected' } : s));
+        this.loadStats();
+
+        const sendMsg = confirm(
+          `🎉 Student "${student.full_name}" is now SELECTED for ${student.batch_preference || 'Morning'} Batch!\n\n` +
+          `Would you like to send the Admission Confirmation message to the student on WhatsApp (${student.phone}) now?`
+        );
+        if (sendMsg) {
+          this.sendSelectionWhatsApp(student);
+        }
+      },
+      error: (err) => alert('Failed to select student: ' + (err.error?.message || err.message))
+    });
   }
 
   updateStatus(id: number, status: string): void {
