@@ -518,12 +518,36 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
             </div>
 
             <div class="modal-body p-4">
-              <p class="text-muted small mb-3">
-                Connect your Google Form directly using its linked spreadsheet. Students fill your Google Form, and all responses are imported into the Admin Panel with one click!
-              </p>
+              <!-- STEP 1: CREATE GOOGLE FORM -->
+              <div class="p-3 bg-light rounded-3 mb-3 border">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                  <div class="fw-bold text-dark small">
+                    <i class="bi bi-plus-circle-fill text-danger me-1"></i> Don't have a Google Form yet?
+                  </div>
+                  <a 
+                    href="https://forms.new" 
+                    target="_blank" 
+                    class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-semibold d-inline-flex align-items-center gap-1.5 shadow-xs"
+                  >
+                    <i class="bi bi-box-arrow-up-right"></i>
+                    <span>Create Google Form Now</span>
+                  </a>
+                </div>
+                <p class="text-muted small mb-2" style="font-size: 12px;">
+                  Click the button above to instantly open a new Google Form in your Google account.
+                </p>
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-1 border-top">
+                  <span class="text-secondary" style="font-size: 11px;">Recommended fields: Name, Phone, Age, Address, Batch, Qualification</span>
+                  <button type="button" class="btn btn-xs btn-light border py-0.5 px-2 rounded-pill small" style="font-size: 11px;" (click)="copyRecommendedFields()">
+                    <i class="bi" [class.bi-check-lg]="copiedType === 'fields'" [class.bi-clipboard]="copiedType !== 'fields'"></i>
+                    {{ copiedType === 'fields' ? 'Copied 6 Fields!' : 'Copy 6 Question Names' }}
+                  </button>
+                </div>
+              </div>
 
+              <!-- STEP 2: LINK & SYNC -->
               <div class="p-3 bg-light rounded-3 mb-3 border small">
-                <div class="fw-bold text-dark mb-1.5"><i class="bi bi-list-check text-primary me-1"></i> Quick 3-Step Setup:</div>
+                <div class="fw-bold text-dark mb-1.5"><i class="bi bi-arrow-repeat text-success me-1"></i> How to Connect Your Form:</div>
                 <ol class="mb-0 ps-3 text-muted">
                   <li class="mb-1">In your Google Form, click the <strong>Responses</strong> tab and click the green <strong>"Link to Sheets"</strong> icon.</li>
                   <li class="mb-1">In the opened Google Sheet, click the top-right <strong>Share</strong> button and set to <strong>"Anyone with the link can view"</strong> (Viewer).</li>
@@ -1022,6 +1046,20 @@ export class StudentsComponent implements OnInit {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  copyRecommendedFields(): void {
+    const fields = 
+`1. Full Name (Short answer, Required)
+2. Mobile / WhatsApp Number (Short answer, Required)
+3. Age (Short answer, Optional)
+4. Residential Address / Village (Paragraph)
+5. Preferred Batch (Multiple choice: Morning, Afternoon, Evening)
+6. Qualification / Education (Short answer)`;
+    navigator.clipboard.writeText(fields).then(() => {
+      this.copiedType = 'fields';
+      setTimeout(() => this.copiedType = '', 2500);
+    });
   }
 
   copyToClipboard(text: string, type: string): void {
