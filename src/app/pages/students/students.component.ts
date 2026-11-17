@@ -39,15 +39,15 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
             </button>
           }
 
-          <!-- Share Application Form Modal Trigger -->
+          <!-- Connect Google Form Modal Trigger -->
           <button 
             type="button" 
             class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5 shadow-xs fw-semibold"
             (click)="showWebhookModal = true"
-            title="Get Application Form Link or Connect Google Form"
+            title="Connect Google Form"
           >
-            <i class="bi bi-share-fill"></i>
-            <span>Application Form & Links</span>
+            <i class="bi bi-google text-danger"></i>
+            <span>Connect Google Form</span>
           </button>
 
           <!-- Export CSV -->
@@ -505,76 +505,53 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
       </div>
       <div class="modal-backdrop fade show" *ngIf="showFormModal"></div>
 
-      <!-- SHARE APPLICATION LINK & GOOGLE FORM MODAL -->
+      <!-- GOOGLE FORM INTEGRATION MODAL -->
       <div class="modal fade" [class.show]="showWebhookModal" [style.display]="showWebhookModal ? 'block' : 'none'" tabindex="-1" *ngIf="showWebhookModal">
         <div class="modal-dialog modal-dialog-centered modal-lg">
           <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-bottom px-4 py-3" style="background: #f0fdf4;">
+            <div class="modal-header border-bottom px-4 py-3" style="background: #f8fafc;">
               <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-person-check-fill text-success fs-4"></i>
-                <h5 class="modal-title fw-bold text-navy mb-0">Student Application Form & Registration</h5>
+                <i class="bi bi-google text-danger fs-4"></i>
+                <h5 class="modal-title fw-bold text-navy mb-0">Google Form Integration</h5>
               </div>
               <button type="button" class="btn-close" (click)="showWebhookModal = false"></button>
             </div>
 
             <div class="modal-body p-4">
-              <!-- METHOD 1: RECOMMENDED OFFICIAL ONLINE APPLICATION FORM (ZERO SETUP) -->
-              <div class="p-3.5 bg-white border border-success-subtle rounded-3 mb-4 shadow-2xs">
+              <!-- 1-CLICK GOOGLE SHEET SYNC (NO SCRIPT / NO CODE) -->
+              <div class="p-4 bg-white border border-primary-subtle rounded-3 mb-4 shadow-2xs">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                   <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-success text-white px-2.5 py-1 text-uppercase" style="font-size: 10px;">Recommended</span>
-                    <strong class="text-dark">Official Online Form Link (Zero Setup)</strong>
+                    <span class="badge bg-primary text-white px-2.5 py-1 text-uppercase" style="font-size: 10px;">Recommended</span>
+                    <strong class="text-dark">1-Click Google Sheet Sync (Zero Coding / No Script)</strong>
                   </div>
-                  <span class="badge bg-light text-muted border">No Code Needed</span>
+                  <span class="badge bg-light text-muted border">Automatic Import</span>
                 </div>
                 <p class="text-muted small mb-3">
-                  Share this ready-made link on WhatsApp status or groups. Students open it directly on their phones, register their details, and they immediately appear on your Admin Panel!
+                  Connect your Google Form directly using its linked spreadsheet. Students fill your Google Form, and all responses are imported with one click!
                 </p>
 
-                <div class="input-group mb-2.5">
-                  <span class="input-group-text bg-light"><i class="bi bi-link-45deg"></i></span>
-                  <input type="text" class="form-control font-monospace small bg-light" [value]="websiteFormUrl" readonly>
-                  <button type="button" class="btn btn-primary" (click)="copyToClipboard(websiteFormUrl, 'website_url')">
-                    <i class="bi" [class.bi-check-lg]="copiedType === 'website_url'" [class.bi-clipboard]="copiedType !== 'website_url'"></i>
-                    {{ copiedType === 'website_url' ? 'Copied Link!' : 'Copy Link' }}
-                  </button>
-                  <a [href]="websiteFormUrl" target="_blank" class="btn btn-outline-secondary">
-                    <i class="bi bi-box-arrow-up-right"></i> Open Form
-                  </a>
+                <div class="p-3 bg-light rounded-3 mb-3 border small">
+                  <div class="fw-bold text-dark mb-1.5"><i class="bi bi-list-check text-primary me-1"></i> Quick 3-Step Setup:</div>
+                  <ol class="mb-0 ps-3 text-muted">
+                    <li class="mb-1">In your Google Form, click the <strong>Responses</strong> tab and click the green <strong>"Link to Sheets"</strong> icon.</li>
+                    <li class="mb-1">In the opened Google Sheet, click the top-right <strong>Share</strong> button and set to <strong>"Anyone with the link can view"</strong> (Viewer).</li>
+                    <li>Copy that Google Sheet URL, paste it below, and click <strong>"Sync Responses"</strong>!</li>
+                  </ol>
                 </div>
 
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-1">
-                  <button type="button" class="btn btn-sm btn-success rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1.5 fw-semibold" (click)="shareApplicationLinkOnWa()">
-                    <i class="bi bi-whatsapp"></i> Share Link on WhatsApp Status / Group
-                  </button>
-                  <span class="small text-muted"><i class="bi bi-lightning-charge-fill text-warning"></i> Real-time direct database sync</span>
-                </div>
-              </div>
-
-              <!-- METHOD 2: 1-CLICK GOOGLE SHEET SYNC (NO SCRIPT / NO CODE) -->
-              <div class="p-3.5 bg-white border border-primary-subtle rounded-3 mb-4 shadow-2xs">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary text-white px-2.5 py-1 text-uppercase" style="font-size: 10px;">Google Form</span>
-                    <strong class="text-dark">Connect Existing Google Form via Sheet Link</strong>
-                  </div>
-                  <span class="badge bg-light text-muted border">Zero Apps Script</span>
-                </div>
-                <p class="text-muted small mb-2">
-                  If you already have a Google Form: In your Google Form, go to <strong>Responses</strong> &rarr; click <strong>"Link to Sheets"</strong> &rarr; click <strong>Share</strong> (set to "Anyone with the link can view") &rarr; paste the Google Sheet URL here and click <strong>Sync Responses</strong>!
-                </p>
-
+                <label class="form-label small fw-semibold text-dark mb-1">Your Google Sheet URL:</label>
                 <div class="input-group mb-2">
                   <span class="input-group-text bg-light"><i class="bi bi-file-earmark-spreadsheet-fill text-success"></i></span>
                   <input 
                     type="text" 
-                    class="form-control small" 
+                    class="form-control" 
                     [(ngModel)]="googleSheetUrl" 
                     placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id/edit"
                   >
                   <button 
                     type="button" 
-                    class="btn btn-success d-inline-flex align-items-center gap-1.5 fw-semibold"
+                    class="btn btn-success d-inline-flex align-items-center gap-1.5 fw-semibold px-3"
                     [disabled]="isSyncingSheet || !googleSheetUrl"
                     (click)="syncFromGoogleSheet()"
                   >
@@ -591,18 +568,18 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                 }
               </div>
 
-              <!-- METHOD 3: OPTIONAL GOOGLE APPS SCRIPT WEBHOOK -->
+              <!-- ADVANCED: OPTIONAL GOOGLE APPS SCRIPT WEBHOOK -->
               <div class="accordion" id="accordionGoogleForm">
                 <div class="accordion-item border rounded-3 overflow-hidden">
                   <h2 class="accordion-header">
                     <button class="accordion-button collapsed py-2.5 small fw-bold text-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGoogle">
-                      <i class="bi bi-code-slash me-2 text-dark"></i> Advanced: Instant Google Apps Script Webhook (Optional)
+                      <i class="bi bi-code-slash me-2 text-dark"></i> Advanced: Instant Webhook via Apps Script (Optional)
                     </button>
                   </h2>
                   <div id="collapseGoogle" class="accordion-collapse collapse" data-bs-parent="#accordionGoogleForm">
                     <div class="accordion-body p-3 bg-light">
                       <p class="text-muted small mb-2">
-                        If you want Google Form to push submissions instantly the millisecond a student clicks Submit (without clicking "Sync"):
+                        If you prefer instant real-time forwarding the second a student hits Submit on Google Form:
                       </p>
 
                       <div class="mb-3">
@@ -718,10 +695,9 @@ export class StudentsComponent implements OnInit {
     notes: ''
   };
 
-  // Online Application Form & Google Form Sync Modal
+  // Google Form Integration Modal
   showWebhookModal = false;
   copiedType = '';
-  readonly websiteFormUrl = 'https://arrahmantrust.netlify.app/tailoring-apply';
   readonly webhookUrl = 'https://ar-rehman-backend.onrender.com/api/students/public';
 
   // Google Sheet Direct Sync (No Coding / No Apps Script)
@@ -888,21 +864,6 @@ export class StudentsComponent implements OnInit {
     }
 
     return lines;
-  }
-
-  shareApplicationLinkOnWa(): void {
-    const text = encodeURIComponent(
-      `📢 *Free Tailoring Classes Registration - Ar Rahman Trust, Pernambut*\\n\\n` +
-      `Alhamdulillah, registrations are now open for our upcoming batch!\\n\\n` +
-      `✅ 100% Free Training\\n` +
-      `✅ Free Machine Practice & Materials\\n` +
-      `✅ Completion Certificate\\n` +
-      `✅ Flexible Morning / Afternoon / Evening Batches\\n\\n` +
-      `👉 *Apply Online in 2 minutes here:*\\n` +
-      `${this.websiteFormUrl}\\n\\n` +
-      `Share this with sisters in need of skills & self-reliance. Jazakallahu Khair!`
-    );
-    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   }
 
   readonly googleScriptCode = `function onFormSubmit(e) {
