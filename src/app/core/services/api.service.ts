@@ -13,7 +13,7 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   // 1. Dashboard
-  getDashboardStats(): Observable<{ success: boolean; stats: DashboardStats; recentDonations: Donation[]; monthlyTrends: any[]; typeBreakdown: any[]; recentActivity: any[] }> {
+  getDashboardStats(): Observable<{ success: boolean; stats: DashboardStats; recentDonations: Donation[]; recentExpenses?: Expense[]; monthlyTrends: any[]; typeBreakdown: any[]; recentActivity: any[] }> {
     return this.http.get<any>(`${this.base}/dashboard/stats`);
   }
 

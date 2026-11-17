@@ -121,6 +121,12 @@ export interface DashboardStats {
   pendingVolunteers: number;
   totalInquiries: number;
   unreadInquiries: number;
+  totalExpensesAmount?: number;
+  totalExpensesCount?: number;
+  tailoringExpenses?: number;
+  rationKitExpenses?: number;
+  monthlyRationKitExpenses?: number;
+  netBalance?: number;
 }
 
 export interface Expense {
