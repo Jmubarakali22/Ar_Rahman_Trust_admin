@@ -349,11 +349,18 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                       </span>
                     </td>
 
-                    <!-- Receipt Bill -->
+                    <!-- Receipt Bill (PDF or Image) -->
                     <td class="text-center">
                       @if (item.receipt_url) {
-                        <a [href]="item.receipt_url" target="_blank" class="btn btn-sm btn-outline-info p-1 rounded-circle" title="View attached bill/receipt">
-                          <i class="bi bi-file-earmark-image"></i>
+                        <a 
+                          [href]="item.receipt_url" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          class="btn btn-sm p-1 rounded-circle" 
+                          [ngClass]="item.receipt_url.toLowerCase().includes('.pdf') ? 'btn-outline-danger' : 'btn-outline-primary'"
+                          [title]="item.receipt_url.toLowerCase().includes('.pdf') ? 'Open PDF Bill Attachment' : 'View Bill / Receipt Image'"
+                        >
+                          <i class="bi" [ngClass]="item.receipt_url.toLowerCase().includes('.pdf') ? 'bi-file-earmark-pdf-fill' : 'bi-file-earmark-image'"></i>
                         </a>
                       } @else {
                         <span class="text-muted small" title="No document attached">&mdash;</span>
@@ -490,10 +497,10 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                       <button 
                         type="button" 
                         class="btn btn-sm preset-cat-btn" 
-                        [class.active]="formData.category === 'Tailoring'" 
-                        (click)="formData.category = 'Tailoring'"
+                        [class.active]="formData.category === 'Tailoring' || formData.category === 'Tailoring Class'" 
+                        (click)="formData.category = 'Tailoring Class'"
                       >
-                        <i class="bi bi-scissors me-1 text-purple"></i> Tailoring
+                        <i class="bi bi-scissors me-1 text-purple"></i> Tailoring Class
                       </button>
                       <button 
                         type="button" 
@@ -632,10 +639,11 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                     </div>
                   </div>
 
-                  <!-- Document / Bill Upload -->
+                  <!-- Document / Bill Upload (Images & PDF) -->
                   <div class="bg-white p-3 rounded-3 border shadow-sm">
-                    <div class="fw-bold small text-dark mb-2 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
-                      <i class="bi bi-paperclip text-primary me-1"></i> Bill / Receipt Attachment (Optional)
+                    <div class="fw-bold small text-dark mb-2 text-uppercase d-flex align-items-center justify-content-between" style="font-size: 11px; letter-spacing: 0.5px;">
+                      <span><i class="bi bi-paperclip text-primary me-1"></i> Bill / Receipt Attachment (PDF or Image)</span>
+                      <span class="badge bg-light text-secondary border fw-normal" style="font-size: 10px;">PDF, PNG, JPG</span>
                     </div>
                     <div class="d-flex align-items-center gap-3">
                       <input 
@@ -646,8 +654,20 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                       >
                       @if (formData.receipt_url && !selectedFile) {
                         <a [href]="formData.receipt_url" target="_blank" class="small text-primary text-nowrap">
-                          <i class="bi bi-eye me-1"></i> Current File
+                          <i class="bi" [ngClass]="formData.receipt_url.toLowerCase().includes('.pdf') ? 'bi-file-earmark-pdf text-danger' : 'bi-eye'"></i> Current File
                         </a>
+                      }
+                    </div>
+
+                    <!-- Dynamic ImageKit destination folder preview -->
+                    <div class="small text-muted mt-2.5 pt-2 border-top d-flex align-items-center gap-1.5 flex-wrap" style="font-size: 11.5px;">
+                      <i class="bi bi-cloud-arrow-up text-primary"></i>
+                      <span>ImageKit Destination:</span>
+                      <code class="text-primary bg-light px-2 py-0.5 rounded border font-monospace">/assets/expenses-management/{{ getFolderSlug(formData.category) }}</code>
+                      @if (isCustomCategory(formData.category)) {
+                        <span class="badge bg-success-subtle text-success border px-2 py-0.5" style="font-size: 10px;">
+                          <i class="bi bi-folder-plus me-1"></i>New Folder Auto-Created in ImageKit
+                        </span>
                       }
                     </div>
                   </div>
@@ -1366,5 +1386,22 @@ export class ExpensesComponent implements OnInit {
     if (m.includes('bank') || m.includes('transfer')) return 'bi-bank text-info me-1';
     if (m === 'cheque') return 'bi-card-heading text-secondary me-1';
     return 'bi-cash me-1';
+  }
+
+  // ImageKit Category Folder Helpers
+  getFolderSlug(category: string): string {
+    if (!category) return 'general';
+    const c = category.toLowerCase().trim();
+    if (c.includes('tailor')) return 'tailoring-class';
+    if (c.includes('medic') || c.includes('health')) return 'medical-aid';
+    if (c.includes('ration')) return 'ration-kit';
+    const slug = c.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    return slug || 'general';
+  }
+
+  isCustomCategory(category: string): boolean {
+    if (!category) return false;
+    const c = category.toLowerCase().trim();
+    return !c.includes('tailor') && !c.includes('medic') && !c.includes('health') && !c.includes('ration');
   }
 }
