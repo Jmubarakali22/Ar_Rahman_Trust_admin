@@ -65,7 +65,7 @@ import { AutoLogoutService } from '../../core/services/auto-logout.service';
           </a>
 
           <div class="nav-section-title px-3 mt-4 mb-2" *ngIf="!isSidebarCollapsed() && (authService.hasPermission('causes') || authService.hasPermission('gallery'))">
-            LIVE WEBSITE CONFIGURATION
+            WEBSITE CONFIGURATION
           </div>
 
           <a routerLink="/causes" routerLinkActive="active" class="nav-item-link" *ngIf="authService.hasPermission('causes')" (click)="closeMobileSidebar()">
