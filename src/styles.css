@@ -132,21 +132,67 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.2;
 }
 
-/* Custom Buttons */
+/* Global Button Styling - Standardized to Record Expense Pill Design */
+.btn:not(.btn-close):not(.btn-link):not(.input-group .btn) {
+  border-radius: 50rem !important;
+}
+
 .btn-trust-primary {
-  background-color: var(--primary-navy);
-  color: #ffffff;
+  background-color: var(--primary-navy) !important;
+  color: #ffffff !important;
   font-weight: 600;
-  border: 1px solid var(--primary-navy);
-  border-radius: 8px;
-  padding: 0.55rem 1.15rem;
+  border: 1px solid var(--primary-navy) !important;
+  border-radius: 50rem !important;
+  padding: 0.45rem 1.15rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   transition: all 0.2s ease;
 }
 
 .btn-trust-primary:hover {
-  background-color: var(--primary-navy-dark);
-  border-color: var(--primary-navy-dark);
-  color: #ffffff;
+  background-color: var(--primary-navy-dark) !important;
+  border-color: var(--primary-navy-dark) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15, 61, 99, 0.2);
+}
+
+.btn-trust-primary:focus, .btn-trust-primary:active {
+  background-color: var(--primary-navy-dark) !important;
+  border-color: var(--primary-navy-dark) !important;
+  color: #ffffff !important;
+}
+
+.btn-trust-success {
+  background-color: var(--accent-green) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  border: 1px solid var(--accent-green) !important;
+  border-radius: 50rem !important;
+  padding: 0.45rem 1.15rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.btn-trust-success:hover {
+  background-color: #146c43 !important;
+  border-color: #146c43 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+.btn-trust-outline {
+  border: 1.5px solid var(--border-color) !important;
+  background: #ffffff !important;
+  color: var(--primary-navy) !important;
+  font-weight: 600;
+  border-radius: 50rem !important;
+  padding: 0.45rem 1.15rem;
+  transition: all 0.2s ease;
+}
+
+.btn-trust-outline:hover {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
   transform: translateY(-1px);
 }
 
@@ -174,36 +220,6 @@ h1, h2, h3, h4, h5, h6 {
   100% {
     transform: rotate(360deg);
   }
-}
-
-.btn-trust-success {
-  background-color: var(--accent-green);
-  color: #ffffff;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  padding: 0.55rem 1.15rem;
-  transition: all 0.2s ease;
-}
-
-.btn-trust-success:hover {
-  background-color: #146c43;
-  color: #ffffff;
-}
-
-.btn-trust-outline {
-  border: 1px solid var(--border-color);
-  background: #ffffff;
-  color: var(--primary-navy);
-  font-weight: 600;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  transition: all 0.2s ease;
-}
-
-.btn-trust-outline:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
 }
 
 /* Modern Badges */
@@ -334,7 +350,7 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center !important;
   justify-content: center !important;
   font-size: 0.85rem !important;
-  border-radius: 8px !important;
+  border-radius: 50% !important;
   margin: 0 3px !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
   flex-shrink: 0 !important;

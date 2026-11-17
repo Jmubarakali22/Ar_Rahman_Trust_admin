@@ -54,7 +54,9 @@ import { ContactInquiry } from '../../core/models/models';
             </select>
           </div>
           <div class="col-md-2 d-grid">
-            <button class="btn btn-trust-outline" (click)="resetFilters()">Reset</button>
+            <button class="btn btn-trust-outline rounded-pill px-3 py-1.5 d-flex align-items-center justify-content-center gap-1.5" (click)="resetFilters()">
+              <i class="bi bi-arrow-counterclockwise"></i> Reset
+            </button>
           </div>
         </div>
       </div>
@@ -109,21 +111,21 @@ import { ContactInquiry } from '../../core/models/models';
                   <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                     <div class="d-flex gap-2">
                       @if (inq.status === 'unread') {
-                        <button class="btn btn-sm btn-outline-secondary" (click)="updateStatus(inq.id, 'read')">
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1" (click)="updateStatus(inq.id, 'read')">
                           <i class="bi bi-envelope-open me-1"></i> Mark Read
                         </button>
                       }
                       @if (inq.status !== 'replied') {
-                        <button class="btn btn-sm btn-outline-success" (click)="updateStatus(inq.id, 'replied')">
+                        <button class="btn btn-sm btn-outline-success rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1" (click)="updateStatus(inq.id, 'replied')">
                           <i class="bi bi-check2-all me-1"></i> Mark Replied
                         </button>
                       }
                     </div>
-                    <div class="d-flex gap-2">
-                      <a [href]="'mailto:' + inq.email + '?subject=Re: ' + (inq.subject || 'Inquiry regarding Ar Rahman Trust')" class="btn btn-sm btn-trust-primary">
-                        <i class="bi bi-reply-fill me-1"></i> Reply via Email
+                    <div class="d-flex align-items-center gap-2">
+                      <a [href]="'mailto:' + inq.email + '?subject=Re: ' + (inq.subject || 'Inquiry regarding Ar Rahman Trust')" class="btn btn-sm btn-trust-primary rounded-pill px-3.5 py-1.5 shadow-sm fw-semibold d-inline-flex align-items-center gap-1.5 text-decoration-none">
+                        <i class="bi bi-reply-fill"></i> Reply via Email
                       </a>
-                      <button class="btn btn-sm btn-outline-danger" (click)="deleteInquiry(inq.id)">
+                      <button class="btn btn-sm btn-outline-danger action-btn rounded-circle" (click)="deleteInquiry(inq.id)" title="Delete Message">
                         <i class="bi bi-trash"></i>
                       </button>
                     </div>

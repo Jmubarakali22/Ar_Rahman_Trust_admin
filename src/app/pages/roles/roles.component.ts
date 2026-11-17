@@ -196,13 +196,13 @@ import { Role, UserRoleItem, AvailablePage } from '../../core/models/models';
                     <span class="text-muted small" style="font-size: 11.5px;">
                       {{ role.permissions.includes('*') ? 'All Modules Enabled' : (role.permissions.length + ' page(s) granted') }}
                     </span>
-                    <div class="d-flex gap-1.5">
-                      <button class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-2 d-flex align-items-center gap-1" (click)="openEditRoleModal(role)" title="Edit Page Permissions">
+                    <div class="d-flex align-items-center gap-1.5">
+                      <button class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1" (click)="openEditRoleModal(role)" title="Edit Page Permissions">
                         <i class="bi bi-pencil"></i>
                         <span>Edit</span>
                       </button>
                       @if (!role.is_system) {
-                        <button class="btn btn-sm btn-outline-danger py-1 px-2 rounded-2" (click)="deleteRole(role)" title="Delete Role">
+                        <button class="btn btn-sm btn-outline-danger action-btn rounded-circle" (click)="deleteRole(role)" title="Delete Role">
                           <i class="bi bi-trash"></i>
                         </button>
                       }
@@ -216,7 +216,7 @@ import { Role, UserRoleItem, AvailablePage } from '../../core/models/models';
                   <i class="bi bi-shield-exclamation text-warning fs-1 d-block mb-2"></i>
                   <h6 class="fw-bold text-dark">No Roles Defined Yet</h6>
                   <p class="text-muted small mb-3">Create custom designations or reload system standard templates.</p>
-                  <button class="btn btn-trust-primary btn-sm px-3" (click)="openCreateRoleModal()">
+                  <button class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5 shadow-sm fw-semibold" (click)="openCreateRoleModal()">
                     <i class="bi bi-plus-circle me-1"></i> Create First Role
                   </button>
                 </div>
@@ -309,8 +309,8 @@ import { Role, UserRoleItem, AvailablePage } from '../../core/models/models';
                   </div>
 
                   <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-                    <button type="button" class="btn btn-light px-3" (click)="showRoleModal.set(false)" [disabled]="isSubmitting()">Cancel</button>
-                    <button type="submit" class="btn btn-trust-primary px-4" [disabled]="isSubmitting()">
+                    <button type="button" class="btn btn-light rounded-pill px-4 py-2" (click)="showRoleModal.set(false)" [disabled]="isSubmitting()">Cancel</button>
+                    <button type="submit" class="btn btn-trust-primary rounded-pill px-4 py-2 shadow-sm fw-semibold" [disabled]="isSubmitting()">
                       @if (isSubmitting()) {
                         <span class="spinner-border spinner-border-sm me-1.5"></span> Saving...
                       } @else {

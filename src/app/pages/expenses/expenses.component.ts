@@ -362,14 +362,14 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
 
                     <!-- Actions -->
                     <td class="text-end" style="min-width: 140px; white-space: nowrap;">
-                      <div class="d-inline-flex gap-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 8px;" (click)="viewVoucher(item)" title="View & Print Voucher Slip">
+                      <div class="action-btn-group">
+                        <button type="button" class="btn btn-outline-secondary action-btn" (click)="viewVoucher(item)" title="View & Print Voucher Slip">
                           <i class="bi bi-printer"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 8px;" (click)="openEditModal(item)" title="Edit Expense">
+                        <button type="button" class="btn btn-outline-primary action-btn" (click)="openEditModal(item)" title="Edit Expense">
                           <i class="bi bi-pencil-square"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 8px;" (click)="deleteExpense(item)" title="Delete Record">
+                        <button type="button" class="btn btn-outline-danger action-btn" (click)="deleteExpense(item)" title="Delete Record">
                           <i class="bi bi-trash"></i>
                         </button>
                       </div>
@@ -654,8 +654,8 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                 </div>
 
                 <div class="modal-footer bg-white border-top px-4 py-3 d-flex justify-content-between">
-                  <button type="button" class="btn btn-light px-3" (click)="closeFormModal()" [disabled]="isSubmitting()">Cancel</button>
-                  <button type="submit" class="btn btn-trust-primary px-4 fw-semibold" [disabled]="isSubmitting()">
+                  <button type="button" class="btn btn-light rounded-pill px-4 py-2" (click)="closeFormModal()" [disabled]="isSubmitting()">Cancel</button>
+                  <button type="submit" class="btn btn-trust-primary rounded-pill px-4 py-2 shadow-sm fw-semibold" [disabled]="isSubmitting()">
                     @if (isSubmitting()) {
                       <span class="spinner-border spinner-border-sm me-1"></span> Saving...
                     } @else {

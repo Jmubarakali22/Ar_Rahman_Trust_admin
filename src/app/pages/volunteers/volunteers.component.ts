@@ -63,7 +63,9 @@ import { Volunteer } from '../../core/models/models';
             </select>
           </div>
           <div class="col-4 col-md-2 d-grid">
-            <button class="btn btn-trust-outline" (click)="resetFilters()">Reset</button>
+            <button class="btn btn-trust-outline rounded-pill px-3 py-1.5 d-flex align-items-center justify-content-center gap-1.5" (click)="resetFilters()">
+              <i class="bi bi-arrow-counterclockwise"></i> Reset
+            </button>
           </div>
         </div>
       </div>
@@ -124,18 +126,18 @@ import { Volunteer } from '../../core/models/models';
                       </span>
                     </td>
                     <td class="text-end" style="min-width: 130px; white-space: nowrap;">
-                      <div class="btn-group btn-group-sm">
+                      <div class="action-btn-group">
                         @if (v.status !== 'approved') {
-                          <button class="btn btn-outline-success" title="Approve Volunteer" (click)="updateStatus(v.id, 'approved')">
+                          <button class="btn btn-outline-success action-btn" title="Approve Volunteer" (click)="updateStatus(v.id, 'approved')">
                             <i class="bi bi-check-lg"></i>
                           </button>
                         }
                         @if (v.status !== 'rejected') {
-                          <button class="btn btn-outline-warning" title="Reject / Deactivate" (click)="updateStatus(v.id, 'rejected')">
+                          <button class="btn btn-outline-warning action-btn" title="Reject / Deactivate" (click)="updateStatus(v.id, 'rejected')">
                             <i class="bi bi-x-lg"></i>
                           </button>
                         }
-                        <button class="btn btn-outline-danger" title="Delete" (click)="deleteVolunteer(v.id)">
+                        <button class="btn btn-outline-danger action-btn" title="Delete" (click)="deleteVolunteer(v.id)">
                           <i class="bi bi-trash"></i>
                         </button>
                       </div>
@@ -197,8 +199,8 @@ import { Volunteer } from '../../core/models/models';
                   <textarea class="form-control" rows="2" [(ngModel)]="formData.notes" name="notes"></textarea>
                 </div>
                 <div class="d-flex justify-content-end gap-2 mt-4">
-                  <button type="button" class="btn btn-light" (click)="showModal.set(false)">Cancel</button>
-                  <button type="submit" class="btn btn-trust-primary" [disabled]="isSubmitting()">
+                  <button type="button" class="btn btn-light rounded-pill px-4 py-2" (click)="showModal.set(false)">Cancel</button>
+                  <button type="submit" class="btn btn-trust-primary rounded-pill px-4 py-2 shadow-sm fw-semibold" [disabled]="isSubmitting()">
                     {{ isSubmitting() ? 'Saving...' : 'Register' }}
                   </button>
                 </div>

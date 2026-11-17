@@ -20,17 +20,17 @@ import { AutoLogoutService } from '../../core/services/auto-logout.service';
       <!-- Navigation Tabs -->
       <ul class="nav nav-pills mb-4 gap-2">
         <li class="nav-item">
-          <button class="btn btn-sm" [ngClass]="activeTab === 'general' ? 'btn-trust-primary' : 'btn-outline-secondary'" (click)="activeTab = 'general'">
+          <button class="btn btn-sm rounded-pill px-3.5 py-2 fw-semibold shadow-sm" [ngClass]="activeTab === 'general' ? 'btn-trust-primary' : 'btn-outline-secondary'" (click)="activeTab = 'general'">
             <i class="bi bi-bank2 me-1"></i> Trust & Payment Info
           </button>
         </li>
         <li class="nav-item">
-          <button class="btn btn-sm" [ngClass]="activeTab === 'profile' ? 'btn-trust-primary' : 'btn-outline-secondary'" (click)="activeTab = 'profile'">
+          <button class="btn btn-sm rounded-pill px-3.5 py-2 fw-semibold shadow-sm" [ngClass]="activeTab === 'profile' ? 'btn-trust-primary' : 'btn-outline-secondary'" (click)="activeTab = 'profile'">
             <i class="bi bi-person-badge me-1"></i> My Profile & Security
           </button>
         </li>
         <li class="nav-item">
-          <button class="btn btn-sm" [ngClass]="activeTab === 'logs' ? 'btn-trust-primary' : 'btn-outline-secondary'" (click)="activeTab = 'logs'; loadLogs()">
+          <button class="btn btn-sm rounded-pill px-3.5 py-2 fw-semibold shadow-sm" [ngClass]="activeTab === 'logs' ? 'btn-trust-primary' : 'btn-outline-secondary'" (click)="activeTab = 'logs'; loadLogs()">
             <i class="bi bi-clock-history me-1"></i> Audit Activity Logs
           </button>
         </li>
@@ -103,7 +103,7 @@ import { AutoLogoutService } from '../../core/services/auto-logout.service';
                   <input type="text" class="form-control" [(ngModel)]="settings.banner_announcement" name="banner_announcement">
                 </div>
 
-                <button type="submit" class="btn btn-trust-primary" [disabled]="isSubmitting()">
+                <button type="submit" class="btn btn-trust-primary rounded-pill px-4 py-2 shadow-sm fw-semibold" [disabled]="isSubmitting()">
                   {{ isSubmitting() ? 'Saving...' : 'Save Trust Settings' }}
                 </button>
               </form>
@@ -146,7 +146,7 @@ import { AutoLogoutService } from '../../core/services/auto-logout.service';
                   <label class="form-label small fw-bold">Confirm New Password</label>
                   <input type="password" class="form-control" [(ngModel)]="profileData.confirmPassword" name="confirmPassword" required>
                 </div>
-                <button type="submit" class="btn btn-trust-primary" [disabled]="isSubmitting()">
+                <button type="submit" class="btn btn-trust-primary rounded-pill px-4 py-2 shadow-sm fw-semibold" [disabled]="isSubmitting()">
                   Update Password
                 </button>
               </form>

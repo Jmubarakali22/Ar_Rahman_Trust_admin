@@ -104,8 +104,8 @@ import { Donation } from '../../core/models/models';
             </select>
           </div>
           <div class="col-12 col-md-2 d-grid">
-            <button class="btn btn-trust-outline" (click)="resetFilters()">
-              <i class="bi bi-x-circle me-1"></i> Reset
+            <button class="btn btn-trust-outline rounded-pill px-3 py-1.5 d-flex align-items-center justify-content-center gap-1.5" (click)="resetFilters()">
+              <i class="bi bi-arrow-counterclockwise"></i> <span>Reset</span>
             </button>
           </div>
         </div>
@@ -460,8 +460,8 @@ import { Donation } from '../../core/models/models';
                 </div>
 
                 <div class="d-flex justify-content-end gap-2 mt-4">
-                  <button type="button" class="btn btn-light" (click)="showFormModal.set(false)">Cancel</button>
-                  <button type="submit" class="btn btn-trust-primary" [disabled]="isSubmitting()">
+                  <button type="button" class="btn btn-light rounded-pill px-4 py-2" (click)="showFormModal.set(false)">Cancel</button>
+                  <button type="submit" class="btn btn-trust-primary rounded-pill px-4 py-2 shadow-sm fw-semibold" [disabled]="isSubmitting()">
                     {{ isSubmitting() ? 'Saving...' : 'Save Record' }}
                   </button>
                 </div>
@@ -608,12 +608,12 @@ import { Donation } from '../../core/models/models';
 
             <!-- Modal Footer (Always Visible & Accessible on Screen) -->
             <div class="modal-footer bg-light border-top py-2 px-3 d-flex flex-wrap justify-content-between gap-2">
-              <button type="button" class="btn btn-secondary btn-sm" (click)="showReceiptModal.set(false)">Close</button>
+              <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3.5 py-1.5" (click)="showReceiptModal.set(false)">Close</button>
               <div class="d-flex flex-wrap gap-2">
-                <button type="button" class="btn btn-success btn-sm" (click)="openWhatsAppModal(activeReceipt)" style="background-color: #25D366; border-color: #25D366;">
+                <button type="button" class="btn btn-success btn-sm rounded-pill px-3.5 py-1.5 shadow-sm" (click)="openWhatsAppModal(activeReceipt)" style="background-color: #25D366; border-color: #25D366;">
                   <i class="bi bi-whatsapp me-1"></i> Send on WhatsApp
                 </button>
-                <button type="button" class="btn btn-trust-primary btn-sm" (click)="printReceipt()">
+                <button type="button" class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5 shadow-sm fw-semibold" (click)="printReceipt()">
                   <i class="bi bi-printer me-1"></i> Print Receipt
                 </button>
               </div>

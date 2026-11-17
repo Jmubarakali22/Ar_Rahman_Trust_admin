@@ -185,15 +185,15 @@ import { Admin, Role, AvailablePage } from '../../core/models/models';
                     </td>
                     <td class="small text-muted">{{ a.created_at | date:'mediumDate' }}</td>
                     <td class="text-end" style="min-width: 110px; white-space: nowrap;">
-                      <div class="d-inline-flex gap-1">
+                      <div class="action-btn-group">
                         <!-- Edit User & Access Modal Button -->
-                        <button class="btn btn-sm btn-outline-primary" 
+                        <button class="btn btn-outline-primary action-btn rounded-circle" 
                                 (click)="openAssignRoleModal(a)" 
                                 title="Edit User Details & Access">
                           <i class="bi bi-pencil-square"></i>
                         </button>
                         @if (a.id !== authService.currentUser()?.id) {
-                          <button class="btn btn-sm btn-outline-danger" 
+                          <button class="btn btn-outline-danger action-btn rounded-circle" 
                                   (click)="deleteAdmin(a.id, a.name)" 
                                   title="Delete User Account">
                             <i class="bi bi-trash"></i>
@@ -406,8 +406,8 @@ import { Admin, Role, AvailablePage } from '../../core/models/models';
               </div>
 
               <div class="modal-footer bg-white border-top px-4 py-3 d-flex justify-content-between">
-                <button type="button" class="btn btn-light px-3" (click)="showAddModal.set(false)">Cancel</button>
-                <button type="submit" class="btn btn-trust-primary px-4 fw-semibold" [disabled]="isSubmitting()">
+                <button type="button" class="btn btn-light rounded-pill px-4 py-2" (click)="showAddModal.set(false)">Cancel</button>
+                <button type="submit" class="btn btn-trust-primary rounded-pill px-4 py-2 shadow-sm fw-semibold" [disabled]="isSubmitting()">
                   @if (isSubmitting()) {
                     <span class="spinner-border spinner-border-sm me-1" role="status"></span> Creating...
                   } @else {
@@ -567,8 +567,8 @@ import { Admin, Role, AvailablePage } from '../../core/models/models';
               </div>
 
               <div class="modal-footer bg-white border-top px-4 py-3 d-flex justify-content-between">
-                <button type="button" class="btn btn-light px-3" (click)="showAssignModal.set(false)">Cancel</button>
-                <button type="submit" class="btn btn-trust-primary px-4 fw-semibold" [disabled]="isSubmitting()">
+                <button type="button" class="btn btn-light rounded-pill px-4 py-2" (click)="showAssignModal.set(false)">Cancel</button>
+                <button type="submit" class="btn btn-trust-primary rounded-pill px-4 py-2 shadow-sm fw-semibold" [disabled]="isSubmitting()">
                   @if (isSubmitting()) {
                     <span class="spinner-border spinner-border-sm me-1" role="status"></span> Updating...
                   } @else {

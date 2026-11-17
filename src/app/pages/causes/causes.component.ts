@@ -63,7 +63,9 @@ import { Cause } from '../../core/models/models';
             </select>
           </div>
           <div class="col-4 col-md-2 d-grid">
-            <button class="btn btn-trust-outline" (click)="resetFilters()">Reset</button>
+            <button class="btn btn-trust-outline rounded-pill px-3 py-1.5 d-flex align-items-center justify-content-center gap-1.5" (click)="resetFilters()">
+              <i class="bi bi-arrow-counterclockwise"></i> Reset
+            </button>
           </div>
         </div>
       </div>
@@ -108,10 +110,10 @@ import { Cause } from '../../core/models/models';
 
                   <!-- Actions -->
                   <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-auto">
-                    <button class="btn btn-sm btn-outline-primary" (click)="openEditModal(item)">
+                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1" (click)="openEditModal(item)">
                       <i class="bi bi-pencil me-1"></i> Edit
                     </button>
-                    <button class="btn btn-sm btn-outline-danger" (click)="confirmDeleteCause(item)" title="Delete Cause">
+                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1" (click)="confirmDeleteCause(item)" title="Delete Cause">
                       <i class="bi bi-trash me-1"></i> Delete
                     </button>
                   </div>
@@ -263,8 +265,8 @@ import { Cause } from '../../core/models/models';
                   </label>
                 </div>
                 <div class="d-flex justify-content-end gap-2 mt-4">
-                  <button type="button" class="btn btn-light" (click)="showModal.set(false)" [disabled]="isSubmitting()">Cancel</button>
-                  <button type="submit" class="btn btn-trust-primary" [disabled]="isSubmitting()">
+                  <button type="button" class="btn btn-light rounded-pill px-4 py-2" (click)="showModal.set(false)" [disabled]="isSubmitting()">Cancel</button>
+                  <button type="submit" class="btn btn-trust-primary rounded-pill px-4 py-2 shadow-sm fw-semibold" [disabled]="isSubmitting()">
                     @if (isSubmitting()) {
                       <span class="spinner-border spinner-border-sm me-1" role="status"></span>
                       <span>Saving...</span>
@@ -312,10 +314,10 @@ import { Cause } from '../../core/models/models';
 
               <!-- Actions -->
               <div class="d-flex justify-content-center gap-2 pt-2">
-                <button type="button" class="btn btn-light px-4" (click)="cancelDelete()" [disabled]="isDeleting()">
+                <button type="button" class="btn btn-light rounded-pill px-4 py-2" (click)="cancelDelete()" [disabled]="isDeleting()">
                   Cancel
                 </button>
-                <button type="button" class="btn btn-danger px-4" (click)="executeDelete()" [disabled]="isDeleting()">
+                <button type="button" class="btn btn-danger rounded-pill px-4 py-2 shadow-sm fw-semibold" (click)="executeDelete()" [disabled]="isDeleting()">
                   @if (isDeleting()) {
                     <span class="spinner-border spinner-border-sm me-1" role="status"></span>
                     <span>Deleting...</span>
