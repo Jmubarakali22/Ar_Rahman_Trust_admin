@@ -125,6 +125,7 @@ export interface DashboardStats {
   totalExpensesCount?: number;
   tailoringExpenses?: number;
   rationKitExpenses?: number;
+  medicalAidExpenses?: number;
   monthlyRationKitExpenses?: number;
   netBalance?: number;
 }
@@ -132,7 +133,7 @@ export interface DashboardStats {
 export interface Expense {
   id: number;
   title: string;
-  category: 'Tailoring' | 'Ration Kit' | 'Monthly Ration Kit' | string;
+  category: 'Tailoring' | 'Ration Kit' | 'Medical Aid' | 'Monthly Ration Kit' | string;
   amount: number;
   expense_date: string;
   payment_method: 'Cash' | 'UPI' | 'Bank Transfer' | 'Cheque' | string;
@@ -150,6 +151,7 @@ export interface ExpenseSummary {
   overall_total: number;
   tailoring_total: number;
   ration_kit_total: number;
+  medical_aid_total?: number;
   monthly_ration_kit_total: number;
   current_month_total: number;
   total_count: number;

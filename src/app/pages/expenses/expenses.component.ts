@@ -114,19 +114,19 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
           </div>
         </div>
 
-        <!-- 4. Monthly Ration Kit -->
+        <!-- 4. Medical Aid -->
         <div class="col-6 col-xl-3">
           <div class="metric-card h-100">
             <div class="d-flex align-items-center justify-content-between mb-2">
-              <span class="metric-label">Monthly Ration Kit</span>
-              <div class="metric-icon-box bg-amber-subtle text-warning">
-                <i class="bi bi-basket3-fill"></i>
+              <span class="metric-label">Medical Aid</span>
+              <div class="metric-icon-box bg-danger-subtle text-danger">
+                <i class="bi bi-heart-pulse-fill"></i>
               </div>
             </div>
-            <div class="metric-value text-amber">₹{{ (summary().monthly_ration_kit_total || 0) | number:'1.2-2' }}</div>
+            <div class="metric-value text-danger">₹{{ ((summary().medical_aid_total ?? summary().monthly_ration_kit_total) || 0) | number:'1.2-2' }}</div>
             <div class="d-flex align-items-center justify-content-between mt-2 pt-2 border-top">
-              <span class="small text-muted" style="font-size: 11.5px;">Recurring Food Provisions</span>
-              <button type="button" class="btn btn-link btn-xs p-0 text-decoration-none" (click)="filterByCategory('Monthly Ration Kit')">Filter &rarr;</button>
+              <span class="small text-muted" style="font-size: 11.5px;">Medicines & Camp Relief</span>
+              <button type="button" class="btn btn-link btn-xs p-0 text-decoration-none" (click)="filterByCategory('Medical Aid')">Filter &rarr;</button>
             </div>
           </div>
         </div>
@@ -164,10 +164,10 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
         <button 
           type="button" 
           class="btn btn-sm category-pill-btn" 
-          [class.active]="selectedCategory() === 'Monthly Ration Kit'" 
-          (click)="filterByCategory('Monthly Ration Kit')"
+          [class.active]="selectedCategory() === 'Medical Aid' || selectedCategory() === 'Monthly Ration Kit'" 
+          (click)="filterByCategory('Medical Aid')"
         >
-          <i class="bi bi-basket3-fill me-1 text-warning"></i> Monthly Ration Kit
+          <i class="bi bi-heart-pulse-fill me-1 text-danger"></i> Medical Aid
         </button>
       </div>
 
@@ -472,7 +472,7 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                       {{ isEditing() ? 'Edit Expense Record' : 'Record New Trust Expenditure' }}
                     </h5>
                     <div class="small text-white-50" style="font-size: 11.5px;">
-                      Enter details for Tailoring, Ration Kits, or relief disbursements
+                      Enter details for Tailoring, Ration Kits, Medical Aid, or relief disbursements
                     </div>
                   </div>
                 </div>
@@ -506,10 +506,10 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
                       <button 
                         type="button" 
                         class="btn btn-sm preset-cat-btn" 
-                        [class.active]="formData.category === 'Monthly Ration Kit'" 
-                        (click)="formData.category = 'Monthly Ration Kit'"
+                        [class.active]="formData.category === 'Medical Aid'" 
+                        (click)="formData.category = 'Medical Aid'"
                       >
-                        <i class="bi bi-basket3-fill me-1 text-warning"></i> Monthly Ration Kit
+                        <i class="bi bi-heart-pulse-fill me-1 text-danger"></i> Medical Aid
                       </button>
                     </div>
 
@@ -828,6 +828,7 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
     .bg-purple-subtle { background-color: #faf5ff; }
     .bg-emerald-subtle { background-color: #ecfdf5; }
     .bg-amber-subtle { background-color: #fffbeb; }
+    .bg-danger-subtle { background-color: #fef2f2; }
     .text-purple { color: #7e22ce; }
     .text-amber { color: #d97706; }
 
@@ -923,6 +924,7 @@ import { Expense, ExpenseSummary } from '../../core/models/models';
     /* Category badge classes */
     .badge-tailoring { background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; }
     .badge-ration { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    .badge-medical { background: #fee2e2; color: #b91c1c; border: 1px solid #fecdd3; }
     .badge-monthly { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
     .badge-default { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
 
@@ -1336,7 +1338,8 @@ export class ExpensesComponent implements OnInit {
   getCategoryBadgeClass(category: string): string {
     const c = (category || '').toLowerCase();
     if (c.includes('tailor')) return 'badge-tailoring';
-    if (c.includes('monthly') && c.includes('ration')) return 'badge-monthly';
+    if (c.includes('medic') || c.includes('health')) return 'badge-medical';
+    if (c.includes('monthly') && c.includes('ration')) return 'badge-medical';
     if (c.includes('ration')) return 'badge-ration';
     return 'badge-default';
   }
@@ -1344,8 +1347,9 @@ export class ExpensesComponent implements OnInit {
   getCategoryIcon(category: string): string {
     const c = (category || '').toLowerCase();
     if (c.includes('tailor')) return 'bi-scissors';
-    if (c.includes('monthly') && c.includes('ration')) return 'bi-basket3-fill';
-    if (c.includes('ration')) return 'bi-box2-heart';
+    if (c.includes('medic') || c.includes('health')) return 'bi-heart-pulse-fill text-danger';
+    if (c.includes('monthly') && c.includes('ration')) return 'bi-heart-pulse-fill text-danger';
+    if (c.includes('ration')) return 'bi-box2-heart text-success';
     return 'bi-tag-fill';
   }
 

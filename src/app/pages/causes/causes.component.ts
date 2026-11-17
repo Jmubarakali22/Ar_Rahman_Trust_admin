@@ -144,7 +144,7 @@ import { Cause } from '../../core/models/models';
               <form (ngSubmit)="saveCause()">
                 <div class="mb-3">
                   <label class="form-label small fw-bold">Cause Title *</label>
-                  <input type="text" class="form-control" [(ngModel)]="formData.title" name="title" required placeholder="e.g. Monthly Ration Kit">
+                  <input type="text" class="form-control" [(ngModel)]="formData.title" name="title" required placeholder="e.g. Medical Aid Relief">
                 </div>
                 <div class="row g-2 mb-3">
                   <div class="col-6">

@@ -188,7 +188,7 @@ import { DashboardStats, Donation, Expense, ExpenseSummary } from '../../core/mo
           </div>
 
           <!-- Progress Bar: Fund Utilization Breakdown -->
-          <div class="mb-3 p-2.5 rounded-3 bg-light border">
+          <div class="p-2.5 rounded-3 bg-light border">
             <div class="d-flex justify-content-between align-items-center small mb-1.5 flex-wrap gap-2">
               <span class="fw-semibold text-dark" style="font-size: 12px;">
                 <i class="bi bi-bar-chart-fill text-primary me-1"></i> Spend Ratio: 
@@ -217,75 +217,6 @@ import { DashboardStats, Donation, Expense, ExpenseSummary } from '../../core/mo
                 aria-valuemax="100"
                 title="Remaining Funds Available"
               ></div>
-            </div>
-          </div>
-
-          <!-- Program-wise Relief Spending Breakdown -->
-          <div class="p-3 rounded-3 bg-white border">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="small fw-bold text-dark text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
-                <i class="bi bi-tag-fill text-secondary me-1"></i> Program-Wise Spending Breakdown:
-              </span>
-              <a routerLink="/expenses" class="small text-decoration-none text-muted" style="font-size: 11px;">Filter by category &rarr;</a>
-            </div>
-
-            <div class="row g-2">
-              <!-- Tailoring Classes -->
-              <div class="col-12 col-md-4">
-                <div class="d-flex align-items-center justify-content-between p-2.5 rounded-2 border bg-light h-100">
-                  <div class="d-flex align-items-center gap-2">
-                    <div class="p-2 rounded-circle bg-purple-subtle text-purple d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                      <i class="bi bi-scissors fs-6"></i>
-                    </div>
-                    <div>
-                      <div class="small fw-bold text-dark">Tailoring Classes</div>
-                      <div class="text-muted" style="font-size: 11px;">Machines &amp; Course Materials</div>
-                    </div>
-                  </div>
-                  <div class="text-end">
-                    <div class="fw-bold text-purple">₹{{ tailoringTotal() | number:'1.2-2' }}</div>
-                    <span class="badge bg-purple-subtle text-purple" style="font-size: 10px;">Tailoring Aid</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Ration Kit Relief -->
-              <div class="col-12 col-md-4">
-                <div class="d-flex align-items-center justify-content-between p-2.5 rounded-2 border bg-light h-100">
-                  <div class="d-flex align-items-center gap-2">
-                    <div class="p-2 rounded-circle bg-emerald-subtle text-success d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                      <i class="bi bi-box2-heart fs-6"></i>
-                    </div>
-                    <div>
-                      <div class="small fw-bold text-dark">Ration Kits Relief</div>
-                      <div class="text-muted" style="font-size: 11px;">Direct Emergency Relief Kits</div>
-                    </div>
-                  </div>
-                  <div class="text-end">
-                    <div class="fw-bold text-success">₹{{ rationKitTotal() | number:'1.2-2' }}</div>
-                    <span class="badge bg-emerald-subtle text-success" style="font-size: 10px;">Direct Aid</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Monthly Ration Kit -->
-              <div class="col-12 col-md-4">
-                <div class="d-flex align-items-center justify-content-between p-2.5 rounded-2 border bg-light h-100">
-                  <div class="d-flex align-items-center gap-2">
-                    <div class="p-2 rounded-circle bg-amber-subtle text-warning d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                      <i class="bi bi-basket3-fill fs-6"></i>
-                    </div>
-                    <div>
-                      <div class="small fw-bold text-dark">Monthly Ration Kit</div>
-                      <div class="text-muted" style="font-size: 11px;">Recurring Food Provisions</div>
-                    </div>
-                  </div>
-                  <div class="text-end">
-                    <div class="fw-bold text-amber">₹{{ monthlyRationKitTotal() | number:'1.2-2' }}</div>
-                    <span class="badge bg-amber-subtle text-warning" style="font-size: 10px;">Food Packs</span>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -465,6 +396,7 @@ import { DashboardStats, Donation, Expense, ExpenseSummary } from '../../core/mo
                             <span class="badge" [ngClass]="{
                               'bg-purple-subtle text-purple border': exp.category === 'Tailoring',
                               'bg-emerald-subtle text-success border': exp.category === 'Ration Kit',
+                              'bg-danger-subtle text-danger border': exp.category === 'Medical Aid' || exp.category === 'Medical',
                               'bg-amber-subtle text-warning border': exp.category === 'Monthly Ration Kit'
                             }" style="font-size: 10px; padding: 2.5px 5.5px;">
                               {{ exp.category }}
