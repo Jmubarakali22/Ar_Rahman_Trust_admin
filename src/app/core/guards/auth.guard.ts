@@ -23,16 +23,18 @@ export const authGuard: CanActivateFn = (route, state): boolean | UrlTree => {
     const target = authService.getFirstAccessibleRoute();
     const cleanUrl = state.url.split('?')[0];
 
-    // Anti-loop protection: Never redirect to the same URL being requested
-    if (cleanUrl === target || cleanUrl === `/${requiredPage}`) {
-      // If user has no access to target either, logout safely to prevent locking browser
-      if (!authService.hasPermission(target.replace('/', ''))) {
-        authService.logout();
-        return router.createUrlTree(['/login']);
-      }
+    // If user has no accessible pages, logout safely
+    if (target === '/login' || !authService.hasPermission(target.replace('/', ''))) {
+      authService.logout();
+      return router.createUrlTree(['/login']);
+    }
+
+    // Anti-loop protection: If target is the same URL, don't loop
+    if (cleanUrl === target) {
       return false;
     }
 
+    // Redirect to user's permitted landing page
     return router.createUrlTree([target]);
   }
 

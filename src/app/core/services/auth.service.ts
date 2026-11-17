@@ -48,10 +48,28 @@ export class AuthService {
     if (this.hasPermission('dashboard')) {
       return '/dashboard';
     }
-    const pages = ['causes', 'donations', 'gallery', 'volunteers', 'inquiries', 'settings'];
+    const pages = [
+      'students',
+      'donations',
+      'expenses',
+      'causes',
+      'gallery',
+      'volunteers',
+      'inquiries',
+      'settings',
+      'admins',
+      'roles'
+    ];
     for (const page of pages) {
       if (this.hasPermission(page)) {
         return `/${page}`;
+      }
+    }
+    const perms = this.currentUser()?.permissions;
+    if (Array.isArray(perms) && perms.length > 0) {
+      const first = perms.find(p => p && p !== '*');
+      if (first && this.hasPermission(first)) {
+        return `/${first}`;
       }
     }
     return '/login';
