@@ -70,20 +70,6 @@ import { AutoLogoutService } from '../../core/services/auto-logout.service';
 
                 <div class="row g-3 mb-3">
                   <div class="col-md-6">
-                    <label class="form-label small fw-bold">UPI ID (For QR Code Payments)</label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light"><i class="bi bi-qr-code"></i></span>
-                      <input type="text" class="form-control font-monospace" [(ngModel)]="settings.upi_id" name="upi_id" placeholder="fuzailahmed536l@okaxis">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label small fw-bold">UPI Payee / Beneficiary Name</label>
-                    <input type="text" class="form-control" [(ngModel)]="settings.payee_name" name="payee_name" placeholder="Ar Rahman Trust">
-                  </div>
-                </div>
-
-                <div class="row g-3 mb-3">
-                  <div class="col-md-6">
                     <label class="form-label small fw-bold">Contact Phone Number</label>
                     <input type="text" class="form-control" [(ngModel)]="settings.contact_phone" name="contact_phone" placeholder="+91 80156 65648">
                   </div>
@@ -103,25 +89,146 @@ import { AutoLogoutService } from '../../core/services/auto-logout.service';
                   <input type="text" class="form-control" [(ngModel)]="settings.banner_announcement" name="banner_announcement">
                 </div>
 
+                <!-- Section: UPI & Digital Payments -->
+                <h6 class="fw-bold text-primary text-uppercase mt-4 mb-3 pt-3 border-top" style="font-size: 12px; letter-spacing: 0.5px;">
+                  <i class="bi bi-qr-code me-1"></i> UPI & Instant Digital Payments
+                </h6>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">UPI ID (For QR Code Payments)</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="bi bi-qr-code"></i></span>
+                      <input type="text" class="form-control font-monospace" [(ngModel)]="settings.upi_id" name="upi_id" placeholder="fuzailahmed536l@okaxis">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">UPI Payee / Beneficiary Name</label>
+                    <input type="text" class="form-control" [(ngModel)]="settings.payee_name" name="payee_name" placeholder="Ar Rahman Trust">
+                  </div>
+                </div>
+
+                <!-- Section: Official Bank Transfer (NEFT / IMPS / RTGS) -->
+                <h6 class="fw-bold text-primary text-uppercase mt-4 mb-3 pt-3 border-top" style="font-size: 12px; letter-spacing: 0.5px;">
+                  <i class="bi bi-bank2 me-1"></i> Official Bank Transfer Details (NEFT / IMPS / RTGS)
+                </h6>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Bank Name</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="bi bi-building"></i></span>
+                      <input type="text" class="form-control" [(ngModel)]="settings.bank_name" name="bank_name" placeholder="Axis Bank">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Branch Name & City</label>
+                    <input type="text" class="form-control" [(ngModel)]="settings.bank_branch" name="bank_branch" placeholder="Indira Nagar, Chennai">
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Account Name / Holder</label>
+                    <input type="text" class="form-control" [(ngModel)]="settings.bank_account_name" name="bank_account_name" placeholder="Ar Rahman Trust">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Account Number</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="bi bi-credit-card"></i></span>
+                      <input type="text" class="form-control font-monospace fw-bold" [(ngModel)]="settings.bank_account_number" name="bank_account_number" placeholder="918010014738886">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">IFSC Code</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light font-monospace small">IFSC</span>
+                      <input type="text" class="form-control font-monospace text-uppercase fw-bold" [(ngModel)]="settings.bank_ifsc" name="bank_ifsc" placeholder="UTIB0001593">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Transfer Instructions / Note</label>
+                    <input type="text" class="form-control" [(ngModel)]="settings.bank_transfer_instructions" name="bank_transfer_instructions" placeholder="Transfer directly to our trust account via NEFT/IMPS/RTGS.">
+                  </div>
+                </div>
+
                 <button type="submit" class="btn btn-trust-primary rounded-pill px-4 py-2 shadow-sm fw-semibold" [disabled]="isSubmitting()">
-                  {{ isSubmitting() ? 'Saving...' : 'Save Trust Settings' }}
+                  {{ isSubmitting() ? 'Saving...' : 'Save Trust & Payment Settings' }}
                 </button>
               </form>
             </div>
           </div>
 
           <div class="col-lg-4">
-            <div class="admin-card p-4">
-              <h6 class="fw-bold mb-3 text-secondary">LIVE QR CODE PREVIEW</h6>
+            <!-- 1. LIVE QR CODE PREVIEW -->
+            <div class="admin-card p-4 mb-4">
+              <h6 class="fw-bold mb-3 text-secondary text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
+                <i class="bi bi-qr-code me-1"></i> Live QR Code Preview
+              </h6>
               <div class="p-3 bg-light rounded-3 text-center border">
                 <i class="bi bi-upc-scan fs-1 text-primary mb-2 d-block"></i>
                 <div class="small fw-bold text-dark">{{ settings.payee_name || 'Ar Rahman Trust' }}</div>
                 <div class="font-monospace small text-muted mb-2">{{ settings.upi_id || 'fuzailahmed536l@okaxis' }}</div>
                 <div class="badge bg-success">UPI Instant QR Ready</div>
               </div>
-              <p class="small text-muted mt-3 mb-0">
+              <p class="small text-muted mt-3 mb-0" style="font-size: 11px;">
                 Any changes saved here immediately update the payment details shown to donors on the official website.
               </p>
+            </div>
+
+            <!-- 2. BANK ACCOUNT PREVIEW -->
+            <div class="admin-card p-4">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="fw-bold mb-0 text-secondary text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
+                  <i class="bi bi-bank2 me-1"></i> Bank Transfer Preview
+                </h6>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 10px;">NEFT / RTGS</span>
+              </div>
+
+              <div class="p-3 bg-light rounded-3 border" style="font-size: 12.5px;">
+                <div class="d-flex align-items-center gap-2 mb-2.5 pb-2 border-bottom">
+                  <div class="rounded-circle bg-white border d-flex align-items-center justify-content-center text-primary shadow-sm" style="width: 34px; height: 34px;">
+                    <i class="bi bi-bank fs-6"></i>
+                  </div>
+                  <div>
+                    <div class="fw-bold text-dark">{{ settings.bank_name || 'Axis Bank' }}</div>
+                    <div class="text-muted small" style="font-size: 11px;">{{ settings.bank_branch || 'Indira Nagar, Chennai' }}</div>
+                  </div>
+                </div>
+
+                <div class="mb-2">
+                  <span class="text-muted small" style="font-size: 10.5px;">Account Name:</span>
+                  <div class="fw-semibold text-dark">{{ settings.bank_account_name || 'Ar Rahman Trust' }}</div>
+                </div>
+
+                <div class="mb-2">
+                  <span class="text-muted small" style="font-size: 10.5px;">Account Number:</span>
+                  <div class="font-monospace fw-bold text-dark fs-6 d-flex align-items-center justify-content-between">
+                    <span>{{ settings.bank_account_number || '918010014738886' }}</span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 rounded-pill" (click)="copyToClipboard(settings.bank_account_number || '918010014738886')" title="Copy Account Number">
+                      <i class="bi bi-clipboard"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="mb-2">
+                  <span class="text-muted small" style="font-size: 10.5px;">IFSC Code:</span>
+                  <div class="font-monospace fw-bold text-primary d-flex align-items-center justify-content-between">
+                    <span>{{ settings.bank_ifsc || 'UTIB0001593' }}</span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 rounded-pill" (click)="copyToClipboard(settings.bank_ifsc || 'UTIB0001593')" title="Copy IFSC Code">
+                      <i class="bi bi-clipboard"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="pt-2 border-top text-muted small" style="font-size: 11px;">
+                  <i class="bi bi-info-circle me-1 text-primary"></i>
+                  {{ settings.bank_transfer_instructions || 'Transfer directly to our trust account via NEFT/IMPS/RTGS.' }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -247,7 +354,13 @@ export class SettingsComponent implements OnInit {
     contact_phone: '+91 80156 65648',
     contact_email: 'arrahmantrust@gmail.com',
     trust_address: '112, Small Mosque Street, Pernambut, Vellore District, Tamil Nadu, India',
-    banner_announcement: 'Welcome to Ar Rahman Trust. Serving Pernambut and surrounding rural villages.'
+    banner_announcement: 'Welcome to Ar Rahman Trust. Serving Pernambut and surrounding rural villages.',
+    bank_account_name: 'Ar Rahman Trust',
+    bank_account_number: '918010014738886',
+    bank_ifsc: 'UTIB0001593',
+    bank_name: 'Axis Bank',
+    bank_branch: 'Indira Nagar, Chennai',
+    bank_transfer_instructions: 'Transfer directly to our trust account via NEFT/IMPS/RTGS.'
   };
 
   profileData = {
@@ -326,6 +439,14 @@ export class SettingsComponent implements OnInit {
         this.errorMessage.set(err.error?.message || 'Failed to update password.');
       }
     });
+  }
+
+  copyToClipboard(text: string): void {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      this.successMessage.set(`Copied "${text}" to clipboard!`);
+      setTimeout(() => this.successMessage.set(null), 3000);
+    }
   }
 
   loadLogs(): void {

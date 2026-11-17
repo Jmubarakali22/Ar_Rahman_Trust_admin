@@ -482,18 +482,73 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* Print Styles: When printing or saving to PDF, show ONLY the receipt voucher or expense voucher */
+/* Print Styles: When printing or saving to PDF, show ONLY the receipt voucher or expense voucher on exactly 1 page */
 @media print {
-  /* Set clean background and zero margins for A4 print */
-  body {
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+
+  html, body {
     background: #ffffff !important;
     margin: 0 !important;
     padding: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
   }
 
   /* Hide absolutely everything on the page by default */
   body * {
     visibility: hidden !important;
+  }
+
+  /* Prevent background pages, tables, and sidebars from inflating document height */
+  .expenses-container > *:not(.modal),
+  .donations-page > *:not(.modal),
+  nav,
+  aside,
+  header,
+  footer,
+  .sidebar,
+  .sidebar-backdrop,
+  .admin-header,
+  .page-header,
+  .metric-card,
+  .admin-card {
+    display: none !important;
+  }
+
+  /* Modal containers collapse and do not introduce extra margins or heights */
+  .modal,
+  .modal-dialog,
+  .modal-content,
+  .modal-body {
+    position: static !important;
+    overflow: visible !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    height: auto !important;
+    max-height: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Force-hide any elements explicitly marked as d-print-none */
+  .d-print-none,
+  .d-print-none *,
+  .modal-header,
+  .modal-footer,
+  .modal-backdrop,
+  .btn-close {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   /* Make ONLY the receipt paper and expense voucher visible */
@@ -508,37 +563,26 @@ h1, h2, h3, h4, h5, h6 {
     visibility: visible !important;
   }
 
-  /* Force-hide any elements explicitly marked as d-print-none */
-  .d-print-none,
-  .d-print-none *,
-  .modal-header,
-  .modal-footer,
-  .btn-close {
-    display: none !important;
-    visibility: hidden !important;
-  }
-
-  /* Position the receipt / voucher cleanly at the top-left of the printed page */
+  /* Position the receipt / voucher cleanly at the top-left of the single printed page */
   #printableReceiptModal,
   #printableReceipt,
   #printableVoucher {
-    position: fixed !important;
+    position: absolute !important; /* absolute instead of fixed prevents repeating across pages */
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
-    padding: 18px !important;
+    padding: 16px !important;
     border: 2px solid #0F3D63 !important;
     box-shadow: none !important;
     background: #ffffff !important;
     box-sizing: border-box !important;
     page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
+    break-inside: avoid !important;
+    break-after: avoid !important;
     border-radius: 8px !important;
-  }
-
-  @page {
-    size: A4 portrait;
-    margin: 8mm;
   }
 }
