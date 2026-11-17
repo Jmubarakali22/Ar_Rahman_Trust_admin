@@ -507,105 +507,56 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
 
       <!-- GOOGLE FORM INTEGRATION MODAL -->
       <div class="modal fade" [class.show]="showWebhookModal" [style.display]="showWebhookModal ? 'block' : 'none'" tabindex="-1" *ngIf="showWebhookModal">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-bottom px-4 py-3" style="background: #f8fafc;">
+            <div class="modal-header border-bottom px-4 py-3 bg-light">
               <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-google text-danger fs-4"></i>
+                <i class="bi bi-google text-danger fs-5"></i>
                 <h5 class="modal-title fw-bold text-navy mb-0">Google Form Integration</h5>
               </div>
               <button type="button" class="btn-close" (click)="showWebhookModal = false"></button>
             </div>
 
             <div class="modal-body p-4">
-              <!-- 1-CLICK GOOGLE SHEET SYNC (NO SCRIPT / NO CODE) -->
-              <div class="p-4 bg-white border border-primary-subtle rounded-3 mb-4 shadow-2xs">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary text-white px-2.5 py-1 text-uppercase" style="font-size: 10px;">Recommended</span>
-                    <strong class="text-dark">1-Click Google Sheet Sync (Zero Coding / No Script)</strong>
-                  </div>
-                  <span class="badge bg-light text-muted border">Automatic Import</span>
-                </div>
-                <p class="text-muted small mb-3">
-                  Connect your Google Form directly using its linked spreadsheet. Students fill your Google Form, and all responses are imported with one click!
-                </p>
+              <p class="text-muted small mb-3">
+                Connect your Google Form directly using its linked spreadsheet. Students fill your Google Form, and all responses are imported into the Admin Panel with one click!
+              </p>
 
-                <div class="p-3 bg-light rounded-3 mb-3 border small">
-                  <div class="fw-bold text-dark mb-1.5"><i class="bi bi-list-check text-primary me-1"></i> Quick 3-Step Setup:</div>
-                  <ol class="mb-0 ps-3 text-muted">
-                    <li class="mb-1">In your Google Form, click the <strong>Responses</strong> tab and click the green <strong>"Link to Sheets"</strong> icon.</li>
-                    <li class="mb-1">In the opened Google Sheet, click the top-right <strong>Share</strong> button and set to <strong>"Anyone with the link can view"</strong> (Viewer).</li>
-                    <li>Copy that Google Sheet URL, paste it below, and click <strong>"Sync Responses"</strong>!</li>
-                  </ol>
-                </div>
-
-                <label class="form-label small fw-semibold text-dark mb-1">Your Google Sheet URL:</label>
-                <div class="input-group mb-2">
-                  <span class="input-group-text bg-light"><i class="bi bi-file-earmark-spreadsheet-fill text-success"></i></span>
-                  <input 
-                    type="text" 
-                    class="form-control" 
-                    [(ngModel)]="googleSheetUrl" 
-                    placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id/edit"
-                  >
-                  <button 
-                    type="button" 
-                    class="btn btn-success d-inline-flex align-items-center gap-1.5 fw-semibold px-3"
-                    [disabled]="isSyncingSheet || !googleSheetUrl"
-                    (click)="syncFromGoogleSheet()"
-                  >
-                    <i class="bi bi-arrow-repeat" [class.spin-icon]="isSyncingSheet"></i>
-                    <span>{{ isSyncingSheet ? 'Syncing...' : 'Sync Responses' }}</span>
-                  </button>
-                </div>
-
-                @if (syncStatusMessage) {
-                  <div class="alert small py-2 px-3 mb-0" [class.alert-success]="syncSuccess" [class.alert-danger]="!syncSuccess">
-                    <i class="bi" [class.bi-check-circle-fill]="syncSuccess" [class.bi-exclamation-triangle-fill]="!syncSuccess"></i>
-                    {{ syncStatusMessage }}
-                  </div>
-                }
+              <div class="p-3 bg-light rounded-3 mb-3 border small">
+                <div class="fw-bold text-dark mb-1.5"><i class="bi bi-list-check text-primary me-1"></i> Quick 3-Step Setup:</div>
+                <ol class="mb-0 ps-3 text-muted">
+                  <li class="mb-1">In your Google Form, click the <strong>Responses</strong> tab and click the green <strong>"Link to Sheets"</strong> icon.</li>
+                  <li class="mb-1">In the opened Google Sheet, click the top-right <strong>Share</strong> button and set to <strong>"Anyone with the link can view"</strong> (Viewer).</li>
+                  <li>Copy that Google Sheet URL, paste it below, and click <strong>"Sync Responses"</strong>!</li>
+                </ol>
               </div>
 
-              <!-- ADVANCED: OPTIONAL GOOGLE APPS SCRIPT WEBHOOK -->
-              <div class="accordion" id="accordionGoogleForm">
-                <div class="accordion-item border rounded-3 overflow-hidden">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed py-2.5 small fw-bold text-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGoogle">
-                      <i class="bi bi-code-slash me-2 text-dark"></i> Advanced: Instant Webhook via Apps Script (Optional)
-                    </button>
-                  </h2>
-                  <div id="collapseGoogle" class="accordion-collapse collapse" data-bs-parent="#accordionGoogleForm">
-                    <div class="accordion-body p-3 bg-light">
-                      <p class="text-muted small mb-2">
-                        If you prefer instant real-time forwarding the second a student hits Submit on Google Form:
-                      </p>
-
-                      <div class="mb-3">
-                        <label class="form-label small fw-semibold text-dark mb-1">Public Webhook URL (POST)</label>
-                        <div class="input-group input-group-sm">
-                          <input type="text" class="form-control font-monospace small bg-white" [value]="webhookUrl" readonly>
-                          <button type="button" class="btn btn-outline-primary" (click)="copyToClipboard(webhookUrl, 'url')">
-                            <i class="bi" [class.bi-check-lg]="copiedType === 'url'" [class.bi-clipboard]="copiedType !== 'url'"></i>
-                            {{ copiedType === 'url' ? 'Copied!' : 'Copy' }}
-                          </button>
-                        </div>
-                      </div>
-
-                      <div class="mb-1 d-flex justify-content-between align-items-center">
-                        <span class="small fw-semibold text-dark">Google Apps Script:</span>
-                        <button type="button" class="btn btn-xs btn-outline-secondary py-0.5 px-2 rounded-pill small" style="font-size: 11px;" (click)="copyToClipboard(googleScriptCode, 'script')">
-                          <i class="bi" [class.bi-check-lg]="copiedType === 'script'" [class.bi-clipboard]="copiedType !== 'script'"></i>
-                          {{ copiedType === 'script' ? 'Copied Code!' : 'Copy Script' }}
-                        </button>
-                      </div>
-                      <pre class="p-2.5 bg-dark text-white rounded-3 small mb-0" style="max-height: 140px; overflow-y: auto; font-size: 11px;"><code>{{ googleScriptCode }}</code></pre>
-                    </div>
-                  </div>
-                </div>
+              <label class="form-label small fw-semibold text-dark mb-1">Your Google Sheet URL:</label>
+              <div class="input-group mb-2">
+                <span class="input-group-text bg-white"><i class="bi bi-file-earmark-spreadsheet-fill text-success"></i></span>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [(ngModel)]="googleSheetUrl" 
+                  placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id/edit"
+                >
+                <button 
+                  type="button" 
+                  class="btn btn-success d-inline-flex align-items-center gap-1.5 fw-semibold px-3"
+                  [disabled]="isSyncingSheet || !googleSheetUrl"
+                  (click)="syncFromGoogleSheet()"
+                >
+                  <i class="bi bi-arrow-repeat" [class.spin-icon]="isSyncingSheet"></i>
+                  <span>{{ isSyncingSheet ? 'Syncing...' : 'Sync Responses' }}</span>
+                </button>
               </div>
 
+              @if (syncStatusMessage) {
+                <div class="alert small py-2 px-3 mt-3 mb-0" [class.alert-success]="syncSuccess" [class.alert-danger]="!syncSuccess">
+                  <i class="bi" [class.bi-check-circle-fill]="syncSuccess" [class.bi-exclamation-triangle-fill]="!syncSuccess"></i>
+                  {{ syncStatusMessage }}
+                </div>
+              }
             </div>
 
             <div class="modal-footer border-top px-4 py-3 bg-light">
@@ -698,7 +649,6 @@ export class StudentsComponent implements OnInit {
   // Google Form Integration Modal
   showWebhookModal = false;
   copiedType = '';
-  readonly webhookUrl = 'https://ar-rehman-backend.onrender.com/api/students/public';
 
   // Google Sheet Direct Sync (No Coding / No Apps Script)
   googleSheetUrl = typeof localStorage !== 'undefined' ? (localStorage.getItem('tailoring_google_sheet_url') || '') : '';
@@ -865,25 +815,6 @@ export class StudentsComponent implements OnInit {
 
     return lines;
   }
-
-  readonly googleScriptCode = `function onFormSubmit(e) {
-  var row = e.values; // Form response array
-  var payload = {
-    full_name: row[1],
-    phone: row[2],
-    age: row[3] || null,
-    address: row[4] || '',
-    batch_preference: row[5] || 'Morning',
-    qualification: row[6] || '',
-    source: 'google_form'
-  };
-
-  UrlFetchApp.fetch('${this.webhookUrl}', {
-    method: 'post',
-    contentType: 'application/json',
-    payload: JSON.stringify(payload)
-  });
-}`;
 
   constructor(private api: ApiService) {}
 
