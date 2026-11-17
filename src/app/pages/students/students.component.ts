@@ -25,15 +25,15 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
         </div>
 
         <div class="d-flex align-items-center gap-2 flex-wrap">
-          <!-- Google Form Setup Guide Modal Trigger -->
+          <!-- Share Application Form Modal Trigger -->
           <button 
             type="button" 
             class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5 shadow-xs fw-semibold"
             (click)="showWebhookModal = true"
-            title="View Google Form Webhook Setup"
+            title="Share Application Form Link or Setup Google Form"
           >
-            <i class="bi bi-google"></i>
-            <span>Google Form Sync</span>
+            <i class="bi bi-share-fill"></i>
+            <span>Share Application Link</span>
           </button>
 
           <!-- Export CSV -->
@@ -491,82 +491,94 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
       </div>
       <div class="modal-backdrop fade show" *ngIf="showFormModal"></div>
 
-      <!-- GOOGLE FORM WEBHOOK HELPER MODAL -->
+      <!-- SHARE APPLICATION LINK & GOOGLE FORM MODAL -->
       <div class="modal fade" [class.show]="showWebhookModal" [style.display]="showWebhookModal ? 'block' : 'none'" tabindex="-1" *ngIf="showWebhookModal">
         <div class="modal-dialog modal-dialog-centered modal-lg">
           <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-bottom px-4 py-3" style="background: #eef2ff;">
+            <div class="modal-header border-bottom px-4 py-3" style="background: #f0fdf4;">
               <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-google text-primary fs-4"></i>
-                <h5 class="modal-title fw-bold text-navy mb-0">Google Form Real-Time Sync Setup</h5>
+                <i class="bi bi-person-check-fill text-success fs-4"></i>
+                <h5 class="modal-title fw-bold text-navy mb-0">Student Application Form & Registration</h5>
               </div>
               <button type="button" class="btn-close" (click)="showWebhookModal = false"></button>
             </div>
 
             <div class="modal-body p-4">
-              <p class="text-muted small">
-                Connect your Google Form so every submission instantly saves into the Ar Rahman Trust database and appears on this screen in real-time.
-              </p>
+              <!-- METHOD 1: RECOMMENDED OFFICIAL WEBSITE FORM -->
+              <div class="p-3.5 bg-white border border-success-subtle rounded-3 mb-4 shadow-2xs">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-success text-white px-2.5 py-1 text-uppercase" style="font-size: 10px;">Recommended</span>
+                    <strong class="text-dark">Official Online Application Page (Zero Setup)</strong>
+                  </div>
+                  <span class="badge bg-light text-muted border">No Coding Needed</span>
+                </div>
+                <p class="text-muted small mb-3">
+                  Share this official link on WhatsApp or social media. Students can open it directly on their phones, register their details, and they will immediately appear on this screen!
+                </p>
 
-              <!-- Webhook URL Box -->
-              <div class="mb-4 p-3 bg-light rounded-3 border">
-                <label class="form-label small fw-bold text-dark mb-1">Your Public Webhook URL</label>
-                <div class="input-group">
-                  <input type="text" class="form-control font-monospace small bg-white" [value]="webhookUrl" readonly #webhookInput>
-                  <button type="button" class="btn btn-outline-primary" (click)="copyToClipboard(webhookUrl, 'url')">
-                    <i class="bi" [class.bi-check-lg]="copiedType === 'url'" [class.bi-clipboard]="copiedType !== 'url'"></i>
-                    {{ copiedType === 'url' ? 'Copied!' : 'Copy URL' }}
+                <div class="input-group mb-2.5">
+                  <span class="input-group-text bg-light"><i class="bi bi-link-45deg"></i></span>
+                  <input type="text" class="form-control font-monospace small bg-light" [value]="websiteFormUrl" readonly>
+                  <button type="button" class="btn btn-primary" (click)="copyToClipboard(websiteFormUrl, 'website_url')">
+                    <i class="bi" [class.bi-check-lg]="copiedType === 'website_url'" [class.bi-clipboard]="copiedType !== 'website_url'"></i>
+                    {{ copiedType === 'website_url' ? 'Copied Link!' : 'Copy Link' }}
                   </button>
+                  <a [href]="websiteFormUrl" target="_blank" class="btn btn-outline-secondary">
+                    <i class="bi bi-box-arrow-up-right"></i> Open
+                  </a>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-1">
+                  <button type="button" class="btn btn-sm btn-success rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1.5 fw-semibold" (click)="shareApplicationLinkOnWa()">
+                    <i class="bi bi-whatsapp"></i> Share on WhatsApp Status / Group
+                  </button>
+                  <span class="small text-muted"><i class="bi bi-lightning-charge-fill text-warning"></i> Real-time sync with database</span>
                 </div>
               </div>
 
-              <!-- Steps -->
-              <h6 class="fw-bold mb-3" style="color: #0F3D63;">Follow These 4 Quick Steps:</h6>
-              <div class="d-flex flex-column gap-3">
-                <div class="d-flex gap-3 align-items-start">
-                  <span class="badge rounded-circle bg-primary text-white p-2" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">1</span>
-                  <div>
-                    <strong>Create your Google Form</strong> with these question fields:
-                    <div class="small text-muted mt-1">1. Full Name, 2. Mobile/WhatsApp Number, 3. Age, 4. Address/Village, 5. Preferred Batch (Morning/Afternoon/Evening), 6. Education / Notes.</div>
-                  </div>
-                </div>
+              <!-- METHOD 2: GOOGLE FORM INTEGRATION -->
+              <div class="accordion" id="accordionGoogleForm">
+                <div class="accordion-item border rounded-3 overflow-hidden">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed py-2.5 small fw-bold text-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGoogle">
+                      <i class="bi bi-google me-2 text-danger"></i> Alternative: Connect an Existing Google Form (via Webhook)
+                    </button>
+                  </h2>
+                  <div id="collapseGoogle" class="accordion-collapse collapse" data-bs-parent="#accordionGoogleForm">
+                    <div class="accordion-body p-3 bg-light">
+                      <p class="text-muted small mb-2">
+                        If you already have a Google Form, you can forward its submissions to our public endpoint:
+                      </p>
 
-                <div class="d-flex gap-3 align-items-start">
-                  <span class="badge rounded-circle bg-primary text-white p-2" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">2</span>
-                  <div>
-                    <strong>Open the linked Google Sheet:</strong>
-                    <div class="small text-muted mt-1">In your Google Form responses tab, click <em>"View in Sheets"</em>. In Google Sheets, click <strong>Extensions &rarr; Apps Script</strong>.</div>
-                  </div>
-                </div>
+                      <div class="mb-3">
+                        <label class="form-label small fw-semibold text-dark mb-1">Public Webhook URL (POST)</label>
+                        <div class="input-group input-group-sm">
+                          <input type="text" class="form-control font-monospace small bg-white" [value]="webhookUrl" readonly>
+                          <button type="button" class="btn btn-outline-primary" (click)="copyToClipboard(webhookUrl, 'url')">
+                            <i class="bi" [class.bi-check-lg]="copiedType === 'url'" [class.bi-clipboard]="copiedType !== 'url'"></i>
+                            {{ copiedType === 'url' ? 'Copied!' : 'Copy' }}
+                          </button>
+                        </div>
+                      </div>
 
-                <div class="d-flex gap-3 align-items-start">
-                  <span class="badge rounded-circle bg-primary text-white p-2" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">3</span>
-                  <div class="w-100">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                      <strong>Paste this script in Google Apps Script:</strong>
-                      <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2.5 rounded-pill" (click)="copyToClipboard(googleScriptCode, 'script')">
-                        <i class="bi" [class.bi-check-lg]="copiedType === 'script'" [class.bi-clipboard]="copiedType !== 'script'"></i>
-                        {{ copiedType === 'script' ? 'Copied Script!' : 'Copy Code' }}
-                      </button>
-                    </div>
-                    <pre class="p-3 bg-dark text-white rounded-3 small mb-0" style="max-height: 180px; overflow-y: auto;"><code>{{ googleScriptCode }}</code></pre>
-                  </div>
-                </div>
-
-                <div class="d-flex gap-3 align-items-start">
-                  <span class="badge rounded-circle bg-primary text-white p-2" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">4</span>
-                  <div>
-                    <strong>Save & Add Trigger:</strong>
-                    <div class="small text-muted mt-1">
-                      In Apps Script, click the <strong>Triggers</strong> icon on the left (alarm clock) &rarr; <em>"Add Trigger"</em> &rarr; Set event type to <strong>"On form submit"</strong> &rarr; Click <strong>Save</strong>!
+                      <div class="mb-1 d-flex justify-content-between align-items-center">
+                        <span class="small fw-semibold text-dark">Google Apps Script:</span>
+                        <button type="button" class="btn btn-xs btn-outline-secondary py-0.5 px-2 rounded-pill small" style="font-size: 11px;" (click)="copyToClipboard(googleScriptCode, 'script')">
+                          <i class="bi" [class.bi-check-lg]="copiedType === 'script'" [class.bi-clipboard]="copiedType !== 'script'"></i>
+                          {{ copiedType === 'script' ? 'Copied Code!' : 'Copy Script' }}
+                        </button>
+                      </div>
+                      <pre class="p-2.5 bg-dark text-white rounded-3 small mb-0" style="max-height: 140px; overflow-y: auto; font-size: 11px;"><code>{{ googleScriptCode }}</code></pre>
                     </div>
                   </div>
                 </div>
               </div>
+
             </div>
 
             <div class="modal-footer border-top px-4 py-3 bg-light">
-              <button type="button" class="btn btn-trust-primary rounded-pill px-4" (click)="showWebhookModal = false">Done</button>
+              <button type="button" class="btn btn-trust-primary rounded-pill px-4" (click)="showWebhookModal = false">Close</button>
             </div>
           </div>
         </div>
@@ -652,10 +664,26 @@ export class StudentsComponent implements OnInit {
     notes: ''
   };
 
-  // Google Form Sync Modal
+  // Online Application Form & Google Form Sync Modal
   showWebhookModal = false;
   copiedType = '';
+  readonly websiteFormUrl = 'https://arrahmantrust.netlify.app/tailoring-apply';
   readonly webhookUrl = 'https://ar-rehman-backend.onrender.com/api/students/public';
+
+  shareApplicationLinkOnWa(): void {
+    const text = encodeURIComponent(
+      `📢 *Free Tailoring Classes Registration - Ar Rahman Trust, Pernambut*\\n\\n` +
+      `Alhamdulillah, registrations are now open for our upcoming batch!\\n\\n` +
+      `✅ 100% Free Training\\n` +
+      `✅ Free Machine Practice & Materials\\n` +
+      `✅ Completion Certificate\\n` +
+      `✅ Flexible Morning / Afternoon / Evening Batches\\n\\n` +
+      `👉 *Apply Online in 2 minutes here:*\\n` +
+      `${this.websiteFormUrl}\\n\\n` +
+      `Share this with sisters in need of skills & self-reliance. Jazakallahu Khair!`
+    );
+    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+  }
 
   readonly googleScriptCode = `function onFormSubmit(e) {
   var row = e.values; // Form response array
