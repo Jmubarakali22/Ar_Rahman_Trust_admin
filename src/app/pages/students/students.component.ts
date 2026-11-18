@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
 import { TailoringStudent, StudentStats } from '../../core/models/models';
 
 @Component({
@@ -25,8 +26,8 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
         </div>
 
         <div class="d-flex align-items-center gap-2 flex-wrap">
-          <!-- Quick Sync from Google Sheet if URL exists -->
-          @if (googleSheetUrl) {
+          <!-- Quick Sync from Google Sheet if URL exists (Super Admin Only) -->
+          @if (isSuperAdmin() && googleSheetUrl) {
             <button 
               type="button" 
               class="btn btn-success btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5 shadow-xs fw-semibold"
@@ -39,16 +40,18 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
             </button>
           }
 
-          <!-- Connect Google Form Modal Trigger -->
-          <button 
-            type="button" 
-            class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5 shadow-xs fw-semibold"
-            (click)="showWebhookModal = true"
-            title="Connect Google Form"
-          >
-            <i class="bi bi-google text-danger"></i>
-            <span>Connect Google Form</span>
-          </button>
+          <!-- Connect Google Form Modal Trigger (Super Admin Only) -->
+          @if (isSuperAdmin()) {
+            <button 
+              type="button" 
+              class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5 shadow-xs fw-semibold"
+              (click)="showWebhookModal = true"
+              title="Connect Google Form"
+            >
+              <i class="bi bi-google text-danger"></i>
+              <span>Connect Google Form</span>
+            </button>
+          }
 
           <!-- Export CSV -->
           <button 
@@ -74,17 +77,39 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
             <span>Refresh</span>
           </button>
 
-          <!-- Add Manual Student -->
-          <button 
-            type="button" 
-            class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5 fw-semibold"
-            (click)="openAddModal()"
-          >
-            <i class="bi bi-person-plus-fill"></i>
-            <span>Add Student</span>
-          </button>
+          <!-- Add Manual Student (Super Admin Only) -->
+          @if (isSuperAdmin()) {
+            <button 
+              type="button" 
+              class="btn btn-trust-primary btn-sm rounded-pill px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5 fw-semibold"
+              (click)="openAddModal()"
+            >
+              <i class="bi bi-person-plus-fill"></i>
+              <span>Add Student</span>
+            </button>
+          }
         </div>
       </div>
+
+      <!-- Tailoring Class Staff Role Info Banner -->
+      @if (!isSuperAdmin()) {
+        <div class="alert bg-white border border-primary-subtle shadow-xs rounded-3 p-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-2.5">
+            <div class="avatar-circle bg-primary-subtle text-primary" style="width: 36px; height: 36px; font-size: 14px;">
+              <i class="bi bi-person-badge-fill"></i>
+            </div>
+            <div>
+              <div class="fw-bold small text-navy">Tailoring Class Staff Access</div>
+              <div class="text-secondary small" style="font-size: 11px;">
+                You can assign students selected by the Super Admin to their <strong>Batch Number</strong> and <strong>Batch Timing</strong>. Student selection, details editing, and deletion are managed by the Super Admin.
+              </div>
+            </div>
+          </div>
+          <span class="badge bg-primary text-white rounded-pill px-2.5 py-1 small">
+            <i class="bi bi-shield-check me-1"></i> Class Operations
+          </span>
+        </div>
+      }
 
       <!-- Metric Cards -->
       <div class="row g-3 mb-4">
@@ -230,7 +255,7 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                 <th>Contact</th>
                 <th>Family & Background</th>
                 <th>Aadhar Card</th>
-                <th>Batch</th>
+                <th>Assigned Batch</th>
                 <th>Status</th>
                 <th class="text-end pe-3">Actions</th>
               </tr>
@@ -338,11 +363,27 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                       }
                     </td>
 
-                    <!-- Batch -->
+                    <!-- Assigned Batch -->
                     <td>
-                      <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1 small">
-                        <i class="bi bi-clock me-1"></i> {{ student.batch_preference || 'Morning' }}
-                      </span>
+                      @if (student.batch_number) {
+                        <div class="d-flex flex-column gap-1">
+                          <span class="badge bg-primary text-white rounded-pill px-2.5 py-1 fw-semibold align-self-start" style="font-size: 11px;">
+                            <i class="bi bi-tag-fill me-1"></i> {{ student.batch_number }}
+                          </span>
+                          <span class="small text-dark fw-medium" style="font-size: 11px;">
+                            <i class="bi bi-clock me-1 text-secondary"></i> {{ student.batch_timing || student.batch_preference || 'Morning' }}
+                          </span>
+                        </div>
+                      } @else {
+                        <div class="d-flex flex-column gap-0.5">
+                          <span class="badge bg-light text-secondary border rounded-pill px-2 py-0.5 small align-self-start" style="font-size: 10px;">
+                            Not Assigned
+                          </span>
+                          <span class="text-muted small" style="font-size: 11px;">
+                            Pref: {{ student.batch_preference || 'Morning' }}
+                          </span>
+                        </div>
+                      }
                     </td>
 
                     <!-- Status -->
@@ -373,69 +414,95 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                     <!-- Actions -->
                     <td class="text-end pe-3">
                       <div class="d-inline-flex align-items-center gap-1">
-                        <!-- 1-Click "Select" Button if applied -->
-                        @if (student.status === 'applied') {
+                        <!-- ASSIGN BATCH BUTTON: For Tailoring Class Staff and Super Admin -->
+                        @if (student.status === 'selected' || student.status === 'in_training' || isSuperAdmin()) {
+                          <button 
+                            type="button" 
+                            class="btn btn-sm btn-primary rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1 shadow-xs fw-semibold"
+                            (click)="openAssignBatchModal(student)"
+                            [title]="student.batch_number ? 'Update Assigned Batch Number & Timing' : 'Assign to Batch Number & Timing'"
+                          >
+                            <i class="bi bi-clock-history"></i>
+                            <span class="d-none d-md-inline">{{ student.batch_number ? 'Update Batch' : 'Assign Batch' }}</span>
+                          </button>
+                        }
+
+                        <!-- Tailoring Class Staff notice when student is waiting for Super Admin selection -->
+                        @if (!isSuperAdmin() && student.status === 'applied') {
+                          <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-1 small" title="Super Admin must select this student before batch assignment">
+                            <i class="bi bi-hourglass-split me-1"></i> Awaiting Selection
+                          </span>
+                        }
+
+                        <!-- SUPER ADMIN ONLY: 1-Click "Select" Button if applied -->
+                        @if (isSuperAdmin() && student.status === 'applied') {
                           <button 
                             type="button" 
                             class="btn btn-sm btn-success rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1 shadow-xs fw-semibold"
                             (click)="quickSelectStudent(student)"
-                            title="Mark Student as Selected"
+                            title="Super Admin: Mark Student as Selected"
                           >
                             <i class="bi bi-check-lg"></i>
                             <span>Select</span>
                           </button>
                         }
 
-                        <!-- WhatsApp Selection Dispatch -->
+                        <!-- WhatsApp Selection / Details Dispatch -->
                         <button 
                           type="button" 
                           class="btn btn-sm btn-outline-success rounded-circle p-1.5"
                           (click)="sendSelectionWhatsApp(student)"
-                          title="Send WhatsApp Selection Message"
+                          title="Send WhatsApp Message"
                         >
                           <i class="bi bi-whatsapp"></i>
                         </button>
 
-                        <!-- Change Status Dropdown -->
-                        <div class="dropdown d-inline-block">
+                        <!-- SUPER ADMIN ONLY: Change Status Dropdown -->
+                        @if (isSuperAdmin()) {
+                          <div class="dropdown d-inline-block">
+                            <button 
+                              type="button" 
+                              class="btn btn-sm btn-light border rounded-circle p-1.5" 
+                              data-bs-toggle="dropdown"
+                              title="Super Admin: Change Status"
+                            >
+                              <i class="bi bi-arrow-repeat"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                              <li><h6 class="dropdown-header small text-uppercase">Update Status (Super Admin)</h6></li>
+                              <li><button class="dropdown-item small" (click)="updateStatus(student.id, 'selected')"><i class="bi bi-check-circle text-success me-2"></i> Mark as Selected</button></li>
+                              <li><button class="dropdown-item small" (click)="updateStatus(student.id, 'in_training')"><i class="bi bi-mortarboard text-info me-2"></i> Mark In Training</button></li>
+                              <li><button class="dropdown-item small" (click)="updateStatus(student.id, 'completed')"><i class="bi bi-award text-primary me-2"></i> Mark Completed / Graduated</button></li>
+                              <li><button class="dropdown-item small" (click)="updateStatus(student.id, 'applied')"><i class="bi bi-clock text-warning me-2"></i> Reset to Pending</button></li>
+                              <li><hr class="dropdown-divider"></li>
+                              <li><button class="dropdown-item small text-danger" (click)="updateStatus(student.id, 'rejected')"><i class="bi bi-x-circle me-2"></i> Reject</button></li>
+                            </ul>
+                          </div>
+                        }
+
+                        <!-- SUPER ADMIN ONLY: Edit Details -->
+                        @if (isSuperAdmin()) {
                           <button 
                             type="button" 
-                            class="btn btn-sm btn-light border rounded-circle p-1.5" 
-                            data-bs-toggle="dropdown"
-                            title="Change Status"
+                            class="btn btn-sm btn-light border rounded-circle p-1.5"
+                            (click)="openEditModal(student)"
+                            title="Super Admin: Edit Student Details"
                           >
-                            <i class="bi bi-arrow-repeat"></i>
+                            <i class="bi bi-pencil-fill text-muted"></i>
                           </button>
-                          <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                            <li><h6 class="dropdown-header small text-uppercase">Update Status</h6></li>
-                            <li><button class="dropdown-item small" (click)="updateStatus(student.id, 'selected')"><i class="bi bi-check-circle text-success me-2"></i> Mark as Selected</button></li>
-                            <li><button class="dropdown-item small" (click)="updateStatus(student.id, 'in_training')"><i class="bi bi-mortarboard text-info me-2"></i> Mark In Training</button></li>
-                            <li><button class="dropdown-item small" (click)="updateStatus(student.id, 'completed')"><i class="bi bi-award text-primary me-2"></i> Mark Completed / Graduated</button></li>
-                            <li><button class="dropdown-item small" (click)="updateStatus(student.id, 'applied')"><i class="bi bi-clock text-warning me-2"></i> Reset to Pending</button></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item small text-danger" (click)="updateStatus(student.id, 'rejected')"><i class="bi bi-x-circle me-2"></i> Reject</button></li>
-                          </ul>
-                        </div>
+                        }
 
-                        <!-- Edit Details -->
-                        <button 
-                          type="button" 
-                          class="btn btn-sm btn-light border rounded-circle p-1.5"
-                          (click)="openEditModal(student)"
-                          title="View / Edit Details"
-                        >
-                          <i class="bi bi-pencil-fill text-muted"></i>
-                        </button>
-
-                        <!-- Delete -->
-                        <button 
-                          type="button" 
-                          class="btn btn-sm btn-light border rounded-circle p-1.5"
-                          (click)="deleteStudent(student)"
-                          title="Delete Student"
-                        >
-                          <i class="bi bi-trash-fill text-danger"></i>
-                        </button>
+                        <!-- SUPER ADMIN ONLY: Delete -->
+                        @if (isSuperAdmin()) {
+                          <button 
+                            type="button" 
+                            class="btn btn-sm btn-light border rounded-circle p-1.5"
+                            (click)="deleteStudent(student)"
+                            title="Super Admin: Delete Student"
+                          >
+                            <i class="bi bi-trash-fill text-danger"></i>
+                          </button>
+                        }
                       </div>
                     </td>
                   </tr>
@@ -542,6 +609,21 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                 </div>
 
                 <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Assigned Batch Number</label>
+                  <input type="text" class="form-control" [(ngModel)]="studentForm.batch_number" placeholder="e.g. Batch 1, Batch 2">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Assigned Batch Timing</label>
+                  <select class="form-select" [(ngModel)]="studentForm.batch_timing">
+                    <option value="">-- Match Preferred Timing --</option>
+                    <option value="Morning (9:30 AM - 12:30 PM)">Morning (9:30 AM - 12:30 PM)</option>
+                    <option value="Afternoon (2:00 PM - 5:00 PM)">Afternoon (2:00 PM - 5:00 PM)</option>
+                    <option value="Evening (5:00 PM - 7:00 PM)">Evening (5:00 PM - 7:00 PM)</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6">
                   <label class="form-label small fw-semibold text-secondary">Status</label>
                   <select class="form-select" [(ngModel)]="studentForm.status">
                     <option value="applied">Applied (Pending Review)</option>
@@ -581,6 +663,133 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
         </div>
       </div>
       <div class="modal-backdrop fade show" *ngIf="showFormModal"></div>
+
+      <!-- ASSIGN BATCH MODAL (FOR TAILORING CLASS STAFF & SUPER ADMIN) -->
+      <div class="modal fade" [class.show]="showAssignBatchModal" [style.display]="showAssignBatchModal ? 'block' : 'none'" tabindex="-1" *ngIf="showAssignBatchModal">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header border-bottom px-4 py-3 bg-light">
+              <div class="d-flex align-items-center gap-2">
+                <div class="avatar-circle bg-primary text-white" style="width: 36px; height: 36px; font-size: 14px;">
+                  <i class="bi bi-clock-history"></i>
+                </div>
+                <div>
+                  <h5 class="modal-title fw-bold text-navy mb-0">Assign Student to Batch</h5>
+                  <div class="text-muted small" style="font-size: 11px;">Cohort Allocation & Training Schedule</div>
+                </div>
+              </div>
+              <button type="button" class="btn-close" (click)="showAssignBatchModal = false"></button>
+            </div>
+
+            <div class="modal-body p-4" *ngIf="selectedStudentForBatch">
+              <!-- Student Summary Card -->
+              <div class="p-3 bg-light rounded-3 mb-3 border">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-1.5">
+                  <div class="fw-bold text-dark fs-6">{{ selectedStudentForBatch.full_name }}</div>
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1">
+                    {{ selectedStudentForBatch.student_code || '#' + selectedStudentForBatch.id }}
+                  </span>
+                </div>
+                <div class="small text-muted d-flex flex-wrap gap-3" style="font-size: 12px;">
+                  <span><i class="bi bi-telephone text-success me-1"></i> {{ selectedStudentForBatch.phone }}</span>
+                  <span *ngIf="selectedStudentForBatch.dob"><i class="bi bi-calendar-event text-primary me-1"></i> DOB: {{ selectedStudentForBatch.dob }}</span>
+                  <span><i class="bi bi-bookmark-star text-warning me-1"></i> Pref: {{ selectedStudentForBatch.batch_preference || 'Morning' }}</span>
+                </div>
+              </div>
+
+              <!-- Batch Number / Cohort Selection -->
+              <div class="mb-3">
+                <label class="form-label small fw-semibold text-secondary">
+                  Batch Number / Cohort <span class="text-danger">*</span>
+                </label>
+                <div class="input-group mb-1.5">
+                  <span class="input-group-text bg-light"><i class="bi bi-tag-fill text-primary"></i></span>
+                  <select class="form-select" [(ngModel)]="assignBatchForm.batch_number">
+                    <option value="">-- Choose Batch Number --</option>
+                    <option value="Batch 1">Batch 1</option>
+                    <option value="Batch 2">Batch 2</option>
+                    <option value="Batch 3">Batch 3</option>
+                    <option value="Batch 4">Batch 4</option>
+                    <option value="Batch 5">Batch 5</option>
+                    <option value="Batch 6">Batch 6</option>
+                    <option value="custom">Other / Custom Batch Number...</option>
+                  </select>
+                </div>
+                <input 
+                  *ngIf="assignBatchForm.batch_number === 'custom' || (!['Batch 1','Batch 2','Batch 3','Batch 4','Batch 5','Batch 6',''].includes(assignBatchForm.batch_number))"
+                  type="text" 
+                  class="form-control" 
+                  [(ngModel)]="customBatchNumber"
+                  (ngModelChange)="onCustomBatchChange($event)"
+                  placeholder="Enter batch number (e.g. Batch 7 or Cohort 2026-A)"
+                >
+              </div>
+
+              <!-- Batch Timing Selection -->
+              <div class="mb-3">
+                <label class="form-label small fw-semibold text-secondary">
+                  Batch Timing <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-clock-fill text-info"></i></span>
+                  <select class="form-select" [(ngModel)]="assignBatchForm.batch_timing">
+                    <option value="Morning (9:30 AM - 12:30 PM)">Morning (9:30 AM - 12:30 PM)</option>
+                    <option value="Afternoon (2:00 PM - 5:00 PM)">Afternoon (2:00 PM - 5:00 PM)</option>
+                    <option value="Evening (5:00 PM - 7:00 PM)">Evening (5:00 PM - 7:00 PM)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Training Status -->
+              <div class="mb-3">
+                <label class="form-label small fw-semibold text-secondary">Training Status</label>
+                <select class="form-select" [(ngModel)]="assignBatchForm.status">
+                  <option value="in_training">In Training (Active Student)</option>
+                  <option value="selected">Selected (Scheduled for Batch)</option>
+                  <option value="completed" *ngIf="isSuperAdmin()">Completed / Graduated</option>
+                </select>
+              </div>
+
+              <!-- Machine / Staff Notes -->
+              <div class="mb-3">
+                <label class="form-label small fw-semibold text-secondary">Sewing Machine / Instructor Remarks</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [(ngModel)]="assignBatchForm.notes" 
+                  placeholder="e.g. Assigned Machine #3, Instructor: Sis Fatima"
+                >
+              </div>
+
+              <!-- WhatsApp Notification Toggle -->
+              <div class="form-check form-switch p-3 bg-light rounded-3 border">
+                <input class="form-check-input ms-0 me-2" type="checkbox" id="sendWaCheck" [(ngModel)]="sendWaOnBatchAssign">
+                <label class="form-check-label small fw-semibold text-dark" for="sendWaCheck">
+                  <i class="bi bi-whatsapp text-success me-1"></i> Send Batch Confirmation via WhatsApp to Student
+                </label>
+                <div class="text-muted small ps-4 mt-0.5" style="font-size: 11px;">
+                  Will open WhatsApp with student's assigned Batch Number & Timing.
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer border-top px-4 py-3 bg-light">
+              <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="showAssignBatchModal = false">Cancel</button>
+              <button 
+                type="button" 
+                class="btn btn-trust-primary rounded-pill px-4 fw-semibold"
+                [disabled]="isSavingBatch || !assignBatchForm.batch_number"
+                (click)="saveBatchAssignment()"
+              >
+                <span class="spinner-border spinner-border-sm me-1" *ngIf="isSavingBatch"></span>
+                <i class="bi bi-check-circle me-1" *ngIf="!isSavingBatch"></i>
+                <span>Save Batch Assignment</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show" *ngIf="showAssignBatchModal"></div>
 
       <!-- GOOGLE FORM INTEGRATION MODAL -->
       <div class="modal fade" [class.show]="showWebhookModal" [style.display]="showWebhookModal ? 'block' : 'none'" tabindex="-1" *ngIf="showWebhookModal">
@@ -750,8 +959,24 @@ export class StudentsComponent implements OnInit {
     address: '',
     qualification: '',
     batch_preference: 'Morning',
+    batch_number: '',
+    batch_timing: '',
     has_prior_experience: 'No',
     status: 'applied',
+    notes: ''
+  };
+
+  // Assign Batch Modal State (For Tailoring Class Staff & Super Admin)
+  showAssignBatchModal = false;
+  isSavingBatch = false;
+  selectedStudentForBatch: TailoringStudent | null = null;
+  customBatchNumber = '';
+  sendWaOnBatchAssign = true;
+
+  assignBatchForm = {
+    batch_number: 'Batch 1',
+    batch_timing: 'Morning (9:30 AM - 12:30 PM)',
+    status: 'in_training',
     notes: ''
   };
 
@@ -1016,7 +1241,11 @@ export class StudentsComponent implements OnInit {
     return lines;
   }
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, public authService: AuthService) {}
+
+  isSuperAdmin(): boolean {
+    return this.authService.isSuperAdmin();
+  }
 
   ngOnInit(): void {
     this.loadStudents();
@@ -1059,7 +1288,7 @@ export class StudentsComponent implements OnInit {
       if (st !== 'all' && s.status !== st) return false;
 
       // Batch filter
-      if (batch !== 'all' && s.batch_preference !== batch) return false;
+      if (batch !== 'all' && s.batch_preference !== batch && s.batch_timing !== batch) return false;
 
       // Search query
       if (q) {
@@ -1073,7 +1302,8 @@ export class StudentsComponent implements OnInit {
         const matchSpouse = s.spouse_name?.toLowerCase().includes(q);
         const matchOcc = s.father_spouse_occupation?.toLowerCase().includes(q);
         const matchMarital = s.marital_status?.toLowerCase().includes(q);
-        return matchName || matchPhone || matchCode || matchAddr || matchEmail || matchDob || matchFather || matchSpouse || matchOcc || matchMarital;
+        const matchBatch = s.batch_number?.toLowerCase().includes(q) || s.batch_timing?.toLowerCase().includes(q);
+        return matchName || matchPhone || matchCode || matchAddr || matchEmail || matchDob || matchFather || matchSpouse || matchOcc || matchMarital || matchBatch;
       }
 
       return true;
@@ -1084,7 +1314,88 @@ export class StudentsComponent implements OnInit {
     this.selectedStatus.set(status);
   }
 
+  // Assign Batch Modal Operations (Tailoring Class Staff & Super Admin)
+  openAssignBatchModal(student: TailoringStudent): void {
+    this.selectedStudentForBatch = student;
+    this.customBatchNumber = '';
+    const existingNum = student.batch_number || 'Batch 1';
+    const isStandard = ['Batch 1', 'Batch 2', 'Batch 3', 'Batch 4', 'Batch 5', 'Batch 6'].includes(existingNum);
+    
+    this.assignBatchForm = {
+      batch_number: isStandard ? existingNum : (existingNum ? 'custom' : 'Batch 1'),
+      batch_timing: student.batch_timing || (student.batch_preference ? `${student.batch_preference} Batch` : 'Morning (9:30 AM - 12:30 PM)'),
+      status: student.status === 'selected' ? 'in_training' : student.status,
+      notes: student.notes || ''
+    };
+    if (!isStandard && existingNum) {
+      this.customBatchNumber = existingNum;
+    }
+    this.showAssignBatchModal = true;
+  }
+
+  onCustomBatchChange(val: string): void {
+    this.customBatchNumber = val;
+  }
+
+  saveBatchAssignment(): void {
+    if (!this.selectedStudentForBatch) return;
+    const finalBatchNum = this.assignBatchForm.batch_number === 'custom' 
+      ? this.customBatchNumber.trim() 
+      : this.assignBatchForm.batch_number;
+
+    if (!finalBatchNum) {
+      alert('Please enter or select a Batch Number.');
+      return;
+    }
+
+    this.isSavingBatch = true;
+    const student = this.selectedStudentForBatch;
+    const payload = {
+      batch_number: finalBatchNum,
+      batch_timing: this.assignBatchForm.batch_timing,
+      status: this.assignBatchForm.status,
+      notes: this.assignBatchForm.notes
+    };
+
+    this.api.assignStudentBatch(student.id, payload).subscribe({
+      next: () => {
+        this.isSavingBatch = false;
+        this.showAssignBatchModal = false;
+        this.loadStudents();
+        this.loadStats();
+
+        if (this.sendWaOnBatchAssign) {
+          this.sendBatchAssignedWhatsApp(student, finalBatchNum, this.assignBatchForm.batch_timing);
+        }
+      },
+      error: (err) => {
+        this.isSavingBatch = false;
+        alert('Failed to assign batch: ' + (err.error?.message || err.message));
+      }
+    });
+  }
+
+  sendBatchAssignedWhatsApp(student: TailoringStudent, batchNum: string, batchTiming: string): void {
+    const cleanPhone = this.cleanPhoneForWa(student.whatsapp_number || student.phone);
+    const msg = encodeURIComponent(
+      `Assalamu Alaikum wa Rahmatullahi wa Barakatuh ${student.full_name},\n\n` +
+      `You have been assigned to your batch for the *Ar Rahman Trust Free Tailoring Class*:\n\n` +
+      `Student Code: *${student.student_code || '#' + student.id}*\n` +
+      `Assigned Batch: *${batchNum}*\n` +
+      `Batch Timing: *${batchTiming}*\n` +
+      `Center: Ar Rahman Trust Training Center, Pernambut.\n\n` +
+      `Please report to the training center on time for your regular sessions.\n\n` +
+      `For inquiries: +91 80156 65648\n` +
+      `Ar Rahman Trust, Pernambut`
+    );
+    window.open(`https://wa.me/91${cleanPhone}?text=${msg}`, '_blank');
+  }
+
   quickSelectStudent(student: TailoringStudent): void {
+    if (!this.isSuperAdmin()) {
+      alert('Permission denied: Only Super Admin can select students for admission.');
+      return;
+    }
     this.api.updateStudentStatus(student.id, 'selected').subscribe({
       next: () => {
         this.students.update(list => list.map(s => s.id === student.id ? { ...s, status: 'selected' } : s));
@@ -1103,6 +1414,10 @@ export class StudentsComponent implements OnInit {
   }
 
   updateStatus(id: number, status: string): void {
+    if (!this.isSuperAdmin()) {
+      alert('Permission denied: Only Super Admin has authority to change student admission status.');
+      return;
+    }
     this.api.updateStudentStatus(id, status).subscribe({
       next: () => {
         // Optimistic update
@@ -1132,6 +1447,10 @@ export class StudentsComponent implements OnInit {
   }
 
   openAddModal(): void {
+    if (!this.isSuperAdmin()) {
+      alert('Permission denied: Only Super Admin can register or add students.');
+      return;
+    }
     this.isEditing = false;
     this.editingStudentId = undefined;
     this.studentForm = {
@@ -1150,6 +1469,8 @@ export class StudentsComponent implements OnInit {
       address: '',
       qualification: '',
       batch_preference: 'Morning',
+      batch_number: '',
+      batch_timing: '',
       has_prior_experience: 'No',
       status: 'applied',
       notes: ''
@@ -1158,6 +1479,10 @@ export class StudentsComponent implements OnInit {
   }
 
   openEditModal(student: TailoringStudent): void {
+    if (!this.isSuperAdmin()) {
+      alert('Permission denied: Only Super Admin can edit student details.');
+      return;
+    }
     this.isEditing = true;
     this.editingStudentId = student.id;
     this.studentForm = { ...student };
@@ -1198,6 +1523,10 @@ export class StudentsComponent implements OnInit {
   }
 
   deleteStudent(student: TailoringStudent): void {
+    if (!this.isSuperAdmin()) {
+      alert('Permission denied: Only Super Admin can delete student records.');
+      return;
+    }
     if (confirm(`Are you sure you want to delete student "${student.full_name}" (${student.student_code})?`)) {
       this.api.deleteStudent(student.id).subscribe({
         next: () => {
@@ -1227,7 +1556,9 @@ export class StudentsComponent implements OnInit {
       'Father/Spouse Occupation',
       'Aadhar Card URL',
       'Address',
-      'Batch Preference',
+      'Preferred Batch',
+      'Assigned Batch Number',
+      'Assigned Batch Timing',
       'Status',
       'Date Applied'
     ];
@@ -1246,6 +1577,8 @@ export class StudentsComponent implements OnInit {
       `"${(s.aadhar_card_url || '').replace(/"/g, '""')}"`,
       `"${(s.address || '').replace(/"/g, '""')}"`,
       s.batch_preference || '',
+      `"${(s.batch_number || '').replace(/"/g, '""')}"`,
+      `"${(s.batch_timing || '').replace(/"/g, '""')}"`,
       s.status || '',
       s.created_at ? s.created_at.slice(0, 10) : ''
     ]);

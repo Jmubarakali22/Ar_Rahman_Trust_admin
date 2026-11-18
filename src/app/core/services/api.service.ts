@@ -235,6 +235,10 @@ export class ApiService {
     return this.http.patch<any>(`${this.base}/students/${id}/status`, { status, notes });
   }
 
+  assignStudentBatch(id: number, data: { batch_number?: string; batch_timing?: string; notes?: string; status?: string }): Observable<any> {
+    return this.http.patch<any>(`${this.base}/students/${id}/assign-batch`, data);
+  }
+
   deleteStudent(id: number): Observable<any> {
     return this.http.delete<any>(`${this.base}/students/${id}`);
   }

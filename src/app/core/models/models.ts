@@ -175,6 +175,8 @@ export interface TailoringStudent {
   address?: string;
   qualification?: string;
   batch_preference: 'Morning' | 'Afternoon' | 'Evening' | string;
+  batch_number?: string;
+  batch_timing?: string;
   has_prior_experience?: string;
   family_income?: string;
   guardian_name?: string;
