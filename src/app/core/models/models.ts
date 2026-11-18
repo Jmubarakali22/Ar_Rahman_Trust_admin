@@ -163,7 +163,15 @@ export interface TailoringStudent {
   full_name: string;
   phone: string;
   whatsapp_number?: string;
+  email?: string;
   age?: number;
+  dob?: string;
+  marital_status?: string;
+  father_name?: string;
+  mother_name?: string;
+  spouse_name?: string;
+  father_spouse_occupation?: string;
+  aadhar_card_url?: string;
   address?: string;
   qualification?: string;
   batch_preference: 'Morning' | 'Afternoon' | 'Evening' | string;

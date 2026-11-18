@@ -228,8 +228,9 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                 <th class="ps-3 py-3">Code / Date</th>
                 <th>Student Details</th>
                 <th>Contact</th>
-                <th>Batch / Timing</th>
-                <th>Education</th>
+                <th>Family & Background</th>
+                <th>Aadhar Card</th>
+                <th>Batch</th>
                 <th>Status</th>
                 <th class="text-end pe-3">Actions</th>
               </tr>
@@ -237,14 +238,14 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
             <tbody>
               @if (isLoading()) {
                 <tr>
-                  <td colspan="7" class="text-center py-5">
+                  <td colspan="8" class="text-center py-5">
                     <div class="spinner-border spinner-border-sm text-primary me-2"></div>
                     <span class="text-muted small">Loading tailoring students...</span>
                   </td>
                 </tr>
               } @else if (filteredStudents().length === 0) {
                 <tr>
-                  <td colspan="7" class="text-center py-5">
+                  <td colspan="8" class="text-center py-5">
                     <div class="text-muted">
                       <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
                       <div class="fw-semibold">No students found</div>
@@ -268,18 +269,23 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                       </div>
                     </td>
 
-                    <!-- Name & Age & Address -->
+                    <!-- Student Details -->
                     <td>
                       <div class="fw-semibold text-dark">{{ student.full_name }}</div>
-                      <div class="small text-muted d-flex align-items-center gap-1.5 mt-0.5">
-                        <span *ngIf="student.age">{{ student.age }} yrs • </span>
-                        <span *ngIf="student.address"><i class="bi bi-geo-alt text-danger"></i> {{ student.address }}</span>
+                      <div class="small text-muted d-flex flex-wrap align-items-center gap-1.5 mt-0.5">
+                        <span *ngIf="student.dob"><i class="bi bi-calendar-event me-0.5"></i> {{ student.dob }}</span>
+                        <span *ngIf="student.age">({{ student.age }} yrs)</span>
+                        <span *ngIf="student.marital_status" class="badge bg-light text-secondary border py-0.5 px-1.5" style="font-size: 10px;">{{ student.marital_status }}</span>
+                      </div>
+                      <div *ngIf="student.address" class="text-muted small mt-0.5" style="font-size: 11px;">
+                        <i class="bi bi-geo-alt text-danger"></i> {{ student.address }}
                       </div>
                     </td>
 
                     <!-- Contact & WhatsApp -->
                     <td>
                       <div class="small fw-semibold text-dark">{{ student.phone }}</div>
+                      <div *ngIf="student.email" class="text-muted" style="font-size: 11px;">{{ student.email }}</div>
                       <div class="d-flex align-items-center gap-1 mt-1">
                         <a 
                           [href]="'https://wa.me/91' + cleanPhoneForWa(student.whatsapp_number || student.phone)" 
@@ -292,19 +298,51 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                       </div>
                     </td>
 
+                    <!-- Family & Background -->
+                    <td>
+                      <div class="small">
+                        <div *ngIf="student.father_name" class="text-dark">
+                          <span class="text-muted">F:</span> {{ student.father_name }}
+                        </div>
+                        <div *ngIf="student.mother_name" class="text-dark">
+                          <span class="text-muted">M:</span> {{ student.mother_name }}
+                        </div>
+                        <div *ngIf="student.spouse_name" class="text-dark">
+                          <span class="text-muted">Spouse:</span> {{ student.spouse_name }}
+                        </div>
+                        <div *ngIf="student.father_spouse_occupation" class="text-primary mt-0.5 fw-medium" style="font-size: 11px;">
+                          <i class="bi bi-briefcase me-0.5"></i> {{ student.father_spouse_occupation }}
+                        </div>
+                        <span *ngIf="!student.father_name && !student.mother_name && !student.spouse_name && !student.father_spouse_occupation" class="text-muted fst-italic" style="font-size: 11px;">
+                          -
+                        </span>
+                      </div>
+                    </td>
+
+                    <!-- Aadhar Card Document Link -->
+                    <td>
+                      @if (student.aadhar_card_url) {
+                        <a 
+                          [href]="student.aadhar_card_url" 
+                          target="_blank" 
+                          class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1.5 shadow-2xs fw-semibold" 
+                          style="font-size: 11px;"
+                          title="Open Aadhar Card Document in new tab"
+                        >
+                          <i class="bi bi-file-earmark-person-fill text-danger"></i>
+                          <span>View Aadhar</span>
+                          <i class="bi bi-box-arrow-up-right" style="font-size: 9px;"></i>
+                        </a>
+                      } @else {
+                        <span class="text-muted small" style="font-size: 11px;">Not uploaded</span>
+                      }
+                    </td>
+
                     <!-- Batch -->
                     <td>
                       <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1 small">
                         <i class="bi bi-clock me-1"></i> {{ student.batch_preference || 'Morning' }}
                       </span>
-                    </td>
-
-                    <!-- Qualification -->
-                    <td>
-                      <span class="small text-muted">{{ student.qualification || 'Not Specified' }}</span>
-                      <div *ngIf="student.has_prior_experience === 'Yes'" class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill mt-1" style="font-size: 10px;">
-                        Has Prior Exp
-                      </div>
                     </td>
 
                     <!-- Status -->
@@ -424,27 +462,58 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
               <div class="row g-3">
                 <div class="col-md-6">
                   <label class="form-label small fw-semibold text-secondary">Student Full Name *</label>
-                  <input type="text" class="form-control" [(ngModel)]="studentForm.full_name" placeholder="e.g. Ayesha Begum">
+                  <input type="text" class="form-control" [(ngModel)]="studentForm.full_name" placeholder="e.g. Sameeha">
                 </div>
 
                 <div class="col-md-6">
-                  <label class="form-label small fw-semibold text-secondary">Phone Number *</label>
-                  <input type="text" class="form-control" [(ngModel)]="studentForm.phone" placeholder="e.g. 9876543210">
+                  <label class="form-label small fw-semibold text-secondary">Date of Birth (DOB)</label>
+                  <input type="text" class="form-control" [(ngModel)]="studentForm.dob" (blur)="onDobChange()" placeholder="e.g. 16/04/2002">
                 </div>
 
                 <div class="col-md-6">
-                  <label class="form-label small fw-semibold text-secondary">WhatsApp Number</label>
-                  <input type="text" class="form-control" [(ngModel)]="studentForm.whatsapp_number" placeholder="Leave empty if same as phone">
+                  <label class="form-label small fw-semibold text-secondary">Mobile Number *</label>
+                  <input type="text" class="form-control" [(ngModel)]="studentForm.phone" placeholder="e.g. 6655778899">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Email Address</label>
+                  <input type="email" class="form-control" [(ngModel)]="studentForm.email" placeholder="e.g. sameeha@gmail.com">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Marital Status</label>
+                  <select class="form-select" [(ngModel)]="studentForm.marital_status">
+                    <option value="">Select Marital Status</option>
+                    <option value="Single">Single</option>
+                    <option value="Married">Married</option>
+                    <option value="Divorced">Divorced</option>
+                    <option value="Widowed">Widowed</option>
+                  </select>
                 </div>
 
                 <div class="col-md-6">
                   <label class="form-label small fw-semibold text-secondary">Age</label>
-                  <input type="number" class="form-control" [(ngModel)]="studentForm.age" placeholder="e.g. 24">
+                  <input type="number" class="form-control" [(ngModel)]="studentForm.age" placeholder="Auto-calculated from DOB or enter age">
                 </div>
 
-                <div class="col-12">
-                  <label class="form-label small fw-semibold text-secondary">Residential Address / Village</label>
-                  <textarea class="form-control" rows="2" [(ngModel)]="studentForm.address" placeholder="e.g. Small Mosque Street, Pernambut"></textarea>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Father Name</label>
+                  <input type="text" class="form-control" [(ngModel)]="studentForm.father_name" placeholder="Father's full name">
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Mother Name</label>
+                  <input type="text" class="form-control" [(ngModel)]="studentForm.mother_name" placeholder="Mother's full name">
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Spouse Name</label>
+                  <input type="text" class="form-control" [(ngModel)]="studentForm.spouse_name" placeholder="Husband / Spouse name">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Father / Spouse Occupation</label>
+                  <input type="text" class="form-control" [(ngModel)]="studentForm.father_spouse_occupation" placeholder="e.g. Coolie, Daily Wage, Tailor">
                 </div>
 
                 <div class="col-md-6">
@@ -456,17 +525,15 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                   </select>
                 </div>
 
-                <div class="col-md-6">
-                  <label class="form-label small fw-semibold text-secondary">Education / Qualification</label>
-                  <input type="text" class="form-control" [(ngModel)]="studentForm.qualification" placeholder="e.g. 10th Pass / Higher Secondary">
-                </div>
-
-                <div class="col-md-6">
-                  <label class="form-label small fw-semibold text-secondary">Prior Stitching Experience?</label>
-                  <select class="form-select" [(ngModel)]="studentForm.has_prior_experience">
-                    <option value="No">No - Complete Beginner</option>
-                    <option value="Yes">Yes - Basic Sewing Knowledge</option>
-                  </select>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Aadhar Card Document Link (Google Drive / URL)</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-file-earmark-person text-danger"></i></span>
+                    <input type="text" class="form-control" [(ngModel)]="studentForm.aadhar_card_url" placeholder="https://drive.google.com/open?id=...">
+                    <a *ngIf="studentForm.aadhar_card_url" [href]="studentForm.aadhar_card_url" target="_blank" class="btn btn-outline-secondary">
+                      <i class="bi bi-box-arrow-up-right"></i> Open Link
+                    </a>
+                  </div>
                 </div>
 
                 <div class="col-md-6">
@@ -478,6 +545,11 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                     <option value="completed">Completed / Graduated</option>
                     <option value="rejected">Rejected</option>
                   </select>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Residential Address / Village</label>
+                  <input type="text" class="form-control" [(ngModel)]="studentForm.address" placeholder="e.g. Small Mosque Street, Pernambut">
                 </div>
 
                 <div class="col-12">
@@ -537,10 +609,10 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                   Click the button above to instantly open a new Google Form in your Google account.
                 </p>
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-1 border-top">
-                  <span class="text-secondary" style="font-size: 11px;">Recommended fields: Name, Phone, Age, Address, Batch, Qualification</span>
+                  <span class="text-secondary" style="font-size: 11px;">10 Question Fields: Name, DOB, Mobile, Email, Marital Status, Family, Occupation, Aadhar</span>
                   <button type="button" class="btn btn-xs btn-light border py-0.5 px-2 rounded-pill small" style="font-size: 11px;" (click)="copyRecommendedFields()">
                     <i class="bi" [class.bi-check-lg]="copiedType === 'fields'" [class.bi-clipboard]="copiedType !== 'fields'"></i>
-                    {{ copiedType === 'fields' ? 'Copied 6 Fields!' : 'Copy 6 Question Names' }}
+                    {{ copiedType === 'fields' ? 'Copied 10 Fields!' : 'Copy 10 Question Names' }}
                   </button>
                 </div>
               </div>
@@ -661,7 +733,15 @@ export class StudentsComponent implements OnInit {
     full_name: '',
     phone: '',
     whatsapp_number: '',
+    email: '',
+    dob: '',
     age: undefined,
+    marital_status: '',
+    father_name: '',
+    mother_name: '',
+    spouse_name: '',
+    father_spouse_occupation: '',
+    aadhar_card_url: '',
     address: '',
     qualification: '',
     batch_preference: 'Morning',
@@ -669,6 +749,53 @@ export class StudentsComponent implements OnInit {
     status: 'applied',
     notes: ''
   };
+
+  calculateAge(dobStr?: string): number | undefined {
+    if (!dobStr) return undefined;
+    const trimmed = dobStr.trim();
+    let birthDate: Date | null = null;
+
+    // DD/MM/YYYY or DD-MM-YYYY
+    const dmyMatch = trimmed.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+    if (dmyMatch) {
+      const day = parseInt(dmyMatch[1], 10);
+      const month = parseInt(dmyMatch[2], 10) - 1;
+      const year = parseInt(dmyMatch[3], 10);
+      birthDate = new Date(year, month, day);
+    } else {
+      // YYYY-MM-DD
+      const ymdMatch = trimmed.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/);
+      if (ymdMatch) {
+        const year = parseInt(ymdMatch[1], 10);
+        const month = parseInt(ymdMatch[2], 10) - 1;
+        const day = parseInt(ymdMatch[3], 10);
+        birthDate = new Date(year, month, day);
+      } else {
+        const parsed = new Date(trimmed);
+        if (!isNaN(parsed.getTime())) {
+          birthDate = parsed;
+        }
+      }
+    }
+
+    if (!birthDate || isNaN(birthDate.getTime())) return undefined;
+
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age >= 0 && age <= 120 ? age : undefined;
+  }
+
+  onDobChange(dob?: string): void {
+    const val = dob !== undefined ? dob : this.studentForm.dob;
+    const age = this.calculateAge(val);
+    if (age !== undefined) {
+      this.studentForm.age = age;
+    }
+  }
 
   // Google Form Integration Modal
   showWebhookModal = false;
@@ -720,20 +847,25 @@ export class StudentsComponent implements OnInit {
       // Headers (Row 0)
       const headers = rows[0].map(h => h.trim().toLowerCase());
       
-      let nameIdx = headers.findIndex(h => h.includes('name'));
-      let phoneIdx = headers.findIndex(h => h.includes('phone') || h.includes('mobile') || h.includes('contact') || h.includes('whatsapp') || h.includes('number'));
-      let ageIdx = headers.findIndex(h => h.includes('age'));
+      let nameIdx = headers.findIndex(h => h.includes('name') && !h.includes('father') && !h.includes('mother') && !h.includes('spouse'));
+      let dobIdx = headers.findIndex(h => h.includes('birth') || h.includes('dob') || h.includes('date of birth'));
+      let phoneIdx = headers.findIndex(h => h.includes('mobile') || h.includes('phone') || h.includes('contact') || h.includes('whatsapp') || h.includes('number'));
+      let emailIdx = headers.findIndex(h => h.includes('email') || h.includes('mail'));
+      let maritalIdx = headers.findIndex(h => h.includes('marital') || h.includes('marriage'));
+      let fatherIdx = headers.findIndex(h => h.includes('father') && !h.includes('occupation'));
+      let motherIdx = headers.findIndex(h => h.includes('mother'));
+      let spouseIdx = headers.findIndex(h => (h.includes('spouse') || h.includes('husband')) && !h.includes('occupation'));
+      let occIdx = headers.findIndex(h => h.includes('occupation') || h.includes('father/spouse') || h.includes('job') || h.includes('work'));
+      let aadharIdx = headers.findIndex(h => h.includes('aadhar') || h.includes('adhaar') || h.includes('aadhaar') || h.includes('card') || h.includes('proof'));
+      let ageIdx = headers.findIndex(h => h.includes('age') && !h.includes('marriage') && !h.includes('village'));
       let addrIdx = headers.findIndex(h => h.includes('address') || h.includes('place') || h.includes('village') || h.includes('area') || h.includes('city'));
       let batchIdx = headers.findIndex(h => h.includes('batch') || h.includes('time') || h.includes('preference'));
       let qualIdx = headers.findIndex(h => h.includes('qualification') || h.includes('education') || h.includes('study'));
 
-      // Sensible defaults based on standard Google Form column order (0: Timestamp, 1: Name, 2: Phone...)
-      if (nameIdx === -1) nameIdx = 1;
-      if (phoneIdx === -1) phoneIdx = 2;
-      if (ageIdx === -1) ageIdx = 3;
-      if (addrIdx === -1) addrIdx = 4;
-      if (batchIdx === -1) batchIdx = 5;
-      if (qualIdx === -1) qualIdx = 6;
+      // Positional fallbacks based on Google Form column order (0: Timestamp, 1: Name, 2: DOB, 3: Phone...)
+      if (nameIdx === -1 && rows[0].length >= 2) nameIdx = 1;
+      if (dobIdx === -1 && rows[0].length >= 3) dobIdx = 2;
+      if (phoneIdx === -1 && rows[0].length >= 4) phoneIdx = 3;
 
       const existingPhones = new Set(this.students().map(s => this.cleanPhoneForWa(s.phone || '')));
       let newCount = 0;
@@ -741,8 +873,8 @@ export class StudentsComponent implements OnInit {
 
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
-        const rawName = row[nameIdx]?.trim();
-        const rawPhone = row[phoneIdx]?.trim();
+        const rawName = nameIdx !== -1 ? row[nameIdx]?.trim() : '';
+        const rawPhone = phoneIdx !== -1 ? row[phoneIdx]?.trim() : '';
 
         if (!rawName || !rawPhone) continue;
 
@@ -752,7 +884,23 @@ export class StudentsComponent implements OnInit {
           continue;
         }
 
-        const rawBatch = (row[batchIdx] || '').trim().toLowerCase();
+        const rawDob = dobIdx !== -1 ? row[dobIdx]?.trim() : '';
+        const rawEmail = emailIdx !== -1 ? row[emailIdx]?.trim() : '';
+        const rawMarital = maritalIdx !== -1 ? row[maritalIdx]?.trim() : '';
+        const rawFather = fatherIdx !== -1 ? row[fatherIdx]?.trim() : '';
+        const rawMother = motherIdx !== -1 ? row[motherIdx]?.trim() : '';
+        const rawSpouse = spouseIdx !== -1 ? row[spouseIdx]?.trim() : '';
+        const rawOcc = occIdx !== -1 ? row[occIdx]?.trim() : '';
+        const rawAadhar = aadharIdx !== -1 ? (row[aadharIdx]?.trim()?.split(',')?.[0]?.trim() || '') : '';
+        const rawAddr = addrIdx !== -1 ? row[addrIdx]?.trim() : '';
+        const rawQual = qualIdx !== -1 ? row[qualIdx]?.trim() : '';
+
+        let calcAge = rawDob ? this.calculateAge(rawDob) : undefined;
+        if (calcAge === undefined && ageIdx !== -1 && row[ageIdx]) {
+          calcAge = parseInt(row[ageIdx], 10) || undefined;
+        }
+
+        const rawBatch = batchIdx !== -1 ? (row[batchIdx] || '').trim().toLowerCase() : '';
         let batchPref = 'Morning';
         if (rawBatch.includes('afternoon') || rawBatch.includes('noon')) batchPref = 'Afternoon';
         else if (rawBatch.includes('eve')) batchPref = 'Evening';
@@ -761,10 +909,18 @@ export class StudentsComponent implements OnInit {
           full_name: rawName,
           phone: rawPhone,
           whatsapp_number: rawPhone,
-          age: row[ageIdx] ? parseInt(row[ageIdx], 10) || undefined : undefined,
-          address: row[addrIdx]?.trim() || '',
+          email: rawEmail || undefined,
+          dob: rawDob || undefined,
+          age: calcAge,
+          marital_status: rawMarital || undefined,
+          father_name: rawFather || undefined,
+          mother_name: rawMother || undefined,
+          spouse_name: rawSpouse || undefined,
+          father_spouse_occupation: rawOcc || undefined,
+          aadhar_card_url: rawAadhar || undefined,
+          address: rawAddr || undefined,
           batch_preference: batchPref,
-          qualification: row[qualIdx]?.trim() || '',
+          qualification: rawQual || undefined,
           source: 'google_form',
           status: 'applied'
         };
@@ -891,7 +1047,13 @@ export class StudentsComponent implements OnInit {
         const matchPhone = s.phone?.includes(q) || s.whatsapp_number?.includes(q);
         const matchCode = s.student_code?.toLowerCase().includes(q);
         const matchAddr = s.address?.toLowerCase().includes(q);
-        return matchName || matchPhone || matchCode || matchAddr;
+        const matchEmail = s.email?.toLowerCase().includes(q);
+        const matchDob = s.dob?.includes(q);
+        const matchFather = s.father_name?.toLowerCase().includes(q);
+        const matchSpouse = s.spouse_name?.toLowerCase().includes(q);
+        const matchOcc = s.father_spouse_occupation?.toLowerCase().includes(q);
+        const matchMarital = s.marital_status?.toLowerCase().includes(q);
+        return matchName || matchPhone || matchCode || matchAddr || matchEmail || matchDob || matchFather || matchSpouse || matchOcc || matchMarital;
       }
 
       return true;
@@ -956,7 +1118,15 @@ export class StudentsComponent implements OnInit {
       full_name: '',
       phone: '',
       whatsapp_number: '',
+      email: '',
+      dob: '',
       age: undefined,
+      marital_status: '',
+      father_name: '',
+      mother_name: '',
+      spouse_name: '',
+      father_spouse_occupation: '',
+      aadhar_card_url: '',
       address: '',
       qualification: '',
       batch_preference: 'Morning',
@@ -1023,17 +1193,39 @@ export class StudentsComponent implements OnInit {
     const list = this.filteredStudents();
     if (list.length === 0) return;
 
-    const headers = ['Student Code', 'Name', 'Phone', 'WhatsApp', 'Age', 'Address', 'Batch', 'Qualification', 'Prior Exp', 'Status', 'Date Applied'];
+    const headers = [
+      'Student Code',
+      'Name',
+      'Date Of Birth',
+      'Age',
+      'Mobile Number',
+      'Email',
+      'Marital Status',
+      'Father Name',
+      'Mother Name',
+      'Spouse Name',
+      'Father/Spouse Occupation',
+      'Aadhar Card URL',
+      'Address',
+      'Batch Preference',
+      'Status',
+      'Date Applied'
+    ];
     const rows = list.map(s => [
       s.student_code || '',
       `"${(s.full_name || '').replace(/"/g, '""')}"`,
-      s.phone || '',
-      s.whatsapp_number || '',
+      s.dob || '',
       s.age || '',
+      s.phone || '',
+      s.email || '',
+      s.marital_status || '',
+      `"${(s.father_name || '').replace(/"/g, '""')}"`,
+      `"${(s.mother_name || '').replace(/"/g, '""')}"`,
+      `"${(s.spouse_name || '').replace(/"/g, '""')}"`,
+      `"${(s.father_spouse_occupation || '').replace(/"/g, '""')}"`,
+      `"${(s.aadhar_card_url || '').replace(/"/g, '""')}"`,
       `"${(s.address || '').replace(/"/g, '""')}"`,
       s.batch_preference || '',
-      `"${(s.qualification || '').replace(/"/g, '""')}"`,
-      s.has_prior_experience || '',
       s.status || '',
       s.created_at ? s.created_at.slice(0, 10) : ''
     ]);
@@ -1050,12 +1242,16 @@ export class StudentsComponent implements OnInit {
 
   copyRecommendedFields(): void {
     const fields = 
-`1. Full Name (Short answer, Required)
-2. Mobile / WhatsApp Number (Short answer, Required)
-3. Age (Short answer, Optional)
-4. Residential Address / Village (Paragraph)
-5. Preferred Batch (Multiple choice: Morning, Afternoon, Evening)
-6. Qualification / Education (Short answer)`;
+`1. Name (Short answer, Required)
+2. Date Of Birth (Short answer / Date, Required)
+3. Mobile Number (Short answer, Required)
+4. Email (Short answer, Optional)
+5. Marital Status (Multiple choice: Single, Married, Divorced, Widowed)
+6. Father Name (Short answer, Optional)
+7. Mother Name (Short answer, Optional)
+8. Spouse Name (Short answer, Optional)
+9. Father/Spouse Occupation (Short answer, Optional)
+10. Aadhar Card (File upload or Drive link, Optional)`;
     navigator.clipboard.writeText(fields).then(() => {
       this.copiedType = 'fields';
       setTimeout(() => this.copiedType = '', 2500);
