@@ -26,8 +26,8 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
         </div>
 
         <div class="d-flex align-items-center gap-2 flex-wrap">
-          <!-- Quick Sync from Google Sheet if URL exists (Super Admin Only) -->
-          @if (isSuperAdmin() && googleSheetUrl) {
+          <!-- Quick Sync from Google Sheet if URL exists -->
+          @if (googleSheetUrl) {
             <button 
               type="button" 
               class="btn btn-success btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5 shadow-xs fw-semibold"
@@ -40,18 +40,16 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
             </button>
           }
 
-          <!-- Connect Google Form Modal Trigger (Super Admin Only) -->
-          @if (isSuperAdmin()) {
-            <button 
-              type="button" 
-              class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5 shadow-xs fw-semibold"
-              (click)="showWebhookModal = true"
-              title="Connect Google Form"
-            >
-              <i class="bi bi-google text-danger"></i>
-              <span>Connect Google Form</span>
-            </button>
-          }
+          <!-- Connect Google Form Modal Trigger -->
+          <button 
+            type="button" 
+            class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5 shadow-xs fw-semibold"
+            (click)="showWebhookModal = true"
+            title="Connect Google Form & Sync Sheet"
+          >
+            <i class="bi bi-google text-danger"></i>
+            <span>Connect Google Form</span>
+          </button>
 
           <!-- Export CSV -->
           <button 
@@ -101,12 +99,12 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
             <div>
               <div class="fw-bold small text-navy">Tailoring Class Staff Access</div>
               <div class="text-secondary small" style="font-size: 11px;">
-                You can assign students selected by the Super Admin to their <strong>Batch Number</strong> and <strong>Batch Timing</strong>. Student selection, details editing, and deletion are managed by the Super Admin.
+                You can create/connect Google Forms, sync & refresh student applications from Google Sheets, and assign selected students to their <strong>Batch Number</strong> and <strong>Batch Timing</strong>. Student selection, details editing, and deletion are managed by the Super Admin.
               </div>
             </div>
           </div>
           <span class="badge bg-primary text-white rounded-pill px-2.5 py-1 small">
-            <i class="bi bi-shield-check me-1"></i> Class Operations
+            <i class="bi bi-shield-check me-1"></i> Class Operations & Sync
           </span>
         </div>
       }
@@ -1060,6 +1058,7 @@ export class StudentsComponent implements OnInit {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem('tailoring_google_sheet_url', url);
       }
+      this.api.saveTailoringSheetUrl(url).subscribe({ next: () => {}, error: () => {} });
 
       // Extract Sheet ID
       const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
@@ -1250,6 +1249,21 @@ export class StudentsComponent implements OnInit {
   ngOnInit(): void {
     this.loadStudents();
     this.loadStats();
+    this.loadSheetUrl();
+  }
+
+  loadSheetUrl(): void {
+    this.api.getTailoringSheetUrl().subscribe({
+      next: (res) => {
+        if (res?.url) {
+          this.googleSheetUrl = res.url;
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('tailoring_google_sheet_url', res.url);
+          }
+        }
+      },
+      error: () => {}
+    });
   }
 
   loadStudents(): void {

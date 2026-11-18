@@ -242,4 +242,12 @@ export class ApiService {
   deleteStudent(id: number): Observable<any> {
     return this.http.delete<any>(`${this.base}/students/${id}`);
   }
+
+  getTailoringSheetUrl(): Observable<{ success: boolean; url: string }> {
+    return this.http.get<{ success: boolean; url: string }>(`${this.base}/students/config/sheet-url`);
+  }
+
+  saveTailoringSheetUrl(url: string): Observable<{ success: boolean; message: string; url: string }> {
+    return this.http.post<{ success: boolean; message: string; url: string }>(`${this.base}/students/config/sheet-url`, { url });
+  }
 }
