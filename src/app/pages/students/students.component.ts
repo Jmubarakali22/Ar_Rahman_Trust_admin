@@ -274,7 +274,7 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                       <div class="fw-semibold text-dark">{{ student.full_name }}</div>
                       <div class="small text-muted d-flex flex-wrap align-items-center gap-1.5 mt-0.5">
                         <span *ngIf="student.dob"><i class="bi bi-calendar-event me-0.5"></i> {{ student.dob }}</span>
-                        <span *ngIf="student.age">({{ student.age }} yrs)</span>
+                        <span *ngIf="getStudentAge(student) as age" class="fw-semibold text-primary">({{ age }} yrs)</span>
                         <span *ngIf="student.marital_status" class="badge bg-light text-secondary border py-0.5 px-1.5" style="font-size: 10px;">{{ student.marital_status }}</span>
                       </div>
                       <div *ngIf="student.address" class="text-muted small mt-0.5" style="font-size: 11px;">
@@ -466,8 +466,13 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                 </div>
 
                 <div class="col-md-6">
-                  <label class="form-label small fw-semibold text-secondary">Date of Birth (DOB)</label>
-                  <input type="text" class="form-control" [(ngModel)]="studentForm.dob" (blur)="onDobChange()" placeholder="e.g. 16/04/2002">
+                  <div class="d-flex align-items-center justify-content-between mb-1">
+                    <label class="form-label small fw-semibold text-secondary mb-0">Date of Birth (DOB)</label>
+                    <span *ngIf="calculateAge(studentForm.dob) as currentAge" class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 11px;">
+                      <i class="bi bi-clock-history me-1"></i> Current Age: {{ currentAge }} yrs
+                    </span>
+                  </div>
+                  <input type="text" class="form-control" [(ngModel)]="studentForm.dob" (input)="onDobChange()" (blur)="onDobChange()" placeholder="e.g. 16/04/2002">
                 </div>
 
                 <div class="col-md-6">
@@ -750,12 +755,12 @@ export class StudentsComponent implements OnInit {
     notes: ''
   };
 
-  calculateAge(dobStr?: string): number | undefined {
-    if (!dobStr) return undefined;
-    const trimmed = dobStr.trim();
+  calculateAge(dobStr?: string): number | null {
+    if (!dobStr) return null;
+    const trimmed = String(dobStr).trim();
     let birthDate: Date | null = null;
 
-    // DD/MM/YYYY or DD-MM-YYYY
+    // DD/MM/YYYY or DD-MM-YYYY or D/M/YYYY
     const dmyMatch = trimmed.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
     if (dmyMatch) {
       const day = parseInt(dmyMatch[1], 10);
@@ -763,7 +768,7 @@ export class StudentsComponent implements OnInit {
       const year = parseInt(dmyMatch[3], 10);
       birthDate = new Date(year, month, day);
     } else {
-      // YYYY-MM-DD
+      // YYYY-MM-DD or YYYY/MM/DD
       const ymdMatch = trimmed.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/);
       if (ymdMatch) {
         const year = parseInt(ymdMatch[1], 10);
@@ -778,7 +783,7 @@ export class StudentsComponent implements OnInit {
       }
     }
 
-    if (!birthDate || isNaN(birthDate.getTime())) return undefined;
+    if (!birthDate || isNaN(birthDate.getTime())) return null;
 
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -786,13 +791,25 @@ export class StudentsComponent implements OnInit {
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    return age >= 0 && age <= 120 ? age : undefined;
+    return age >= 10 && age <= 100 ? age : null;
+  }
+
+  getStudentAge(student: TailoringStudent): number | null {
+    if (student.dob) {
+      const calc = this.calculateAge(student.dob);
+      if (calc !== null) return calc;
+    }
+    if (student.age !== undefined && student.age !== null) {
+      const n = Number(student.age);
+      if (!isNaN(n) && n >= 10 && n <= 100) return n;
+    }
+    return null;
   }
 
   onDobChange(dob?: string): void {
     const val = dob !== undefined ? dob : this.studentForm.dob;
     const age = this.calculateAge(val);
-    if (age !== undefined) {
+    if (age !== null) {
       this.studentForm.age = age;
     }
   }
@@ -895,9 +912,12 @@ export class StudentsComponent implements OnInit {
         const rawAddr = addrIdx !== -1 ? row[addrIdx]?.trim() : '';
         const rawQual = qualIdx !== -1 ? row[qualIdx]?.trim() : '';
 
-        let calcAge = rawDob ? this.calculateAge(rawDob) : undefined;
-        if (calcAge === undefined && ageIdx !== -1 && row[ageIdx]) {
-          calcAge = parseInt(row[ageIdx], 10) || undefined;
+        let calcAge = rawDob ? this.calculateAge(rawDob) : null;
+        if (calcAge === null && ageIdx !== -1 && row[ageIdx]) {
+          const parsed = parseInt(row[ageIdx], 10);
+          if (!isNaN(parsed) && parsed >= 10 && parsed <= 100) {
+            calcAge = parsed;
+          }
         }
 
         const rawBatch = batchIdx !== -1 ? (row[batchIdx] || '').trim().toLowerCase() : '';
@@ -911,7 +931,7 @@ export class StudentsComponent implements OnInit {
           whatsapp_number: rawPhone,
           email: rawEmail || undefined,
           dob: rawDob || undefined,
-          age: calcAge,
+          age: calcAge ?? undefined,
           marital_status: rawMarital || undefined,
           father_name: rawFather || undefined,
           mother_name: rawMother || undefined,
@@ -1215,7 +1235,7 @@ export class StudentsComponent implements OnInit {
       s.student_code || '',
       `"${(s.full_name || '').replace(/"/g, '""')}"`,
       s.dob || '',
-      s.age || '',
+      this.getStudentAge(s) !== null ? this.getStudentAge(s) : '',
       s.phone || '',
       s.email || '',
       s.marital_status || '',

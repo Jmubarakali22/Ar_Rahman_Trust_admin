@@ -164,7 +164,7 @@ export interface TailoringStudent {
   phone: string;
   whatsapp_number?: string;
   email?: string;
-  age?: number;
+  age?: number | null;
   dob?: string;
   marital_status?: string;
   father_name?: string;
