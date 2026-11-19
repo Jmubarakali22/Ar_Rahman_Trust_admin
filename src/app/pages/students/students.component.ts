@@ -254,7 +254,7 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                 <th>Aadhar Card</th>
                 <th>Assigned Batch</th>
                 <th>Status</th>
-                <th class="text-end pe-3">Actions</th>
+                <th class="text-end pe-3" style="width: 240px; min-width: 240px;">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -390,7 +390,7 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                     </td>
 
                     <!-- Actions -->
-                    <td class="text-end pe-3" style="white-space: nowrap;">
+                    <td class="text-end pe-3" style="width: 240px; min-width: 240px; white-space: nowrap; vertical-align: middle;">
                       <div class="student-actions-group">
                         <!-- VIEW STUDENT DETAILS (For Both Tailoring Staff & Admin) -->
                         <button 
@@ -404,7 +404,7 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                         </button>
 
                         <!-- ASSIGN / UPDATE BATCH (Tailoring Staff & Super Admin) -->
-                        @if (student.status === 'selected' || student.status === 'in_training' || isSuperAdmin()) {
+                        @if (student.status === 'selected' || student.status === 'in_training' || (isSuperAdmin() && student.status !== 'applied')) {
                           <button 
                             type="button" 
                             class="btn-student-action btn-action-batch"
@@ -1295,16 +1295,17 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
       display: inline-flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 6px;
+      gap: 8px;
       flex-wrap: nowrap;
+      vertical-align: middle;
     }
     .btn-student-action {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 6px;
       height: 32px;
-      padding: 0 12px;
+      box-sizing: border-box;
       font-size: 11.5px;
       font-weight: 600;
       border-radius: 50rem !important;
@@ -1314,14 +1315,19 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
       cursor: pointer;
       text-decoration: none;
       line-height: 1;
+      vertical-align: middle;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
     .btn-student-action i {
       font-size: 12px;
       line-height: 1;
     }
-    /* 1. View Button: Soft sky/ocean blue styling */
+    /* 1. View Button: Soft sky/ocean blue styling - Fixed 76px width for perfect vertical alignment */
     .btn-action-view {
+      width: 76px !important;
+      min-width: 76px !important;
+      max-width: 76px !important;
+      padding: 0 !important;
       background-color: #f0f9ff;
       color: #0284c7;
       border-color: #bae6fd;
@@ -1333,8 +1339,12 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
       transform: translateY(-1px);
       box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25);
     }
-    /* 2. Assign / Update Batch Button: Brand Trust Navy styling */
+    /* 2. Assign / Update Batch Button: Brand Trust Navy styling - Fixed 138px matching Awaiting Selection */
     .btn-action-batch {
+      width: 138px !important;
+      min-width: 138px !important;
+      max-width: 138px !important;
+      padding: 0 !important;
       background-color: #0F3D63;
       color: #ffffff;
       border-color: #0F3D63;
@@ -1346,8 +1356,12 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
       transform: translateY(-1px);
       box-shadow: 0 3px 8px rgba(15, 61, 99, 0.25);
     }
-    /* 3. Quick Select Button: Soft Emerald styling */
+    /* 3. Quick Select Button: Soft Emerald styling - Fixed 138px matching width */
     .btn-action-select {
+      width: 138px !important;
+      min-width: 138px !important;
+      max-width: 138px !important;
+      padding: 0 !important;
       background-color: #ecfdf5;
       color: #059669;
       border-color: #a7f3d0;
@@ -1359,15 +1373,22 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
       transform: translateY(-1px);
       box-shadow: 0 3px 8px rgba(5, 150, 105, 0.25);
     }
-    /* 4. Awaiting Selection Status Pill (Staff): Clean Amber badge */
+    /* 4. Awaiting Selection Status Pill (Staff): Clean Amber badge - Matching 32px height & 138px width */
     .badge-action-awaiting {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 5px;
       height: 32px;
-      padding: 0 11px;
+      width: 138px !important;
+      min-width: 138px !important;
+      max-width: 138px !important;
+      box-sizing: border-box;
+      padding: 0 !important;
       font-size: 11px;
       font-weight: 600;
+      line-height: 1;
+      vertical-align: middle;
       border-radius: 50rem !important;
       background-color: #fffbeb;
       color: #b45309;
@@ -1376,6 +1397,7 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
     }
     .badge-action-awaiting i {
       font-size: 11px;
+      line-height: 1;
     }
     /* 5. Circular Action Icon Buttons (Super Admin Edit, Delete, Dropdown) */
     .btn-action-icon {
