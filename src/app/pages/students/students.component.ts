@@ -245,13 +245,12 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
       <!-- Students Table -->
       <div class="admin-card bg-white border rounded-3 shadow-xs overflow-hidden">
         <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0" style="min-width: 860px;">
+          <table class="table table-hover align-middle mb-0" style="min-width: 780px;">
             <thead class="bg-light table-light">
               <tr class="small text-uppercase text-secondary" style="font-size: 11px; letter-spacing: 0.5px;">
                 <th class="ps-3 py-3">Code / Date</th>
                 <th>Student Details</th>
                 <th>Contact</th>
-                <th>Family & Background</th>
                 <th>Aadhar Card</th>
                 <th>Assigned Batch</th>
                 <th>Status</th>
@@ -261,14 +260,14 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
             <tbody>
               @if (isLoading()) {
                 <tr>
-                  <td colspan="8" class="text-center py-5">
+                  <td colspan="7" class="text-center py-5">
                     <div class="spinner-border spinner-border-sm text-primary me-2"></div>
                     <span class="text-muted small">Loading tailoring students...</span>
                   </td>
                 </tr>
               } @else if (filteredStudents().length === 0) {
                 <tr>
-                  <td colspan="8" class="text-center py-5">
+                  <td colspan="7" class="text-center py-5">
                     <div class="text-muted">
                       <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
                       <div class="fw-semibold">No students found</div>
@@ -321,27 +320,6 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                     <td>
                       <div class="small fw-semibold text-dark">{{ student.phone }}</div>
                       <div *ngIf="student.email" class="text-muted" style="font-size: 11px;">{{ student.email }}</div>
-                    </td>
-
-                    <!-- Family & Background -->
-                    <td>
-                      <div class="small">
-                        <div *ngIf="student.father_name" class="text-dark">
-                          <span class="text-muted">F:</span> {{ student.father_name }}
-                        </div>
-                        <div *ngIf="student.mother_name" class="text-dark">
-                          <span class="text-muted">M:</span> {{ student.mother_name }}
-                        </div>
-                        <div *ngIf="student.spouse_name" class="text-dark">
-                          <span class="text-muted">Spouse:</span> {{ student.spouse_name }}
-                        </div>
-                        <div *ngIf="student.father_spouse_occupation" class="text-primary mt-0.5 fw-medium" style="font-size: 11px;">
-                          <i class="bi bi-briefcase me-0.5"></i> {{ student.father_spouse_occupation }}
-                        </div>
-                        <span *ngIf="!student.father_name && !student.mother_name && !student.spouse_name && !student.father_spouse_occupation" class="text-muted fst-italic" style="font-size: 11px;">
-                          -
-                        </span>
-                      </div>
                     </td>
 
                     <!-- Aadhar Card Document Link -->
@@ -1059,7 +1037,7 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
               </div>
 
               <!-- Section 3: Family & Background Information -->
-              <div class="card border mb-3 shadow-none rounded-3">
+              <div class="card border mb-3 shadow-none rounded-3" *ngIf="viewingStudent.father_name || viewingStudent.mother_name || viewingStudent.spouse_name || viewingStudent.guardian_name || viewingStudent.father_spouse_occupation || viewingStudent.family_income">
                 <div class="card-header bg-light py-2 px-3 border-bottom d-flex align-items-center gap-2">
                   <i class="bi bi-people text-info"></i>
                   <span class="fw-bold small text-uppercase" style="letter-spacing: 0.5px; color: #0F3D63;">Family & Background</span>
