@@ -390,35 +390,37 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                     </td>
 
                     <!-- Actions -->
-                    <td class="text-end pe-3">
-                      <div class="d-inline-flex align-items-center gap-1">
+                    <td class="text-end pe-3" style="white-space: nowrap;">
+                      <div class="student-actions-group">
                         <!-- VIEW STUDENT DETAILS (For Both Tailoring Staff & Admin) -->
                         <button 
                           type="button" 
-                          class="btn btn-sm btn-light border text-primary rounded-circle p-1.5 action-view-btn"
+                          class="btn-student-action btn-action-view"
                           (click)="openViewModal(student)"
-                          title="View Full Student Details"
+                          title="View Complete Student Details"
                         >
-                          <i class="bi bi-eye-fill"></i>
+                          <i class="bi bi-eye"></i>
+                          <span>View</span>
                         </button>
 
-                        <!-- ASSIGN BATCH BUTTON: For Tailoring Class Staff and Super Admin -->
+                        <!-- ASSIGN / UPDATE BATCH (Tailoring Staff & Super Admin) -->
                         @if (student.status === 'selected' || student.status === 'in_training' || isSuperAdmin()) {
                           <button 
                             type="button" 
-                            class="btn btn-sm btn-primary rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1 shadow-xs fw-semibold"
+                            class="btn-student-action btn-action-batch"
                             (click)="openAssignBatchModal(student)"
                             [title]="student.batch_number ? 'Update Assigned Batch Number & Timing' : 'Assign to Batch Number & Timing'"
                           >
                             <i class="bi bi-clock-history"></i>
-                            <span class="d-none d-md-inline">{{ student.batch_number ? 'Update Batch' : 'Assign Batch' }}</span>
+                            <span>{{ student.batch_number ? 'Update Batch' : 'Assign Batch' }}</span>
                           </button>
                         }
 
                         <!-- Tailoring Class Staff notice when student is waiting for Super Admin selection -->
                         @if (!isSuperAdmin() && student.status === 'applied') {
-                          <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-1 small" title="Super Admin must select this student before batch assignment">
-                            <i class="bi bi-hourglass-split me-1"></i> Awaiting Selection
+                          <span class="badge-action-awaiting" title="Super Admin must select this student before batch assignment">
+                            <i class="bi bi-hourglass-split"></i>
+                            <span>Awaiting Selection</span>
                           </span>
                         }
 
@@ -426,7 +428,7 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                         @if (isSuperAdmin() && student.status === 'applied') {
                           <button 
                             type="button" 
-                            class="btn btn-sm btn-success rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1 shadow-xs fw-semibold"
+                            class="btn-student-action btn-action-select"
                             (click)="quickSelectStudent(student)"
                             title="Super Admin: Mark Student as Selected"
                           >
@@ -440,7 +442,7 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                           <div class="dropdown d-inline-block">
                             <button 
                               type="button" 
-                              class="btn btn-sm btn-light border rounded-circle p-1.5" 
+                              class="btn-action-icon btn-dropdown" 
                               data-bs-toggle="dropdown"
                               title="Super Admin: Change Status"
                             >
@@ -462,11 +464,11 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                         @if (isSuperAdmin()) {
                           <button 
                             type="button" 
-                            class="btn btn-sm btn-light border rounded-circle p-1.5"
+                            class="btn-action-icon btn-edit"
                             (click)="openEditModal(student)"
                             title="Super Admin: Edit Student Details"
                           >
-                            <i class="bi bi-pencil-fill text-muted"></i>
+                            <i class="bi bi-pencil-fill"></i>
                           </button>
                         }
 
@@ -474,11 +476,11 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                         @if (isSuperAdmin()) {
                           <button 
                             type="button" 
-                            class="btn btn-sm btn-light border rounded-circle p-1.5"
+                            class="btn-action-icon btn-delete"
                             (click)="deleteStudent(student)"
                             title="Super Admin: Delete Student"
                           >
-                            <i class="bi bi-trash-fill text-danger"></i>
+                            <i class="bi bi-trash-fill"></i>
                           </button>
                         }
                       </div>
@@ -1288,14 +1290,128 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
       border-color: #38bdf8 !important;
       color: #0369a1 !important;
     }
-    .action-view-btn {
-      transition: all 0.15s ease-in-out;
+    /* Clean Modern Action Buttons for Students Table */
+    .student-actions-group {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-wrap: nowrap;
     }
-    .action-view-btn:hover {
-      background-color: #e0f2fe !important;
-      border-color: #0284c7 !important;
-      color: #0369a1 !important;
-      transform: scale(1.08);
+    .btn-student-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 32px;
+      padding: 0 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border-radius: 50rem !important;
+      border: 1px solid transparent;
+      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+      cursor: pointer;
+      text-decoration: none;
+      line-height: 1;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+    .btn-student-action i {
+      font-size: 12px;
+      line-height: 1;
+    }
+    /* 1. View Button: Soft sky/ocean blue styling */
+    .btn-action-view {
+      background-color: #f0f9ff;
+      color: #0284c7;
+      border-color: #bae6fd;
+    }
+    .btn-action-view:hover {
+      background-color: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25);
+    }
+    /* 2. Assign / Update Batch Button: Brand Trust Navy styling */
+    .btn-action-batch {
+      background-color: #0F3D63;
+      color: #ffffff;
+      border-color: #0F3D63;
+    }
+    .btn-action-batch:hover {
+      background-color: #0a2740;
+      color: #ffffff;
+      border-color: #0a2740;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(15, 61, 99, 0.25);
+    }
+    /* 3. Quick Select Button: Soft Emerald styling */
+    .btn-action-select {
+      background-color: #ecfdf5;
+      color: #059669;
+      border-color: #a7f3d0;
+    }
+    .btn-action-select:hover {
+      background-color: #059669;
+      color: #ffffff;
+      border-color: #059669;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(5, 150, 105, 0.25);
+    }
+    /* 4. Awaiting Selection Status Pill (Staff): Clean Amber badge */
+    .badge-action-awaiting {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 32px;
+      padding: 0 11px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 50rem !important;
+      background-color: #fffbeb;
+      color: #b45309;
+      border: 1px solid #fde68a;
+      white-space: nowrap;
+    }
+    .badge-action-awaiting i {
+      font-size: 11px;
+    }
+    /* 5. Circular Action Icon Buttons (Super Admin Edit, Delete, Dropdown) */
+    .btn-action-icon {
+      width: 32px !important;
+      height: 32px !important;
+      padding: 0 !important;
+      border-radius: 50% !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      background: #f8fafc;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+      transition: all 0.18s ease;
+      cursor: pointer;
+    }
+    .btn-action-icon:hover {
+      transform: translateY(-1px);
+    }
+    .btn-action-icon.btn-edit:hover {
+      background: #fef3c7;
+      color: #b45309;
+      border-color: #fde68a;
+      box-shadow: 0 2px 6px rgba(180, 83, 9, 0.15);
+    }
+    .btn-action-icon.btn-delete:hover {
+      background: #fee2e2;
+      color: #dc2626;
+      border-color: #fca5a5;
+      box-shadow: 0 2px 6px rgba(220, 38, 38, 0.15);
+    }
+    .btn-action-icon.btn-dropdown:hover {
+      background: #f1f5f9;
+      color: #334155;
+      border-color: #cbd5e1;
     }
     .btn-xs {
       padding: 0.15rem 0.45rem;
