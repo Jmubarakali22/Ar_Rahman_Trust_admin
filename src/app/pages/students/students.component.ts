@@ -21,7 +21,7 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
             </span>
           </div>
           <p class="text-muted small mb-0 mt-1">
-            Review student applications from Google Form, select candidates, manage training batches, and dispatch WhatsApp alerts.
+            Review student applications from Google Form, select candidates, and manage training batches.
           </p>
         </div>
 
@@ -99,7 +99,7 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
             <div>
               <div class="fw-bold small text-navy">Tailoring Class Staff Access</div>
               <div class="text-secondary small" style="font-size: 11px;">
-                You can create/connect Google Forms, sync & refresh student applications from Google Sheets, and assign selected students to their <strong>Batch Number</strong> and <strong>Batch Timing</strong>. Student selection, details editing, and deletion are managed by the Super Admin.
+                You can view complete student details, create/connect Google Forms, sync & refresh student applications from Google Sheets, and assign selected students to their <strong>Batch Number</strong> and <strong>Batch Timing</strong>. Student selection, details editing, and deletion are managed by the Super Admin.
               </div>
             </div>
           </div>
@@ -284,7 +284,12 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                   <tr>
                     <!-- Code & Date -->
                     <td class="ps-3">
-                      <span class="badge bg-light text-dark border font-monospace px-2 py-1" style="font-size: 11px;">
+                      <span 
+                        class="badge bg-light text-dark border font-monospace px-2 py-1 student-code-badge" 
+                        style="font-size: 11px;"
+                        (click)="openViewModal(student)"
+                        title="Click to view complete student details"
+                      >
                         {{ student.student_code || ('#' + student.id) }}
                       </span>
                       <div class="text-muted mt-1" style="font-size: 11px;">
@@ -294,7 +299,14 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
 
                     <!-- Student Details -->
                     <td>
-                      <div class="fw-semibold text-dark">{{ student.full_name }}</div>
+                      <div 
+                        class="fw-semibold text-dark student-name-link" 
+                        (click)="openViewModal(student)"
+                        role="button"
+                        title="Click to view complete student details"
+                      >
+                        {{ student.full_name }}
+                      </div>
                       <div class="small text-muted d-flex flex-wrap align-items-center gap-1.5 mt-0.5">
                         <span *ngIf="student.dob"><i class="bi bi-calendar-event me-0.5"></i> {{ student.dob }}</span>
                         <span *ngIf="getStudentAge(student) as age" class="fw-semibold text-primary">({{ age }} yrs)</span>
@@ -305,20 +317,10 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                       </div>
                     </td>
 
-                    <!-- Contact & WhatsApp -->
+                    <!-- Contact -->
                     <td>
                       <div class="small fw-semibold text-dark">{{ student.phone }}</div>
                       <div *ngIf="student.email" class="text-muted" style="font-size: 11px;">{{ student.email }}</div>
-                      <div class="d-flex align-items-center gap-1 mt-1">
-                        <a 
-                          [href]="'https://wa.me/91' + cleanPhoneForWa(student.whatsapp_number || student.phone)" 
-                          target="_blank"
-                          class="badge text-bg-success text-decoration-none d-inline-flex align-items-center gap-1 px-2 py-0.5"
-                          title="Open WhatsApp Chat"
-                        >
-                          <i class="bi bi-whatsapp"></i> Chat
-                        </a>
-                      </div>
                     </td>
 
                     <!-- Family & Background -->
@@ -412,6 +414,16 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                     <!-- Actions -->
                     <td class="text-end pe-3">
                       <div class="d-inline-flex align-items-center gap-1">
+                        <!-- VIEW STUDENT DETAILS (For Both Tailoring Staff & Admin) -->
+                        <button 
+                          type="button" 
+                          class="btn btn-sm btn-light border text-primary rounded-circle p-1.5 action-view-btn"
+                          (click)="openViewModal(student)"
+                          title="View Full Student Details"
+                        >
+                          <i class="bi bi-eye-fill"></i>
+                        </button>
+
                         <!-- ASSIGN BATCH BUTTON: For Tailoring Class Staff and Super Admin -->
                         @if (student.status === 'selected' || student.status === 'in_training' || isSuperAdmin()) {
                           <button 
@@ -444,16 +456,6 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                             <span>Select</span>
                           </button>
                         }
-
-                        <!-- WhatsApp Selection / Details Dispatch -->
-                        <button 
-                          type="button" 
-                          class="btn btn-sm btn-outline-success rounded-circle p-1.5"
-                          (click)="sendSelectionWhatsApp(student)"
-                          title="Send WhatsApp Message"
-                        >
-                          <i class="bi bi-whatsapp"></i>
-                        </button>
 
                         <!-- SUPER ADMIN ONLY: Change Status Dropdown -->
                         @if (isSuperAdmin()) {
@@ -758,17 +760,6 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
                   placeholder="e.g. Assigned Machine #3, Instructor: Sis Fatima"
                 >
               </div>
-
-              <!-- WhatsApp Notification Toggle -->
-              <div class="form-check form-switch p-3 bg-light rounded-3 border">
-                <input class="form-check-input ms-0 me-2" type="checkbox" id="sendWaCheck" [(ngModel)]="sendWaOnBatchAssign">
-                <label class="form-check-label small fw-semibold text-dark" for="sendWaCheck">
-                  <i class="bi bi-whatsapp text-success me-1"></i> Send Batch Confirmation via WhatsApp to Student
-                </label>
-                <div class="text-muted small ps-4 mt-0.5" style="font-size: 11px;">
-                  Will open WhatsApp with student's assigned Batch Number & Timing.
-                </div>
-              </div>
             </div>
 
             <div class="modal-footer border-top px-4 py-3 bg-light">
@@ -875,6 +866,384 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
       </div>
       <div class="modal-backdrop fade show" *ngIf="showWebhookModal"></div>
 
+      <!-- VIEW STUDENT DETAILS MODAL (FOR TAILORING CLASS STAFF & ADMIN) -->
+      <div 
+        class="modal fade" 
+        [class.show]="showViewModal" 
+        [style.display]="showViewModal ? 'block' : 'none'" 
+        tabindex="-1" 
+        *ngIf="showViewModal && viewingStudent"
+      >
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+          <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden" id="printable-student-modal">
+            <!-- Modal Header -->
+            <div class="modal-header border-bottom px-4 py-3 bg-light text-dark">
+              <div class="d-flex align-items-center gap-3">
+                <div class="avatar-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center shadow-xs" style="width: 44px; height: 44px; font-size: 18px; border-radius: 50%;">
+                  <i class="bi bi-person-fill"></i>
+                </div>
+                <div>
+                  <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <h5 class="modal-title fw-bold text-navy mb-0" style="color: #0F3D63;">{{ viewingStudent.full_name }}</h5>
+                    <span class="badge bg-light text-dark border font-monospace px-2.5 py-1" style="font-size: 11px;">
+                      {{ viewingStudent.student_code || ('#' + viewingStudent.id) }}
+                    </span>
+                    <!-- Status Badge -->
+                    @if (viewingStudent.status === 'applied') {
+                      <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 small">
+                        <i class="bi bi-clock me-1"></i> Pending Review
+                      </span>
+                    } @else if (viewingStudent.status === 'selected') {
+                      <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 small">
+                        <i class="bi bi-check-circle-fill me-1"></i> Selected
+                      </span>
+                    } @else if (viewingStudent.status === 'in_training') {
+                      <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1 small">
+                        <i class="bi bi-mortarboard me-1"></i> In Training
+                      </span>
+                    } @else if (viewingStudent.status === 'completed') {
+                      <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 small">
+                        <i class="bi bi-award-fill me-1"></i> Completed
+                      </span>
+                    } @else if (viewingStudent.status === 'rejected') {
+                      <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2.5 py-1 small">
+                        Rejected
+                      </span>
+                    }
+                  </div>
+                  <div class="text-muted small mt-0.5" style="font-size: 11px;">
+                    Registered on {{ viewingStudent.created_at | date:'dd MMM yyyy, hh:mm a' }} &bull; Source: <span class="text-capitalize">{{ (viewingStudent.source || 'Google Form').replace('_', ' ') }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 d-none d-sm-inline-flex align-items-center gap-1.5 no-print" 
+                  (click)="printStudentDetails()" 
+                  title="Print student details"
+                >
+                  <i class="bi bi-printer"></i>
+                  <span>Print</span>
+                </button>
+                <button type="button" class="btn-close no-print" (click)="closeViewModal()"></button>
+              </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-4">
+              <!-- Fast Highlights Strip -->
+              <div class="row g-2 mb-4">
+                <div class="col-6 col-md-3">
+                  <div class="p-2.5 bg-light rounded-3 border text-center h-100">
+                    <div class="text-muted small fw-medium" style="font-size: 10px; letter-spacing: 0.5px;">PREFERRED BATCH</div>
+                    <div class="fw-bold text-dark mt-0.5">{{ viewingStudent.batch_preference || 'Morning' }}</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="p-2.5 bg-light rounded-3 border text-center h-100">
+                    <div class="text-muted small fw-medium" style="font-size: 10px; letter-spacing: 0.5px;">ASSIGNED BATCH</div>
+                    <div class="fw-bold mt-0.5" [class.text-primary]="viewingStudent.batch_number" [class.text-secondary]="!viewingStudent.batch_number">
+                      {{ viewingStudent.batch_number || 'Not Assigned' }}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="p-2.5 bg-light rounded-3 border text-center h-100">
+                    <div class="text-muted small fw-medium" style="font-size: 10px; letter-spacing: 0.5px;">AGE & DOB</div>
+                    <div class="fw-bold text-dark mt-0.5">
+                      {{ getStudentAge(viewingStudent) ? (getStudentAge(viewingStudent) + ' yrs') : 'N/A' }}
+                      <span *ngIf="viewingStudent.dob" class="text-muted fw-normal small">({{ viewingStudent.dob }})</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="p-2.5 bg-light rounded-3 border text-center h-100">
+                    <div class="text-muted small fw-medium" style="font-size: 10px; letter-spacing: 0.5px;">MOBILE NUMBER</div>
+                    <div class="fw-bold text-success mt-0.5">{{ viewingStudent.phone }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 1: Personal & Demographic Information -->
+              <div class="card border mb-3 shadow-none rounded-3">
+                <div class="card-header bg-light py-2 px-3 border-bottom d-flex align-items-center gap-2">
+                  <i class="bi bi-person-vcard text-primary"></i>
+                  <span class="fw-bold small text-uppercase" style="letter-spacing: 0.5px; color: #0F3D63;">Personal & Demographic Information</span>
+                </div>
+                <div class="card-body p-3">
+                  <div class="row g-3">
+                    <div class="col-sm-6 col-md-4">
+                      <div class="text-muted small" style="font-size: 11px;">FULL NAME</div>
+                      <div class="fw-semibold text-dark">{{ viewingStudent.full_name }}</div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="text-muted small" style="font-size: 11px;">DATE OF BIRTH (DOB)</div>
+                      <div class="fw-semibold text-dark">{{ viewingStudent.dob || 'Not specified' }}</div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="text-muted small" style="font-size: 11px;">CURRENT AGE</div>
+                      <div class="fw-semibold text-dark">
+                        {{ getStudentAge(viewingStudent) ? (getStudentAge(viewingStudent) + ' Years') : (viewingStudent.age ? viewingStudent.age + ' Years' : 'Not recorded') }}
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="text-muted small" style="font-size: 11px;">MARITAL STATUS</div>
+                      <div class="fw-semibold text-dark">
+                        <span *ngIf="viewingStudent.marital_status" class="badge bg-light text-secondary border px-2 py-0.5">
+                          {{ viewingStudent.marital_status }}
+                        </span>
+                        <span *ngIf="!viewingStudent.marital_status" class="text-muted">Not specified</span>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="text-muted small" style="font-size: 11px;">EDUCATIONAL QUALIFICATION</div>
+                      <div class="fw-semibold text-dark">{{ viewingStudent.qualification || 'Not provided' }}</div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="text-muted small" style="font-size: 11px;">PRIOR TAILORING EXPERIENCE</div>
+                      <div class="fw-semibold text-dark">
+                        <span class="badge" [class.bg-success-subtle]="viewingStudent.has_prior_experience === 'Yes'" [class.text-success]="viewingStudent.has_prior_experience === 'Yes'" [class.bg-light]="viewingStudent.has_prior_experience !== 'Yes'" [class.text-muted]="viewingStudent.has_prior_experience !== 'Yes'">
+                          {{ viewingStudent.has_prior_experience || 'No' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 2: Contact & Address Information -->
+              <div class="card border mb-3 shadow-none rounded-3">
+                <div class="card-header bg-light py-2 px-3 border-bottom d-flex align-items-center gap-2">
+                  <i class="bi bi-geo-alt text-danger"></i>
+                  <span class="fw-bold small text-uppercase" style="letter-spacing: 0.5px; color: #0F3D63;">Contact & Residence</span>
+                </div>
+                <div class="card-body p-3">
+                  <div class="row g-3">
+                    <div class="col-sm-6 col-md-4">
+                      <div class="text-muted small" style="font-size: 11px;">MOBILE NUMBER</div>
+                      <div class="d-flex align-items-center gap-2 mt-0.5">
+                        <span class="fw-semibold text-dark">{{ viewingStudent.phone }}</span>
+                        <a [href]="'tel:' + viewingStudent.phone" class="btn btn-xs btn-outline-primary py-0 px-1.5 rounded" title="Call">
+                          <i class="bi bi-telephone-fill" style="font-size: 10px;"></i>
+                        </a>
+                        <button type="button" class="btn btn-xs btn-light border py-0 px-1.5 rounded" (click)="copyToClipboard(viewingStudent.phone, 'view_phone')" title="Copy Phone">
+                          <i class="bi" [class.bi-check-lg]="copiedType === 'view_phone'" [class.bi-clipboard]="copiedType !== 'view_phone'" style="font-size: 10px;"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="text-muted small" style="font-size: 11px;">WHATSAPP NUMBER</div>
+                      <div class="fw-semibold text-dark mt-0.5">
+                        {{ viewingStudent.whatsapp_number || viewingStudent.phone }}
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="text-muted small" style="font-size: 11px;">EMAIL ADDRESS</div>
+                      <div class="fw-semibold text-dark mt-0.5">
+                        <a *ngIf="viewingStudent.email" [href]="'mailto:' + viewingStudent.email" class="text-decoration-none">
+                          {{ viewingStudent.email }}
+                        </a>
+                        <span *ngIf="!viewingStudent.email" class="text-muted">Not provided</span>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="text-muted small" style="font-size: 11px;">RESIDENTIAL ADDRESS / VILLAGE</div>
+                      <div class="fw-medium text-dark mt-0.5">
+                        <i class="bi bi-pin-map text-danger me-1"></i>
+                        {{ viewingStudent.address || 'Address not recorded' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 3: Family & Background Information -->
+              <div class="card border mb-3 shadow-none rounded-3">
+                <div class="card-header bg-light py-2 px-3 border-bottom d-flex align-items-center gap-2">
+                  <i class="bi bi-people text-info"></i>
+                  <span class="fw-bold small text-uppercase" style="letter-spacing: 0.5px; color: #0F3D63;">Family & Background</span>
+                </div>
+                <div class="card-body p-3">
+                  <div class="row g-3">
+                    <div class="col-sm-6 col-md-4">
+                      <div class="text-muted small" style="font-size: 11px;">FATHER'S NAME</div>
+                      <div class="fw-semibold text-dark">{{ viewingStudent.father_name || '-' }}</div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="text-muted small" style="font-size: 11px;">MOTHER'S NAME</div>
+                      <div class="fw-semibold text-dark">{{ viewingStudent.mother_name || '-' }}</div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="text-muted small" style="font-size: 11px;">SPOUSE / HUSBAND NAME</div>
+                      <div class="fw-semibold text-dark">{{ viewingStudent.spouse_name || '-' }}</div>
+                    </div>
+                    <div class="col-sm-6 col-md-4" *ngIf="viewingStudent.guardian_name">
+                      <div class="text-muted small" style="font-size: 11px;">GUARDIAN NAME</div>
+                      <div class="fw-semibold text-dark">{{ viewingStudent.guardian_name }}</div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="text-muted small" style="font-size: 11px;">FATHER / SPOUSE OCCUPATION</div>
+                      <div class="fw-semibold text-primary">
+                        <i class="bi bi-briefcase me-1" *ngIf="viewingStudent.father_spouse_occupation"></i>
+                        {{ viewingStudent.father_spouse_occupation || '-' }}
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4" *ngIf="viewingStudent.family_income">
+                      <div class="text-muted small" style="font-size: 11px;">MONTHLY FAMILY INCOME</div>
+                      <div class="fw-semibold text-dark">{{ viewingStudent.family_income }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 4: Training, Batch & Allocation Details -->
+              <div class="card border mb-3 shadow-none rounded-3">
+                <div class="card-header bg-light py-2 px-3 border-bottom d-flex align-items-center gap-2">
+                  <i class="bi bi-clock-history text-primary"></i>
+                  <span class="fw-bold small text-uppercase" style="letter-spacing: 0.5px; color: #0F3D63;">Batch Schedule & Class Operations</span>
+                </div>
+                <div class="card-body p-3">
+                  <div class="row g-3">
+                    <div class="col-sm-6 col-md-3">
+                      <div class="text-muted small" style="font-size: 11px;">PREFERRED BATCH TIMING</div>
+                      <div class="fw-semibold text-dark mt-0.5">{{ viewingStudent.batch_preference || 'Morning' }}</div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                      <div class="text-muted small" style="font-size: 11px;">ASSIGNED BATCH NUMBER</div>
+                      <div class="mt-0.5">
+                        <span *ngIf="viewingStudent.batch_number" class="badge bg-primary text-white rounded-pill px-2.5 py-1 fw-semibold">
+                          <i class="bi bi-tag-fill me-1"></i> {{ viewingStudent.batch_number }}
+                        </span>
+                        <span *ngIf="!viewingStudent.batch_number" class="badge bg-light text-secondary border rounded-pill px-2 py-0.5">
+                          Not Assigned Yet
+                        </span>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                      <div class="text-muted small" style="font-size: 11px;">ASSIGNED BATCH TIMING</div>
+                      <div class="fw-semibold text-dark mt-0.5">
+                        <i class="bi bi-clock me-1 text-secondary" *ngIf="viewingStudent.batch_timing"></i>
+                        {{ viewingStudent.batch_timing || '-' }}
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                      <div class="text-muted small" style="font-size: 11px;">CURRENT STATUS</div>
+                      <div class="fw-semibold text-dark mt-0.5 text-capitalize">{{ viewingStudent.status.replace('_', ' ') }}</div>
+                    </div>
+                    <div class="col-sm-6 col-md-4" *ngIf="viewingStudent.selected_date">
+                      <div class="text-muted small" style="font-size: 11px;">ADMISSION SELECTED DATE</div>
+                      <div class="fw-semibold text-success mt-0.5">{{ viewingStudent.selected_date | date:'dd MMM yyyy, hh:mm a' }}</div>
+                    </div>
+                    <div class="col-sm-6 col-md-4" *ngIf="viewingStudent.completed_date">
+                      <div class="text-muted small" style="font-size: 11px;">COURSE COMPLETED DATE</div>
+                      <div class="fw-semibold text-primary mt-0.5">{{ viewingStudent.completed_date | date:'dd MMM yyyy, hh:mm a' }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 5: Aadhar Card Document -->
+              <div class="card border mb-3 shadow-none rounded-3">
+                <div class="card-header bg-light py-2 px-3 border-bottom d-flex align-items-center gap-2">
+                  <i class="bi bi-file-earmark-person text-danger"></i>
+                  <span class="fw-bold small text-uppercase" style="letter-spacing: 0.5px; color: #0F3D63;">Identity Document (Aadhar Card)</span>
+                </div>
+                <div class="card-body p-3">
+                  @if (viewingStudent.aadhar_card_url) {
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 p-3 bg-light rounded-3 border">
+                      <div class="d-flex align-items-center gap-2.5">
+                        <i class="bi bi-file-earmark-pdf-fill text-danger fs-2"></i>
+                        <div>
+                          <div class="fw-bold text-dark small">Aadhar Card Document Link</div>
+                          <div class="text-muted text-truncate small" style="max-width: 400px; font-size: 11px;">
+                            {{ viewingStudent.aadhar_card_url }}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1" (click)="copyToClipboard(viewingStudent.aadhar_card_url, 'view_aadhar')" title="Copy Document Link">
+                          <i class="bi" [class.bi-check-lg]="copiedType === 'view_aadhar'" [class.bi-clipboard]="copiedType !== 'view_aadhar'"></i>
+                          <span>{{ copiedType === 'view_aadhar' ? 'Copied' : 'Copy Link' }}</span>
+                        </button>
+                        <a 
+                          [href]="viewingStudent.aadhar_card_url" 
+                          target="_blank" 
+                          class="btn btn-sm btn-primary rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1.5 shadow-xs fw-semibold"
+                        >
+                          <i class="bi bi-box-arrow-up-right"></i>
+                          <span>Open Document</span>
+                        </a>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="p-3 bg-light rounded-3 text-center text-muted small">
+                      <i class="bi bi-info-circle me-1"></i> No Aadhar card or identity proof has been uploaded for this student.
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Section 6: Notes & Remarks -->
+              <div class="card border mb-0 shadow-none rounded-3">
+                <div class="card-header bg-light py-2 px-3 border-bottom d-flex align-items-center gap-2">
+                  <i class="bi bi-chat-left-text text-secondary"></i>
+                  <span class="fw-bold small text-uppercase" style="letter-spacing: 0.5px; color: #0F3D63;">Staff & Admin Remarks</span>
+                </div>
+                <div class="card-body p-3">
+                  <div *ngIf="viewingStudent.notes" class="p-3 bg-light rounded-3 border text-dark small" style="white-space: pre-wrap;">
+                    {{ viewingStudent.notes }}
+                  </div>
+                  <div *ngIf="!viewingStudent.notes" class="text-muted small fst-italic">
+                    No notes or remarks entered for this student.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-top px-4 py-3 bg-light d-flex align-items-center justify-content-between flex-wrap gap-2 no-print">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-light text-secondary border small py-1 px-2.5">
+                  <i class="bi bi-shield-check text-primary me-1"></i> Visible to Tailoring Staff & Admin
+                </span>
+              </div>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <!-- Close Button -->
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-3.5 py-1.5 small fw-semibold" (click)="closeViewModal()">
+                  Close
+                </button>
+
+                <!-- Assign Batch Button (Tailoring Staff & Super Admin) -->
+                @if (viewingStudent.status === 'selected' || viewingStudent.status === 'in_training' || isSuperAdmin()) {
+                  <button 
+                    type="button" 
+                    class="btn btn-primary rounded-pill px-3.5 py-1.5 small d-inline-flex align-items-center gap-1.5 shadow-xs fw-semibold"
+                    (click)="openAssignBatchFromView()"
+                  >
+                    <i class="bi bi-clock-history"></i>
+                    <span>{{ viewingStudent.batch_number ? 'Update Batch' : 'Assign Batch' }}</span>
+                  </button>
+                }
+
+                <!-- Edit Student Button (Super Admin Only) -->
+                @if (isSuperAdmin()) {
+                  <button 
+                    type="button" 
+                    class="btn btn-trust-primary rounded-pill px-3.5 py-1.5 small d-inline-flex align-items-center gap-1.5 shadow-xs fw-semibold"
+                    (click)="openEditFromView()"
+                  >
+                    <i class="bi bi-pencil-fill"></i>
+                    <span>Edit Student</span>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show" *ngIf="showViewModal"></div>
+
     </div>
   `,
   styles: [`
@@ -924,6 +1293,58 @@ import { TailoringStudent, StudentStats } from '../../core/models/models';
     @keyframes spin {
       100% { transform: rotate(360deg); }
     }
+    .student-name-link {
+      cursor: pointer;
+      transition: color 0.15s ease-in-out;
+    }
+    .student-name-link:hover {
+      color: #0d6efd !important;
+      text-decoration: underline;
+    }
+    .student-code-badge {
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+    }
+    .student-code-badge:hover {
+      background-color: #e0f2fe !important;
+      border-color: #38bdf8 !important;
+      color: #0369a1 !important;
+    }
+    .action-view-btn {
+      transition: all 0.15s ease-in-out;
+    }
+    .action-view-btn:hover {
+      background-color: #e0f2fe !important;
+      border-color: #0284c7 !important;
+      color: #0369a1 !important;
+      transform: scale(1.08);
+    }
+    .btn-xs {
+      padding: 0.15rem 0.45rem;
+      font-size: 0.75rem;
+    }
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #printable-student-modal, #printable-student-modal * {
+        visibility: visible !important;
+      }
+      #printable-student-modal {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 20px !important;
+        background: white !important;
+        box-shadow: none !important;
+      }
+      .modal-backdrop, .btn-close, .modal-footer, .no-print {
+        display: none !important;
+      }
+    }
   `]
 })
 export class StudentsComponent implements OnInit {
@@ -934,6 +1355,10 @@ export class StudentsComponent implements OnInit {
   selectedStatus = signal<string>('all');
   selectedBatch = 'all';
   searchQuery = '';
+
+  // View Details Modal State (Available for Both Tailoring Class Staff & Admin)
+  showViewModal = false;
+  viewingStudent: TailoringStudent | null = null;
 
   // Form Modal
   showFormModal = false;
@@ -969,7 +1394,6 @@ export class StudentsComponent implements OnInit {
   isSavingBatch = false;
   selectedStudentForBatch: TailoringStudent | null = null;
   customBatchNumber = '';
-  sendWaOnBatchAssign = true;
 
   assignBatchForm = {
     batch_number: 'Batch 1',
@@ -1328,6 +1752,45 @@ export class StudentsComponent implements OnInit {
     this.selectedStatus.set(status);
   }
 
+  // View Student Details Modal Operations (Tailoring Class Staff & Admin)
+  openViewModal(student: TailoringStudent): void {
+    this.viewingStudent = student;
+    this.showViewModal = true;
+    if (student.id) {
+      this.api.getStudent(student.id).subscribe({
+        next: (res) => {
+          if (res?.data && this.viewingStudent?.id === student.id) {
+            this.viewingStudent = res.data;
+          }
+        },
+        error: () => {}
+      });
+    }
+  }
+
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.viewingStudent = null;
+  }
+
+  openAssignBatchFromView(): void {
+    if (!this.viewingStudent) return;
+    const st = this.viewingStudent;
+    this.closeViewModal();
+    this.openAssignBatchModal(st);
+  }
+
+  openEditFromView(): void {
+    if (!this.viewingStudent) return;
+    const st = this.viewingStudent;
+    this.closeViewModal();
+    this.openEditModal(st);
+  }
+
+  printStudentDetails(): void {
+    window.print();
+  }
+
   // Assign Batch Modal Operations (Tailoring Class Staff & Super Admin)
   openAssignBatchModal(student: TailoringStudent): void {
     this.selectedStudentForBatch = student;
@@ -1378,8 +1841,14 @@ export class StudentsComponent implements OnInit {
         this.loadStudents();
         this.loadStats();
 
-        if (this.sendWaOnBatchAssign) {
-          this.sendBatchAssignedWhatsApp(student, finalBatchNum, this.assignBatchForm.batch_timing);
+        if (this.viewingStudent && this.viewingStudent.id === student.id) {
+          this.viewingStudent = {
+            ...this.viewingStudent,
+            batch_number: finalBatchNum,
+            batch_timing: this.assignBatchForm.batch_timing,
+            status: this.assignBatchForm.status,
+            notes: this.assignBatchForm.notes
+          };
         }
       },
       error: (err) => {
@@ -1387,22 +1856,6 @@ export class StudentsComponent implements OnInit {
         alert('Failed to assign batch: ' + (err.error?.message || err.message));
       }
     });
-  }
-
-  sendBatchAssignedWhatsApp(student: TailoringStudent, batchNum: string, batchTiming: string): void {
-    const cleanPhone = this.cleanPhoneForWa(student.whatsapp_number || student.phone);
-    const msg = encodeURIComponent(
-      `Assalamu Alaikum wa Rahmatullahi wa Barakatuh ${student.full_name},\n\n` +
-      `You have been assigned to your batch for the *Ar Rahman Trust Free Tailoring Class*:\n\n` +
-      `Student Code: *${student.student_code || '#' + student.id}*\n` +
-      `Assigned Batch: *${batchNum}*\n` +
-      `Batch Timing: *${batchTiming}*\n` +
-      `Center: Ar Rahman Trust Training Center, Pernambut.\n\n` +
-      `Please report to the training center on time for your regular sessions.\n\n` +
-      `For inquiries: +91 80156 65648\n` +
-      `Ar Rahman Trust, Pernambut`
-    );
-    window.open(`https://wa.me/91${cleanPhone}?text=${msg}`, '_blank');
   }
 
   quickSelectStudent(student: TailoringStudent): void {
@@ -1414,14 +1867,10 @@ export class StudentsComponent implements OnInit {
       next: () => {
         this.students.update(list => list.map(s => s.id === student.id ? { ...s, status: 'selected' } : s));
         this.loadStats();
-
-        const sendMsg = confirm(
-          `🎉 Student "${student.full_name}" is now SELECTED for ${student.batch_preference || 'Morning'} Batch!\n\n` +
-          `Would you like to send the Admission Confirmation message to the student on WhatsApp (${student.phone}) now?`
-        );
-        if (sendMsg) {
-          this.sendSelectionWhatsApp(student);
+        if (this.viewingStudent && this.viewingStudent.id === student.id) {
+          this.viewingStudent = { ...this.viewingStudent, status: 'selected' };
         }
+        alert(`🎉 Student "${student.full_name}" is now SELECTED for ${student.batch_preference || 'Morning'} Batch!`);
       },
       error: (err) => alert('Failed to select student: ' + (err.error?.message || err.message))
     });
@@ -1437,23 +1886,12 @@ export class StudentsComponent implements OnInit {
         // Optimistic update
         this.students.update(list => list.map(s => s.id === id ? { ...s, status } : s));
         this.loadStats();
+        if (this.viewingStudent && this.viewingStudent.id === id) {
+          this.viewingStudent = { ...this.viewingStudent, status };
+        }
       },
       error: (err) => alert('Failed to update status: ' + (err.error?.message || err.message))
     });
-  }
-
-  sendSelectionWhatsApp(student: TailoringStudent): void {
-    const cleanPhone = this.cleanPhoneForWa(student.whatsapp_number || student.phone);
-    const msg = encodeURIComponent(
-      `Assalamu Alaikum wa Rahmatullahi wa Barakatuh ${student.full_name},\n\n` +
-      `We are pleased to inform you that you have been SELECTED for the *Ar Rahman Trust Free Tailoring Class* (${student.batch_preference || 'Morning'} Batch).\n\n` +
-      `Student Code: *${student.student_code || '#' + student.id}*\n` +
-      `Center: Ar Rahman Trust Training Center, Pernambut.\n\n` +
-      `Please visit our office to confirm your seat and collect your course materials.\n\n` +
-      `For inquiries: +91 80156 65648\n` +
-      `Ar Rahman Trust, Pernambut`
-    );
-    window.open(`https://wa.me/91${cleanPhone}?text=${msg}`, '_blank');
   }
 
   cleanPhoneForWa(phone: string): string {
@@ -1514,6 +1952,9 @@ export class StudentsComponent implements OnInit {
           this.showFormModal = false;
           this.loadStudents();
           this.loadStats();
+          if (this.viewingStudent && this.viewingStudent.id === this.editingStudentId) {
+            this.viewingStudent = { ...this.viewingStudent, ...this.studentForm } as TailoringStudent;
+          }
         },
         error: (err) => {
           this.isSaving = false;
@@ -1546,6 +1987,9 @@ export class StudentsComponent implements OnInit {
         next: () => {
           this.students.update(list => list.filter(s => s.id !== student.id));
           this.loadStats();
+          if (this.viewingStudent && this.viewingStudent.id === student.id) {
+            this.closeViewModal();
+          }
         },
         error: (err) => alert('Failed to delete student: ' + (err.error?.message || err.message))
       });
